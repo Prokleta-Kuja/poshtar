@@ -1,0 +1,44 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "poshtar (api)",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "build-poshtar",
+            "program": "${workspaceFolder}/src/poshtar/bin/Debug/net7.0/poshtar.dll",
+            "args": [],
+            "cwd": "${workspaceFolder}/src/poshtar",
+            "stopAtEntry": false,
+            // "serverReadyAction": {
+            //     "action": "openExternally",
+            //     "pattern": "\\bNow listening on:\\s+(https?://\\S+)"
+            // },
+            "env": {
+                "ASPNETCORE_ENVIRONMENT": "Development",
+                "ASPNETCORE_URLS": "http://+:5000",
+                "DEBUG": "1",
+                "HOSTNAME": "abcd.ica.hr",
+                "MASTER_USER": "kita",
+                "MASTER_SECRET": "pass"
+            },
+            "sourceFileMap": {
+                "/Views": "${workspaceFolder}/Views"
+            }
+        },
+        {
+            "name": "tester",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "build-tester",
+            "program": "${workspaceFolder}/src/tester/bin/Debug/net7.0/tester.dll",
+            "args": [],
+            "cwd": "${workspaceFolder}/src/tester",
+            "stopAtEntry": false,
+            "console": "internalConsole"
+        }
+    ]
+}
