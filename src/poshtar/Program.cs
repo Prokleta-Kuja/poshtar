@@ -1,9 +1,13 @@
 using System.Diagnostics;
-using System.Text.RegularExpressions;
+using System.Reflection;
+using System.Text.Json.Serialization;
+using FluentValidation;
+using MediatR;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
+using poshtar.Endpoints;
 using poshtar.Entities;
 using poshtar.Services;
 using Serilog;
@@ -32,7 +36,8 @@ public class Program
             var builder = WebApplication.CreateBuilder(args);
             builder.Host.UseSerilog();
             builder.Services.AddSmtp();
-            builder.Services.AddControllers();
+            builder.Services.AddMediatR(Assembly.GetExecutingAssembly());
+            builder.Services.AddValidatorsFromAssemblyContaining<Requests.DomainsValidator>();
             builder.Services.Configure<ForwardedHeadersOptions>(options => options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto);
             builder.Services.AddDataProtection().PersistKeysToDbContext<AppDbContext>();
             builder.Services.AddDbContextFactory<AppDbContext>(builder =>
@@ -48,6 +53,10 @@ public class Program
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
+            builder.Services.ConfigureHttpJsonOptions(o =>
+            {
+                o.SerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingDefault | JsonIgnoreCondition.WhenWritingNull;
+            });
 
             // In production, the React files will be served from this directory
             builder.Services.AddSpaStaticFiles(c => { c.RootPath = "spa"; });
@@ -70,11 +79,13 @@ public class Program
             }
             else
                 app.UseForwardedHeaders();
-            app.UseRouting();
+
             app.UseSpaStaticFiles();
             app.UseHttpsRedirection();
-            app.UseAuthorization();
-            app.MapControllers();
+            // app.UseAuthentication();
+            // app.UseAuthorization();
+
+            app.MapGroup("/api").MapApi();
 
             app.MapWhen(x => !x.Request.Path.Value!.StartsWith("/api/"), builder =>
             {
