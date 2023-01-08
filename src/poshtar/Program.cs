@@ -49,6 +49,9 @@ public class Program
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
 
+            // In production, the React files will be served from this directory
+            builder.Services.AddSpaStaticFiles(c => { c.RootPath = "spa"; });
+
             var app = builder.Build();
             await Initialize(app.Services);
 
@@ -67,10 +70,21 @@ public class Program
             }
             else
                 app.UseForwardedHeaders();
-
+            app.UseRouting();
+            app.UseSpaStaticFiles();
             app.UseHttpsRedirection();
             app.UseAuthorization();
             app.MapControllers();
+
+            app.MapWhen(x => !x.Request.Path.Value!.StartsWith("/api/"), builder =>
+            {
+                builder.UseSpa(spa =>
+                {
+                    spa.Options.SourcePath = "../client-app"; // ???
+                    if (app.Environment.IsDevelopment())
+                        spa.UseProxyToSpaDevelopmentServer("http://localhost:3000");
+                });
+            });
 
             app.Run();
 

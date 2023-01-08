@@ -11,7 +11,7 @@
 *.sln.docstates
 appsettings.*.json
 certs/
-/src/mailica/data
+/src/poshtar/data
 /dovecot/data
 /dovecot/config/*.conf
 
