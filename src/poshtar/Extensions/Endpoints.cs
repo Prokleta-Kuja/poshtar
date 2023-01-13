@@ -10,5 +10,6 @@ public static class EndpointExtensions
         //group.RequireAuthorization();
         group.MediateValidGet<Domains>("/domains");
         group.MediateValidGet<DomainById>("/domains/{id:int}");
+        group.RequestValidGet<MyDomainById, MyDomainVM>("/domains2/{id:int}");
     }
 }
