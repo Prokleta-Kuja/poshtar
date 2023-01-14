@@ -1,8 +1,5 @@
 using System.Diagnostics;
-using System.Reflection;
 using System.Text.Json.Serialization;
-using FluentValidation;
-using MediatR;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.EntityFrameworkCore;
@@ -36,8 +33,6 @@ public class Program
             var builder = WebApplication.CreateBuilder(args);
             builder.Host.UseSerilog();
             builder.Services.AddSmtp();
-            builder.Services.AddMediatR(Assembly.GetExecutingAssembly());
-            builder.Services.AddValidatorsFromAssemblyContaining<Requests.DomainsValidator>();
             builder.Services.Configure<ForwardedHeadersOptions>(options => options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto);
             builder.Services.AddDataProtection().PersistKeysToDbContext<AppDbContext>();
             builder.Services.AddDbContextFactory<AppDbContext>(builder =>
@@ -52,7 +47,11 @@ public class Program
 
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
-            builder.Services.AddSwaggerGen();
+            builder.Services.AddSwaggerGen(options =>
+            {
+                options.SupportNonNullableReferenceTypes();
+                options.UseAllOfToExtendReferenceSchemas();
+            });
             builder.Services.ConfigureHttpJsonOptions(o =>
             {
                 o.SerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingDefault | JsonIgnoreCondition.WhenWritingNull;
