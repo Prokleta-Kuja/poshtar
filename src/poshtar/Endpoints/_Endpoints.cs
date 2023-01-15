@@ -8,7 +8,7 @@ public static class Endpoints
     public static void MapApi(this RouteGroupBuilder group)
     {
         //group.RequireAuthorization()
-        group.MapEndpointGet<DomainById, DomainByIdResult>("/domains/{id:int}").WithName(nameof(DomainById)).WithTags("Domains");
+        group.MapEndpointGet<DomainById, DomainByIdResult>("/domains/{id:int}").WithName(nameof(DomainById)).WithTags("Domain");
     }
 
     internal static RouteHandlerBuilder MapEndpointGet<TRequest, TResponse>(this RouteGroupBuilder group, string template) where TRequest : IEndpointRequest<TResponse>
