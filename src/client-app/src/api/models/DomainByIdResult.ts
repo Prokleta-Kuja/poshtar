@@ -5,9 +5,9 @@
 import type { Boja } from './Boja';
 
 export type DomainByIdResult = {
-    domainId?: number;
-    name?: string;
+    domainId: number;
+    name: string;
     disabled?: string | null;
-    bojaMoja?: Boja;
+    bojaMoja: Boja;
 };
 

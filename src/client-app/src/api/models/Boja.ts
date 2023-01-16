@@ -3,7 +3,7 @@
 /* eslint-disable */
 
 export enum Boja {
-    CRVENA = 'Crvena',
-    PLAVA = 'Plava',
-    ZELENA = 'Zelena',
+    Crvena = 1,
+    Plava = 2,
+    Zelena = 3,
 }

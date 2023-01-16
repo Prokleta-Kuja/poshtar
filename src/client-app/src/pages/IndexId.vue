@@ -5,8 +5,11 @@ import { DomainByIdResult, DomainService } from "../api/"
 const dat = reactive<{ loading?: boolean, data?: DomainByIdResult }>({});
 
 const load = async () => {
-    const kurac = await DomainService.domainById(1);
-    dat.data = kurac;
+    // const kurac = await DomainService.domainById(1)
+    // dat.data = kurac;
+    DomainService.domainById(1)
+        .then(r => dat.data = r)
+        .catch(r => console.log(r));
 }
 
 load();

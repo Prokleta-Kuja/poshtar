@@ -1,4 +1,4 @@
-using System.Text.Json.Serialization;
+using System.ComponentModel.DataAnnotations;
 using Microsoft.EntityFrameworkCore;
 using poshtar.Entities;
 
@@ -30,13 +30,12 @@ public class DomainById : IEndpointRequest<DomainByIdResult>
 }
 public record DomainByIdResult
 {
-    public required int DomainId { get; init; } = default!;
-    public required string Name { get; init; } = default!;
+    [Required] public required int DomainId { get; init; } = default!;
+    [Required] public required string Name { get; init; } = default!;
     public required DateTime? Disabled { get; init; }
-    public Boja BojaMoja { get; set; } = Boja.Plava;
+    [Required] public Boja BojaMoja { get; set; } = Boja.Plava;
 }
 
-[JsonConverter(typeof(JsonStringEnumConverter))]
 public enum Boja
 {
     Crvena = 1,

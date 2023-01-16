@@ -1,5 +1,9 @@
+using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.OpenApi.Any;
+using Microsoft.OpenApi.Models;
 using Serilog;
+using Swashbuckle.AspNetCore.SwaggerGen;
 
 namespace poshtar.Endpoints;
 
@@ -86,7 +90,7 @@ public class BadResponse
         Errors = errors;
     }
 
-    public string ErrorMessage { get; set; }
+    [Required] public string ErrorMessage { get; set; }
     public IDictionary<string, string[]>? Errors { get; set; }
 }
 
@@ -105,4 +109,19 @@ public class ParamException : Exception
 }
 public class ForbiddenException : Exception { }
 public class NotFoundException : Exception { }
+#endregion
+
+#region OpenApi
+public class EnumSchemaFilter : ISchemaFilter
+{
+    public void Apply(OpenApiSchema schema, SchemaFilterContext context)
+    {
+        if (context.Type.IsEnum)
+        {
+            var array = new OpenApiArray();
+            array.AddRange(Enum.GetNames(context.Type).Select(n => new OpenApiString(n)));
+            schema.Extensions.Add("x-enum-varnames", array);
+        }
+    }
+}
 #endregion
