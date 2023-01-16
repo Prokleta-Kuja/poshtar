@@ -24,12 +24,14 @@ const router = createRouter({
       path: "/domains/:id",
       name: "route.domain",
       component: IndexId,
+      props: true,
     },
     {
       path: "/users",
       name: "route.users",
       component: Index,
     },
+    { path: "/:pathMatch(.*)*", name: "NotFound", component: Index }, // NotFound
   ],
 });
 

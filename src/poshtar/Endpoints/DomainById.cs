@@ -12,13 +12,20 @@ public class DomainById : IEndpointRequest<DomainByIdResult>
     {
         var logger = sp.GetRequiredService<ILogger<DomainById>>();
         var db = sp.GetRequiredService<AppDbContext>();
-        var domain = await db.Domains.Select(x => new DomainByIdResult
-        {
-            DomainId = x.DomainId,
-            Name = x.Name,
-            Disabled = x.Disabled
-        })
-        .FirstAsync();
+
+        var domain = await db.Domains
+            .Where(x => x.DomainId == Id)
+            .Select(x => new DomainByIdResult
+            {
+                DomainId = x.DomainId,
+                Name = x.Name,
+                Disabled = x.Disabled
+            })
+            .FirstOrDefaultAsync();
+
+        if (domain == null)
+            throw new NotFoundException();
+
         logger.LogInformation("OK");
         return domain;
     }

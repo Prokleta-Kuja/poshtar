@@ -62,7 +62,7 @@ public static class Endpoints
             }
             catch (NotFoundException)
             {
-                return TypedResults.NotFound();
+                return TypedResults.NotFound("Entity not found");
             }
             catch (Exception ex)
             {
