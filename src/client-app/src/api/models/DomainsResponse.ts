@@ -5,9 +5,11 @@
 import type { Domains } from './Domains';
 
 export type DomainsResponse = {
+    items: Array<Domains>;
     size: number;
     page: number;
     total: number;
-    items: Array<Domains>;
+    ascending?: boolean;
+    sortBy?: string | null;
 };
 

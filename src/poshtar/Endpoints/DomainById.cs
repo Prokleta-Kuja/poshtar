@@ -19,7 +19,14 @@ public class GetDomainById : IEndpointRequest<DomainByIdResponse>
             {
                 DomainId = x.DomainId,
                 Name = x.Name,
-                Disabled = x.Disabled
+                Host = x.Host,
+                Port = x.Port,
+                IsSecure = x.IsSecure,
+                Username = x.Username,
+                Disabled = x.Disabled,
+                AddressCount = x.Addresses.Count,
+                UserCount = x.Users.Count,
+
             })
             .FirstOrDefaultAsync();
 
@@ -37,15 +44,13 @@ public class GetDomainById : IEndpointRequest<DomainByIdResponse>
 }
 public record DomainByIdResponse
 {
-    [Required] public required int DomainId { get; init; } = default!;
-    [Required] public required string Name { get; init; } = default!;
-    public required DateTime? Disabled { get; init; }
-    [Required] public Boja BojaMoja { get; set; } = Boja.Plava;
-}
-
-public enum Boja
-{
-    Crvena = 1,
-    Plava = 2,
-    Zelena = 3,
+    [Required] public required int DomainId { get; init; }
+    [Required] public required string Name { get; init; }
+    public required string Host { get; set; }
+    public int Port { get; set; }
+    public bool IsSecure { get; set; }
+    public required string Username { get; set; }
+    public DateTime? Disabled { get; set; }
+    public int AddressCount { get; set; }
+    public int UserCount { get; set; }
 }

@@ -13,8 +13,10 @@ public static class Endpoints
     public static void MapApi(this RouteGroupBuilder group)
     {
         //group.RequireAuthorization()
-        group.MapEndpointGet<GetDomainById, DomainByIdResponse>("/domains/{id:int}").WithName(nameof(GetDomainById)).WithTags("Domain");
         group.MapEndpointGet<GetDomains, Response<Domains>>("/domains").WithName(nameof(GetDomains)).WithTags("Domain");
+        group.MapEndpointPost<CreateDomain, DomainCreateResponse>("/domains").WithName(nameof(CreateDomain)).WithTags("Domain");
+        group.MapEndpointGet<GetDomainById, DomainByIdResponse>("/domains/{id:int}").WithName(nameof(GetDomainById)).WithTags("Domain");
+        group.MapEndpointPut<UpdateDomain, DomainUpdateResponse>("/domains/{id:int}").WithName(nameof(UpdateDomain)).WithTags("Domain");
     }
 
     internal static RouteHandlerBuilder MapEndpointGet<TRequest, TResponse>(this RouteGroupBuilder group, string template) where TRequest : IEndpointRequest<TResponse>
@@ -26,6 +28,13 @@ public static class Endpoints
 
     internal static RouteHandlerBuilder MapEndpointPost<TRequest, TResponse>(this RouteGroupBuilder group, string template) where TRequest : IEndpointRequest<TResponse>
         => group.MapPost(template, HandleEndpointRequestAsync<TRequest, TResponse>())
+           .Produces<TResponse>()
+           .Produces<BadResponse>(StatusCodes.Status400BadRequest)
+           .Produces(StatusCodes.Status403Forbidden)
+           .Produces(StatusCodes.Status500InternalServerError);
+
+    internal static RouteHandlerBuilder MapEndpointPut<TRequest, TResponse>(this RouteGroupBuilder group, string template) where TRequest : IEndpointRequest<TResponse>
+        => group.MapPut(template, HandleEndpointRequestAsync<TRequest, TResponse>())
            .Produces<TResponse>()
            .Produces<BadResponse>(StatusCodes.Status400BadRequest)
            .Produces(StatusCodes.Status403Forbidden)
@@ -73,7 +82,7 @@ public static class Endpoints
             }
         };
     }
-    static IResult BadRequest(string message, IDictionary<string, string[]>? errors = null)
+    static IResult BadRequest(string message, IDictionary<string, string>? errors = null)
         => TypedResults.BadRequest(new BadResponse(message, errors));
 
     internal static IQueryable<T> Paginate<T>(this IQueryable<T> query, ListRequest request)
@@ -93,7 +102,7 @@ public static class Endpoints
 public interface IEndpointRequest<TResponse>
 {
     Task<TResponse> HandleAsync(IServiceProvider sp);
-    Dictionary<string, string[]> Validate(IServiceProvider sp)
+    Dictionary<string, string> Validate(IServiceProvider sp)
     {
         return new(0);
     }
@@ -101,14 +110,14 @@ public interface IEndpointRequest<TResponse>
 
 public class BadResponse
 {
-    public BadResponse(string message, IDictionary<string, string[]>? errors = null)
+    public BadResponse(string message, IDictionary<string, string>? errors = null)
     {
         ErrorMessage = message;
         Errors = errors;
     }
 
     [Required] public string ErrorMessage { get; set; }
-    public IDictionary<string, string[]>? Errors { get; set; }
+    public IDictionary<string, string>? Errors { get; set; }
 }
 
 public class ListRequest
@@ -147,14 +156,14 @@ public record Response<T>
 #region Exceptions
 public class ParamException : Exception
 {
-    public Dictionary<string, string[]> Errors { get; set; } = new();
-    public ParamException(string param, params string[] errors)
+    public Dictionary<string, string> Errors { get; set; } = new();
+    public ParamException(string param, string error)
     {
-        Errors.Add(param, errors);
+        Errors.Add(param, error);
     }
-    public void AddError(string param, params string[] errors)
+    public void AddError(string param, string error)
     {
-        Errors.Add(param, errors);
+        Errors.Add(param, error);
     }
 }
 public class ForbiddenException : Exception { }

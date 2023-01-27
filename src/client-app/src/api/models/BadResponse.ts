@@ -4,6 +4,6 @@
 
 export type BadResponse = {
     errorMessage: string;
-    errors?: Record<string, Array<string>> | null;
+    errors?: Record<string, string> | null;
 };
 
