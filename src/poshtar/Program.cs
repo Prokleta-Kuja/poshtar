@@ -49,6 +49,10 @@ public class Program
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen(options =>
             {
+                options.UseOneOfForPolymorphism();
+                options.UseAllOfForInheritance();
+
+                options.DescribeAllParametersInCamelCase();
                 options.SchemaFilter<EnumSchemaFilter>();
                 options.SupportNonNullableReferenceTypes();
                 options.UseAllOfToExtendReferenceSchemas();

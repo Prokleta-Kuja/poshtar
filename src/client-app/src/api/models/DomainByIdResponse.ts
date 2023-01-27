@@ -4,7 +4,7 @@
 
 import type { Boja } from './Boja';
 
-export type DomainByIdResult = {
+export type DomainByIdResponse = {
     domainId: number;
     name: string;
     disabled?: string | null;

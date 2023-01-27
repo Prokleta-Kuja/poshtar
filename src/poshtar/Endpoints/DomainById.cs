@@ -4,18 +4,18 @@ using poshtar.Entities;
 
 namespace poshtar.Endpoints;
 
-public class DomainById : IEndpointRequest<DomainByIdResult>
+public class GetDomainById : IEndpointRequest<DomainByIdResponse>
 {
     public int Id { get; set; }
 
-    public async Task<DomainByIdResult> HandleAsync(IServiceProvider sp)
+    public async Task<DomainByIdResponse> HandleAsync(IServiceProvider sp)
     {
-        var logger = sp.GetRequiredService<ILogger<DomainById>>();
+        var logger = sp.GetRequiredService<ILogger<GetDomainById>>();
         var db = sp.GetRequiredService<AppDbContext>();
 
         var domain = await db.Domains
             .Where(x => x.DomainId == Id)
-            .Select(x => new DomainByIdResult
+            .Select(x => new DomainByIdResponse
             {
                 DomainId = x.DomainId,
                 Name = x.Name,
@@ -35,7 +35,7 @@ public class DomainById : IEndpointRequest<DomainByIdResult>
         return new(0);
     }
 }
-public record DomainByIdResult
+public record DomainByIdResponse
 {
     [Required] public required int DomainId { get; init; } = default!;
     [Required] public required string Name { get; init; } = default!;

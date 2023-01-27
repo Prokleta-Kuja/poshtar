@@ -2,8 +2,8 @@ import { createApp } from "vue";
 import { createRouter, createWebHistory } from "vue-router";
 import "./styles.scss";
 import App from "./App.vue";
-import Index from "./pages/Index.vue";
-import IndexId from "./pages/IndexId.vue";
+import Index from "./views/Index.vue";
+import IndexId from "./views/IndexId.vue";
 import "~bootstrap";
 
 const router = createRouter({
@@ -21,7 +21,7 @@ const router = createRouter({
       component: Index,
     },
     {
-      path: "/domains/:id",
+      path: "/domains/:id(\\d+)",
       name: "route.domain",
       component: IndexId,
       props: true,
