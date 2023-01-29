@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.DataProtection;
 using Microsoft.EntityFrameworkCore;
 using poshtar.Entities;
 
@@ -15,17 +16,19 @@ public class CreateDomain : IEndpointRequest<DomainCreateResponse>
 
     public async Task<DomainCreateResponse> HandleAsync(IServiceProvider sp)
     {
-        var logger = sp.GetRequiredService<ILogger<CreateDomain>>();
-        var db = sp.GetRequiredService<AppDbContext>();
+        using var db = sp.GetRequiredService<AppDbContext>();
 
         Name = Name.Trim().ToLower();
         var isDuplicate = await db.Domains
             .AsNoTracking()
-            .Where(x => x.Name == Name)
+            .Where(d => d.Name == Name)
             .AnyAsync();
 
         if (isDuplicate)
             throw new ParamException(nameof(Name), "Already exists");
+
+        var dpProvider = sp.GetRequiredService<IDataProtectionProvider>();
+        var serverProtector = dpProvider.CreateProtector(nameof(Domain));
 
         var domain = new Domain
         {
@@ -34,7 +37,7 @@ public class CreateDomain : IEndpointRequest<DomainCreateResponse>
             Port = Port,
             IsSecure = IsSecure,
             Username = Username,
-            Password = Password,
+            Password = serverProtector.Protect(Password),
         };
 
         db.Domains.Add(domain);

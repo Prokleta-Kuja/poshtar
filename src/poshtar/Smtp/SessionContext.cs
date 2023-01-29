@@ -162,16 +162,16 @@ public class SessionContext : IDisposable
         }
         // TODO: when matched, add matched users to transaction so we already know which users to deliver to
         foreach (var address in domain.Addresses)
-            if (address.IsStatic)
+            if (address.IsStatic && address.Pattern.Equals(to.User, StringComparison.InvariantCultureIgnoreCase))
             {
-                if (address.Pattern.Equals(to.User, StringComparison.InvariantCultureIgnoreCase))
-                {
-                    Log("Matched recipient to address", new { recipient = to.ToString(), address = to.User, });
-                    return MailboxFilterResult.Yes;
-                }
+                Log("Matched recipient to address", new { recipient = to.ToString(), address = to.User, });
+                return MailboxFilterResult.Yes;
             }
             else if (Regex.IsMatch(to.User, address.Pattern, RegexOptions.IgnoreCase))
+            {
+                Log("Matched recipient to address", new { recipient = to.ToString(), address = to.User, });
                 return MailboxFilterResult.Yes;
+            }
 
         return MailboxFilterResult.NoTemporarily;
     }

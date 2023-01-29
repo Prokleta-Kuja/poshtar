@@ -10,22 +10,21 @@ public class GetDomainById : IEndpointRequest<DomainByIdResponse>
 
     public async Task<DomainByIdResponse> HandleAsync(IServiceProvider sp)
     {
-        var logger = sp.GetRequiredService<ILogger<GetDomainById>>();
-        var db = sp.GetRequiredService<AppDbContext>();
+        using var db = sp.GetRequiredService<AppDbContext>();
 
         var domain = await db.Domains
-            .Where(x => x.DomainId == Id)
-            .Select(x => new DomainByIdResponse
+            .Where(d => d.DomainId == Id)
+            .Select(d => new DomainByIdResponse
             {
-                DomainId = x.DomainId,
-                Name = x.Name,
-                Host = x.Host,
-                Port = x.Port,
-                IsSecure = x.IsSecure,
-                Username = x.Username,
-                Disabled = x.Disabled,
-                AddressCount = x.Addresses.Count,
-                UserCount = x.Users.Count,
+                DomainId = d.DomainId,
+                Name = d.Name,
+                Host = d.Host,
+                Port = d.Port,
+                IsSecure = d.IsSecure,
+                Username = d.Username,
+                Disabled = d.Disabled,
+                AddressCount = d.Addresses.Count,
+                UserCount = d.Users.Count,
 
             })
             .FirstOrDefaultAsync();
@@ -33,7 +32,6 @@ public class GetDomainById : IEndpointRequest<DomainByIdResponse>
         if (domain == null)
             throw new NotFoundException();
 
-        logger.LogInformation("OK");
         return domain;
     }
 

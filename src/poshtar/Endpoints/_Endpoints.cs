@@ -13,10 +13,23 @@ public static class Endpoints
     public static void MapApi(this RouteGroupBuilder group)
     {
         //group.RequireAuthorization()
-        group.MapEndpointGet<GetDomains, Response<Domains>>("/domains").WithName(nameof(GetDomains)).WithTags("Domain");
-        group.MapEndpointPost<CreateDomain, DomainCreateResponse>("/domains").WithName(nameof(CreateDomain)).WithTags("Domain");
-        group.MapEndpointGet<GetDomainById, DomainByIdResponse>("/domains/{id:int}").WithName(nameof(GetDomainById)).WithTags("Domain");
-        group.MapEndpointPut<UpdateDomain, DomainUpdateResponse>("/domains/{id:int}").WithName(nameof(UpdateDomain)).WithTags("Domain");
+        var domain = nameof(Entities.Domain);
+        group.MapEndpointGet<GetDomains, Response<Domains>>("/domains").WithName(nameof(GetDomains)).WithTags(domain);
+        group.MapEndpointPost<CreateDomain, DomainCreateResponse>("/domains").WithName(nameof(CreateDomain)).WithTags(domain);
+        group.MapEndpointGet<GetDomainById, DomainByIdResponse>("/domains/{id:int}").WithName(nameof(GetDomainById)).WithTags(domain);
+        group.MapEndpointPut<UpdateDomain, DomainUpdateResponse>("/domains/{id:int}").WithName(nameof(UpdateDomain)).WithTags(domain);
+
+        var user = nameof(Entities.User);
+        group.MapEndpointGet<GetUsers, Response<Users>>("/users").WithName(nameof(GetUsers)).WithTags(user);
+        group.MapEndpointPost<CreateUser, UserCreateResponse>("/users").WithName(nameof(CreateUser)).WithTags(user);
+        group.MapEndpointGet<GetUserById, UserByIdResponse>("/users/{id:int}").WithName(nameof(GetUserById)).WithTags(user);
+        group.MapEndpointPut<UpdateUser, UserUpdateResponse>("/users/{id:int}").WithName(nameof(UpdateUser)).WithTags(user);
+
+        var address = nameof(Entities.Address);
+        group.MapEndpointGet<GetAddresses, Response<Addresses>>("/addresses").WithName(nameof(GetAddresses)).WithTags(address);
+        group.MapEndpointPost<CreateAddress, AddressCreateResponse>("/addresses").WithName(nameof(CreateAddress)).WithTags(address);
+        group.MapEndpointGet<GetAddressById, AddressByIdResponse>("/addresses/{id:int}").WithName(nameof(GetAddressById)).WithTags(address);
+        group.MapEndpointPut<UpdateAddress, AddressUpdateResponse>("/addresses/{id:int}").WithName(nameof(UpdateAddress)).WithTags(address);
     }
 
     internal static RouteHandlerBuilder MapEndpointGet<TRequest, TResponse>(this RouteGroupBuilder group, string template) where TRequest : IEndpointRequest<TResponse>
@@ -88,7 +101,7 @@ public static class Endpoints
     internal static IQueryable<T> Paginate<T>(this IQueryable<T> query, ListRequest request)
     {
         if (request.Page.HasValue && request.Size.HasValue)
-            return query.Skip(request.Page.Value * request.Size.Value);
+            return query.Skip((request.Page.Value - 1) * request.Size.Value);
 
         return query;
     }

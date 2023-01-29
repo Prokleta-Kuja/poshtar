@@ -9,35 +9,34 @@ public class GetDomains : ListRequest, IEndpointRequest<Response<Domains>>
     public string? SearchTerm { get; set; }
     public async Task<Response<Domains>> HandleAsync(IServiceProvider sp)
     {
-        var logger = sp.GetRequiredService<ILogger<GetDomains>>();
-        var db = sp.GetRequiredService<AppDbContext>();
+        using var db = sp.GetRequiredService<AppDbContext>();
         var query = db.Domains.AsNoTracking();
 
         if (!string.IsNullOrWhiteSpace(SearchTerm))
-            query.Where(x => x.Name.Contains(SearchTerm) || x.Host.Contains(SearchTerm));
+            query = query.Where(d => EF.Functions.Like(d.Name, $"%{SearchTerm}%") || EF.Functions.Like(d.Host, $"%{SearchTerm}%"));
 
         var count = await query.CountAsync();
 
         if (!string.IsNullOrWhiteSpace(SortBy) && Enum.TryParse<DomainsSortBy>(SortBy, true, out var sortBy))
             query = sortBy switch
             {
-                DomainsSortBy.Name => query.Order(x => x.Name, Ascending),
-                DomainsSortBy.Host => query.Order(x => x.Host, Ascending),
-                DomainsSortBy.AddressCount => query.Order(x => x.Addresses.Count(), Ascending),
-                DomainsSortBy.UserCount => query.Order(x => x.Users.Count(), Ascending),
+                DomainsSortBy.Name => query.Order(d => d.Name, Ascending),
+                DomainsSortBy.Host => query.Order(d => d.Host, Ascending),
+                DomainsSortBy.AddressCount => query.Order(d => d.Addresses.Count(), Ascending),
+                DomainsSortBy.UserCount => query.Order(d => d.Users.Count(), Ascending),
                 _ => query
             };
 
         var items = await query
             .Paginate(this)
-            .Select(x => new Domains
+            .Select(d => new Domains
             {
-                DomainId = x.DomainId,
-                Name = x.Name,
-                Host = x.Host,
-                AddressCount = x.Addresses.Count(),
-                UserCount = x.Users.Count(),
-                Disabled = x.Disabled
+                DomainId = d.DomainId,
+                Name = d.Name,
+                Host = d.Host,
+                AddressCount = d.Addresses.Count(),
+                UserCount = d.Users.Count(),
+                Disabled = d.Disabled
             })
             .ToListAsync();
 

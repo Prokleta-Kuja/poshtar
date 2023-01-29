@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.DataProtection;
 using Microsoft.EntityFrameworkCore;
 using poshtar.Entities;
 
@@ -13,18 +14,17 @@ public class UpdateDomain : IEndpointRequest<DomainUpdateResponse>
     public bool IsSecure { get; set; }
     public required string Username { get; set; }
     public string? NewPassword { get; set; }
+    public bool ToggleDisabled { get; set; }
 
     public async Task<DomainUpdateResponse> HandleAsync(IServiceProvider sp)
     {
-        var logger = sp.GetRequiredService<ILogger<UpdateDomain>>();
-        var db = sp.GetRequiredService<AppDbContext>();
+        using var db = sp.GetRequiredService<AppDbContext>();
 
         Name = Name.Trim().ToLower();
-        var domain = await db.Domains.FirstOrDefaultAsync(x => x.DomainId == DomainId);
+        var domain = await db.Domains.FirstOrDefaultAsync(d => d.DomainId == DomainId);
 
         if (domain == null)
             throw new NotFoundException();
-
 
         domain.Name = Name;
         domain.Host = Host;
@@ -32,7 +32,13 @@ public class UpdateDomain : IEndpointRequest<DomainUpdateResponse>
         domain.IsSecure = IsSecure;
         domain.Username = Username;
         if (!string.IsNullOrWhiteSpace(NewPassword))
-            domain.Password = NewPassword;
+        {
+            var dpProvider = sp.GetRequiredService<IDataProtectionProvider>();
+            var serverProtector = dpProvider.CreateProtector(nameof(Domain));
+            domain.Password = serverProtector.Protect(NewPassword);
+        }
+        if (ToggleDisabled)
+            domain.Disabled = domain.Disabled.HasValue ? null : DateTime.UtcNow;
 
         await db.SaveChangesAsync();
 
