@@ -6,7 +6,6 @@ namespace poshtar.Endpoints;
 
 public class GetUsers : ListRequest, IEndpointRequest<Response<Users>>
 {
-    public string? SearchTerm { get; set; }
     public int? DomainId { get; set; }
     public int? AddressId { get; set; }
     public async Task<Response<Users>> HandleAsync(IServiceProvider sp)
@@ -43,7 +42,7 @@ public class GetUsers : ListRequest, IEndpointRequest<Response<Users>>
                 Name = u.Name,
                 Description = u.Description,
                 IsMaster = u.IsMaster,
-                Quota = u.Quota,
+                Quota = u.Quota.HasValue ? u.Quota / 1024 / 1024 : null,
                 AddressCount = u.Addresses.Count,
                 DomainCount = u.Domains.Count,
                 Disabled = u.Disabled,

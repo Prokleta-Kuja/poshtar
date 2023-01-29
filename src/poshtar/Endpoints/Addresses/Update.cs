@@ -11,7 +11,7 @@ public class UpdateAddress : IEndpointRequest<AddressUpdateResponse>
     public required string Pattern { get; set; }
     public string? Description { get; set; }
     public bool IsStatic { get; set; }
-    public bool ToggleDisabled { get; set; }
+    public bool? Disabled { get; set; }
 
     public async Task<AddressUpdateResponse> HandleAsync(IServiceProvider sp)
     {
@@ -36,8 +36,8 @@ public class UpdateAddress : IEndpointRequest<AddressUpdateResponse>
         address.Pattern = Pattern;
         address.Description = Description;
         address.IsStatic = IsStatic;
-        if (ToggleDisabled)
-            address.Disabled = address.Disabled.HasValue ? null : DateTime.UtcNow;
+        if (Disabled.HasValue)
+            address.Disabled = Disabled.Value ? address.Disabled.HasValue ? address.Disabled : DateTime.UtcNow : null;
 
         await db.SaveChangesAsync();
 

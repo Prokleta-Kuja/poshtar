@@ -13,7 +13,7 @@ public class UpdateUser : IEndpointRequest<UserUpdateResponse>
     public bool IsMaster { get; set; }
     public int? Quota { get; set; }
     public string? NewPassword { get; set; }
-    public bool ToggleDisabled { get; set; }
+    public bool? Disabled { get; set; }
 
     public async Task<UserUpdateResponse> HandleAsync(IServiceProvider sp)
     {
@@ -36,8 +36,8 @@ public class UpdateUser : IEndpointRequest<UserUpdateResponse>
             user.Hash = result.Hash;
             user.Password = DovecotHasher.Password(result.Salt, result.Hash);
         }
-        if (ToggleDisabled)
-            user.Disabled = user.Disabled.HasValue ? null : DateTime.UtcNow;
+        if (Disabled.HasValue)
+            user.Disabled = Disabled.Value ? user.Disabled.HasValue ? user.Disabled : DateTime.UtcNow : null;
 
         await db.SaveChangesAsync();
 

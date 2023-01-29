@@ -6,14 +6,14 @@ namespace poshtar.Endpoints;
 
 public class GetDomainById : IEndpointRequest<DomainByIdResponse>
 {
-    public int Id { get; set; }
+    public int DomainId { get; set; }
 
     public async Task<DomainByIdResponse> HandleAsync(IServiceProvider sp)
     {
         using var db = sp.GetRequiredService<AppDbContext>();
 
         var domain = await db.Domains
-            .Where(d => d.DomainId == Id)
+            .Where(d => d.DomainId == DomainId)
             .Select(d => new DomainByIdResponse
             {
                 DomainId = d.DomainId,

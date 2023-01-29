@@ -6,7 +6,6 @@ namespace poshtar.Endpoints;
 
 public class GetAddresses : ListRequest, IEndpointRequest<Response<Addresses>>
 {
-    public string? SearchTerm { get; set; }
     public int? DomainId { get; set; }
     public int? UserId { get; set; }
     public async Task<Response<Addresses>> HandleAsync(IServiceProvider sp)

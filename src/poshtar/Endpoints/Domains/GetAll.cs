@@ -6,7 +6,6 @@ namespace poshtar.Endpoints;
 
 public class GetDomains : ListRequest, IEndpointRequest<Response<Domains>>
 {
-    public string? SearchTerm { get; set; }
     public async Task<Response<Domains>> HandleAsync(IServiceProvider sp)
     {
         using var db = sp.GetRequiredService<AppDbContext>();

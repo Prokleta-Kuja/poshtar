@@ -6,14 +6,14 @@ namespace poshtar.Endpoints;
 
 public class GetAddressById : IEndpointRequest<AddressByIdResponse>
 {
-    public int Id { get; set; }
+    public int AddressId { get; set; }
 
     public async Task<AddressByIdResponse> HandleAsync(IServiceProvider sp)
     {
         using var db = sp.GetRequiredService<AppDbContext>();
 
         var address = await db.Addresses
-            .Where(a => a.AddressId == Id)
+            .Where(a => a.AddressId == AddressId)
             .Select(a => new AddressByIdResponse
             {
                 AddressId = a.AddressId,

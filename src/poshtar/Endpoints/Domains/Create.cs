@@ -53,13 +53,9 @@ public class CreateDomain : IEndpointRequest<DomainCreateResponse>
 
         if (string.IsNullOrWhiteSpace(Name))
             errors.Add(nameof(Name), "Required");
-        else if (!Uri.TryCreate(Name, UriKind.Absolute, out var full) || !string.IsNullOrWhiteSpace(full.PathAndQuery.Trim('/')))
-            errors.Add(nameof(Name), "Invalid");
 
         if (string.IsNullOrWhiteSpace(Host))
             errors.Add(nameof(Host), "Required");
-        else if (!Uri.TryCreate(Host, UriKind.Absolute, out var full) || !string.IsNullOrWhiteSpace(full.PathAndQuery.Trim('/')))
-            errors.Add(nameof(Host), "Invalid");
 
         if (Port <= 0 || Port > 65535)
             errors.Add(nameof(Port), "Invalid");

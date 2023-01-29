@@ -28,7 +28,7 @@ public class CreateAddress : IEndpointRequest<AddressCreateResponse>
 
         var domain = await db.Domains.FirstOrDefaultAsync(d => d.DomainId == DomainId);
         if (domain == null)
-            throw new ParamException(nameof(Pattern), "Invalid");
+            throw new ParamException(nameof(DomainId), "Invalid");
 
         var address = new Address
         {

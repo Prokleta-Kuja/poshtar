@@ -6,21 +6,21 @@ namespace poshtar.Endpoints;
 
 public class GetUserById : IEndpointRequest<UserByIdResponse>
 {
-    public int Id { get; set; }
+    public int UserId { get; set; }
 
     public async Task<UserByIdResponse> HandleAsync(IServiceProvider sp)
     {
         using var db = sp.GetRequiredService<AppDbContext>();
 
         var User = await db.Users
-            .Where(u => u.UserId == Id)
+            .Where(u => u.UserId == UserId)
             .Select(u => new UserByIdResponse
             {
                 UserId = u.UserId,
                 Name = u.Name,
                 Description = u.Description,
                 IsMaster = u.IsMaster,
-                Quota = u.Quota,
+                Quota = u.Quota.HasValue ? u.Quota / 1024 / 1024 : null,
                 Disabled = u.Disabled,
             })
             .FirstOrDefaultAsync();

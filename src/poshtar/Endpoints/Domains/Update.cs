@@ -14,7 +14,7 @@ public class UpdateDomain : IEndpointRequest<DomainUpdateResponse>
     public bool IsSecure { get; set; }
     public required string Username { get; set; }
     public string? NewPassword { get; set; }
-    public bool ToggleDisabled { get; set; }
+    public bool? Disabled { get; set; }
 
     public async Task<DomainUpdateResponse> HandleAsync(IServiceProvider sp)
     {
@@ -37,8 +37,8 @@ public class UpdateDomain : IEndpointRequest<DomainUpdateResponse>
             var serverProtector = dpProvider.CreateProtector(nameof(Domain));
             domain.Password = serverProtector.Protect(NewPassword);
         }
-        if (ToggleDisabled)
-            domain.Disabled = domain.Disabled.HasValue ? null : DateTime.UtcNow;
+        if (Disabled.HasValue)
+            domain.Disabled = Disabled.Value ? domain.Disabled.HasValue ? domain.Disabled : DateTime.UtcNow : null;
 
         await db.SaveChangesAsync();
 
@@ -52,13 +52,9 @@ public class UpdateDomain : IEndpointRequest<DomainUpdateResponse>
 
         if (string.IsNullOrWhiteSpace(Name))
             errors.Add(nameof(Name), "Required");
-        else if (!Uri.TryCreate(Name, UriKind.Absolute, out var full) || !string.IsNullOrWhiteSpace(full.PathAndQuery.Trim('/')))
-            errors.Add(nameof(Name), "Invalid");
 
         if (string.IsNullOrWhiteSpace(Host))
             errors.Add(nameof(Host), "Required");
-        else if (!Uri.TryCreate(Host, UriKind.Absolute, out var full) || !string.IsNullOrWhiteSpace(full.PathAndQuery.Trim('/')))
-            errors.Add(nameof(Host), "Invalid");
 
         if (Port <= 0 || Port > 65535)
             errors.Add(nameof(Port), "Invalid");
