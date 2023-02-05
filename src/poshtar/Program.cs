@@ -4,8 +4,8 @@ using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
-using poshtar.Endpoints;
 using poshtar.Entities;
+using poshtar.Extensions;
 using poshtar.Services;
 using Serilog;
 using Serilog.Events;
@@ -44,6 +44,15 @@ public class Program
                     builder.LogTo(message => Debug.WriteLine(message), new[] { RelationalEventId.CommandExecuted });
                 }
             });
+            builder.Services.AddDbContext<AppDbContext>(builder =>
+            {
+                builder.UseSqlite(C.Paths.AppDbConnectionString);
+                if (C.IsDebug)
+                {
+                    builder.EnableSensitiveDataLogging();
+                    builder.LogTo(message => Debug.WriteLine(message), new[] { RelationalEventId.CommandExecuted });
+                }
+            });
 
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
@@ -53,7 +62,7 @@ public class Program
                 options.UseAllOfForInheritance();
 
                 options.DescribeAllParametersInCamelCase();
-                options.SchemaFilter<EnumSchemaFilter>();
+                options.SchemaFilter<OpenApiEnumSchemaFilter>();
                 options.SupportNonNullableReferenceTypes();
                 options.UseAllOfToExtendReferenceSchemas();
             });
@@ -62,6 +71,8 @@ public class Program
                 o.SerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingDefault | JsonIgnoreCondition.WhenWritingNull;
             });
 
+
+            builder.Services.AddControllers();
             // In production, the React files will be served from this directory
             builder.Services.AddSpaStaticFiles(c => { c.RootPath = "spa"; });
 
@@ -89,7 +100,7 @@ public class Program
             // app.UseAuthentication();
             // app.UseAuthorization();
 
-            app.MapGroup("/api").MapApi();
+            app.MapControllers();
 
             app.MapWhen(x => !x.Request.Path.Value!.StartsWith("/api/"), builder =>
             {
