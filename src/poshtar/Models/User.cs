@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations;
 using poshtar.Entities;
 
 namespace poshtar.Models;
@@ -13,33 +14,33 @@ public class UserVM
         QuotaMegaBytes = u.Quota / 1024 / 1024;
         Disabled = u.Disabled;
     }
-    public int Id { get; set; }
-    public string Name { get; set; }
+    [Required] public int Id { get; set; }
+    [Required] public string Name { get; set; }
     public string? Description { get; set; }
-    public bool IsMaster { get; set; }
+    [Required] public bool IsMaster { get; set; }
     public int? QuotaMegaBytes { get; set; }
     public DateTime? Disabled { get; set; }
 }
 
 public class UserLM
 {
-    public int Id { get; set; }
-    public required string Name { get; set; }
+    [Required] public int Id { get; set; }
+    [Required] public required string Name { get; set; }
     public string? Description { get; set; }
-    public bool IsMaster { get; set; }
+    [Required] public bool IsMaster { get; set; }
     public int? QuotaMegaBytes { get; set; }
     public DateTime? Disabled { get; set; }
-    public int AddressCount { get; set; }
-    public int DomainCount { get; set; }
+    [Required] public int AddressCount { get; set; }
+    [Required] public int DomainCount { get; set; }
 }
 
 public class UserCM
 {
-    public required string Name { get; set; }
+    [Required] public required string Name { get; set; }
     public string? Description { get; set; }
-    public bool IsMaster { get; set; }
+    [Required] public bool IsMaster { get; set; }
     public int? Quota { get; set; }
-    public required string Password { get; set; }
+    [Required] public required string Password { get; set; }
     public bool IsInvalid(out ValidationError errorModel)
     {
         errorModel = new();
@@ -59,9 +60,9 @@ public class UserCM
 
 public class UserUM
 {
-    public required string Name { get; set; }
+    [Required] public required string Name { get; set; }
     public string? Description { get; set; }
-    public bool IsMaster { get; set; }
+    [Required] public bool IsMaster { get; set; }
     public int? Quota { get; set; }
     public string? NewPassword { get; set; }
     public bool? Disabled { get; set; }

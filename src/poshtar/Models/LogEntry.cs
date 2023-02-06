@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations;
 using Microsoft.Extensions.Logging.Abstractions;
 using poshtar.Entities;
 
@@ -13,9 +14,9 @@ public class LogEntryVM
         Message = le.Message;
         Properties = le.Properties;
     }
-    public int LogEntryId { get; set; }
-    public Guid Context { get; set; }
-    public DateTime Timestamp { get; set; }
-    public string Message { get; set; } = string.Empty;
+    [Required] public int LogEntryId { get; set; }
+    [Required] public Guid Context { get; set; }
+    [Required] public DateTime Timestamp { get; set; }
+    [Required] public string Message { get; set; } = string.Empty;
     public string? Properties { get; set; }
 }

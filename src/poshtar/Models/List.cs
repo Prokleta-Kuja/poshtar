@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations;
 using System.Linq.Expressions;
 
 namespace poshtar.Models;
@@ -30,11 +31,11 @@ public record ListResponse<T>
         SortBy = req.SortBy;
     }
 
-    public List<T> Items { get; init; }
-    public int Size { get; init; }
-    public int Page { get; init; }
-    public int Total { get; init; }
-    public bool Ascending { get; init; }
+    [Required] public List<T> Items { get; init; }
+    [Required] public int Size { get; init; }
+    [Required] public int Page { get; init; }
+    [Required] public int Total { get; init; }
+    [Required] public bool Ascending { get; init; }
     public string? SortBy { get; init; }
 }
 

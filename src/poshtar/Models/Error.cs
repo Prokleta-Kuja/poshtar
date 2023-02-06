@@ -1,10 +1,12 @@
+using System.ComponentModel.DataAnnotations;
+
 namespace poshtar.Models;
 
 public class PlainError
 {
     public PlainError() { Message = "Validation error"; }
     public PlainError(string message) { Message = message; }
-    public string Message { get; set; }
+    [Required] public string Message { get; set; }
 }
 
 public class ValidationError : PlainError

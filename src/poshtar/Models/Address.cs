@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations;
 using poshtar.Entities;
 
 namespace poshtar.Models;
@@ -13,32 +14,32 @@ public class AddressVM
         IsStatic = a.IsStatic;
         Disabled = a.Disabled;
     }
-    public int Id { get; set; }
-    public int DomainId { get; set; }
-    public string Pattern { get; set; }
+    [Required] public int Id { get; set; }
+    [Required] public int DomainId { get; set; }
+    [Required] public string Pattern { get; set; }
     public string? Description { get; set; }
-    public bool IsStatic { get; set; }
+    [Required] public bool IsStatic { get; set; }
     public DateTime? Disabled { get; set; }
 }
 
 public class AddressLM
 {
-    public int Id { get; set; }
-    public int DomainId { get; set; }
-    public required string DomainName { get; set; }
-    public required string Pattern { get; set; }
+    [Required] public int Id { get; set; }
+    [Required] public int DomainId { get; set; }
+    [Required] public required string DomainName { get; set; }
+    [Required] public required string Pattern { get; set; }
     public string? Description { get; set; }
-    public bool IsStatic { get; set; }
+    [Required] public bool IsStatic { get; set; }
     public DateTime? Disabled { get; set; }
-    public required int UserCount { get; set; }
+    [Required] public required int UserCount { get; set; }
 }
 
 public class AddressCM
 {
-    public int DomainId { get; set; }
-    public required string Pattern { get; set; }
+    [Required] public int DomainId { get; set; }
+    [Required] public required string Pattern { get; set; }
     public string? Description { get; set; }
-    public bool IsStatic { get; set; }
+    [Required] public bool IsStatic { get; set; }
     public bool IsInvalid(out ValidationError errorModel)
     {
         errorModel = new();
@@ -52,10 +53,10 @@ public class AddressCM
 
 public class AddressUM
 {
-    public int DomainId { get; set; }
-    public required string Pattern { get; set; }
+    [Required] public int DomainId { get; set; }
+    [Required] public required string Pattern { get; set; }
     public string? Description { get; set; }
-    public bool IsStatic { get; set; }
+    [Required] public bool IsStatic { get; set; }
     public bool? Disabled { get; set; }
     public bool IsInvalid(out ValidationError errorModel)
     {

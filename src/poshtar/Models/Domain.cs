@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations;
 using poshtar.Entities;
 
 namespace poshtar.Models;
@@ -14,32 +15,32 @@ public class DomainVM
         Username = d.Username;
         Disabled = d.Disabled;
     }
-    public int Id { get; set; }
-    public string Name { get; set; }
-    public string Host { get; set; }
-    public int Port { get; set; }
-    public bool IsSecure { get; set; }
-    public string Username { get; set; }
+    [Required] public int Id { get; set; }
+    [Required] public string Name { get; set; }
+    [Required] public string Host { get; set; }
+    [Required] public int Port { get; set; }
+    [Required] public bool IsSecure { get; set; }
+    [Required] public string Username { get; set; }
     public DateTime? Disabled { get; set; }
 }
 
 public class DomainLM
 {
-    public required int Id { get; set; }
-    public required string Name { get; set; }
-    public required string Host { get; set; }
-    public required int UserCount { get; set; }
-    public required int AddressCount { get; set; }
+    [Required] public required int Id { get; set; }
+    [Required] public required string Name { get; set; }
+    [Required] public required string Host { get; set; }
+    [Required] public required int UserCount { get; set; }
+    [Required] public required int AddressCount { get; set; }
 }
 
 public class DomainCM
 {
-    public required string Name { get; set; }
-    public required string Host { get; set; }
-    public int Port { get; set; }
-    public bool IsSecure { get; set; }
-    public required string Username { get; set; }
-    public required string Password { get; set; }
+    [Required] public required string Name { get; set; }
+    [Required] public required string Host { get; set; }
+    [Required] public int Port { get; set; }
+    [Required] public bool IsSecure { get; set; }
+    [Required] public required string Username { get; set; }
+    [Required] public required string Password { get; set; }
     public bool IsInvalid(out ValidationError errorModel)
     {
         errorModel = new();
@@ -66,11 +67,11 @@ public class DomainCM
 
 public class DomainUM
 {
-    public required string Name { get; set; }
-    public required string Host { get; set; }
-    public int Port { get; set; }
-    public bool IsSecure { get; set; }
-    public required string Username { get; set; }
+    [Required] public required string Name { get; set; }
+    [Required] public required string Host { get; set; }
+    [Required] public int Port { get; set; }
+    [Required] public bool IsSecure { get; set; }
+    [Required] public required string Username { get; set; }
     public string? NewPassword { get; set; }
     public bool? Disabled { get; set; }
     public bool IsInvalid(out ValidationError errorModel)
