@@ -10,10 +10,10 @@ namespace poshtar.Controllers;
 
 // [Authorize]
 [ApiController]
-[Route("api/[controller]")]
+[Route("api/users")]
 [Tags(nameof(Entities.User))]
 [Produces("application/json")]
-[ProducesErrorResponseType(typeof(ValidationError))]
+[ProducesErrorResponseType(typeof(PlainError))]
 public class UsersController : ControllerBase
 {
     readonly ILogger<UsersController> _logger;
@@ -76,25 +76,25 @@ public class UsersController : ControllerBase
         return Ok(new ListResponse<UserLM>(req, count, items));
     }
 
-    [HttpGet("{id}", Name = "GetUser")]
+    [HttpGet("{userId}", Name = "GetUser")]
     [ProducesResponseType(typeof(UserVM), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> GetOneAsnyc(int id)
+    public async Task<IActionResult> GetOneAsnyc(int userId)
     {
         var user = await _db.Users
-           .Where(u => u.UserId == id)
+           .Where(u => u.UserId == userId)
            .Select(u => new UserVM(u))
            .FirstOrDefaultAsync();
 
         if (user == null)
-            return NotFound();
+            return NotFound(new PlainError("Not found"));
 
         return Ok(user);
     }
 
     [HttpPost(Name = "CreateUser")]
-    [ProducesResponseType(typeof(UserVM), StatusCodes.Status201Created)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(UserVM), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ValidationError), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> CreateAsync(UserCM model)
     {
         model.Name = model.Name.Trim().ToLower();
@@ -129,8 +129,9 @@ public class UsersController : ControllerBase
         return Ok(new UserVM(user));
     }
 
-    [HttpPut("{id}", Name = "UpdateUser")]
+    [HttpPut("{userId}", Name = "UpdateUser")]
     [ProducesResponseType(typeof(UserVM), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ValidationError), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> UpdateAsync(int id, UserUM model)
     {
@@ -139,7 +140,7 @@ public class UsersController : ControllerBase
           .FirstOrDefaultAsync();
 
         if (user == null)
-            return NotFound();
+            return NotFound(new PlainError("Not found"));
 
         model.Name = model.Name.Trim().ToLower();
 
@@ -173,17 +174,17 @@ public class UsersController : ControllerBase
         return Ok(new UserVM(user));
     }
 
-    [HttpDelete("{id}", Name = "DeleteUser")]
-    [ProducesResponseType(typeof(UserVM), StatusCodes.Status204NoContent)]
+    [HttpDelete("{userId}", Name = "DeleteUser")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> DeleteAsync(int id)
+    public async Task<IActionResult> DeleteAsync(int userId)
     {
         var user = await _db.Users
-          .Where(u => u.UserId == id)
+          .Where(u => u.UserId == userId)
           .FirstOrDefaultAsync();
 
         if (user == null)
-            return NotFound();
+            return NotFound(new PlainError("Not found"));
 
         _db.Users.Remove(user);
         await _db.SaveChangesAsync();

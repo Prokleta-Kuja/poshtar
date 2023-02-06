@@ -8,10 +8,10 @@ namespace poshtar.Controllers;
 
 // [Authorize]
 [ApiController]
-[Route("api/[controller]")]
+[Route("api/addresses")]
 [Tags(nameof(Entities.Address))]
 [Produces("application/json")]
-[ProducesErrorResponseType(typeof(ValidationError))]
+[ProducesErrorResponseType(typeof(PlainError))]
 public class AddressesController : ControllerBase
 {
     readonly ILogger<AddressesController> _logger;
@@ -73,24 +73,24 @@ public class AddressesController : ControllerBase
         return Ok(new ListResponse<AddressLM>(req, count, items));
     }
 
-    [HttpGet("{id}", Name = "GetAddress")]
+    [HttpGet("{addressId}", Name = "GetAddress")]
     [ProducesResponseType(typeof(AddressVM), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> GetOneAsnyc(int id)
+    public async Task<IActionResult> GetOneAsnyc(int addressId)
     {
         var address = await _db.Addresses
-           .Where(a => a.AddressId == id)
+           .Where(a => a.AddressId == addressId)
            .Select(a => new AddressVM(a))
            .FirstOrDefaultAsync();
 
         if (address == null)
-            return NotFound();
+            return NotFound(new PlainError("Not found"));
 
         return Ok(address);
     }
 
     [HttpPost(Name = "CreateAddress")]
-    [ProducesResponseType(typeof(AddressVM), StatusCodes.Status201Created)]
+    [ProducesResponseType(typeof(AddressVM), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> CreateAsync(AddressCM model)
     {
@@ -125,17 +125,18 @@ public class AddressesController : ControllerBase
         return Ok(new AddressVM(address));
     }
 
-    [HttpPut("{id}", Name = "UpdateAddress")]
+    [HttpPut("{addressId}", Name = "UpdateAddress")]
     [ProducesResponseType(typeof(AddressVM), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ValidationError), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> UpdateAsync(int id, AddressUM model)
+    public async Task<IActionResult> UpdateAsync(int addressId, AddressUM model)
     {
         var address = await _db.Addresses
-          .Where(a => a.AddressId == id)
+          .Where(a => a.AddressId == addressId)
           .FirstOrDefaultAsync();
 
         if (address == null)
-            return NotFound();
+            return NotFound(new PlainError("Not found"));
 
         if (model.IsStatic)
             model.Pattern = model.Pattern.Trim().ToLower();
@@ -145,7 +146,7 @@ public class AddressesController : ControllerBase
 
         var isDuplicate = await _db.Addresses
             .AsNoTracking()
-            .Where(a => a.AddressId != id && a.Pattern == model.Pattern && a.IsStatic == model.IsStatic)
+            .Where(a => a.AddressId != addressId && a.Pattern == model.Pattern && a.IsStatic == model.IsStatic)
             .AnyAsync();
 
         if (isDuplicate)
@@ -166,19 +167,70 @@ public class AddressesController : ControllerBase
         return Ok(new AddressVM(address));
     }
 
-    [HttpDelete("{id}", Name = "DeleteAddress")]
-    [ProducesResponseType(typeof(AddressVM), StatusCodes.Status204NoContent)]
+    [HttpDelete("{addressId}", Name = "DeleteAddress")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> DeleteAsync(int id)
+    public async Task<IActionResult> DeleteAsync(int addressId)
     {
         var address = await _db.Addresses
-          .Where(d => d.AddressId == id)
+          .Where(d => d.AddressId == addressId)
           .FirstOrDefaultAsync();
 
         if (address == null)
-            return NotFound();
+            return NotFound(new PlainError("Not found"));
 
         _db.Addresses.Remove(address);
+        await _db.SaveChangesAsync();
+
+        return NoContent();
+    }
+
+    [HttpPost("{addressId}/users/{userId}", Name = "AddAddressUser")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status409Conflict)]
+    public async Task<IActionResult> AddAddressUserAsync(int addressId, int userId)
+    {
+        var address = await _db.Addresses
+            .Include(d => d.Users.Where(u => u.UserId == userId))
+            .Where(d => d.DomainId == addressId)
+            .FirstOrDefaultAsync();
+
+        if (address == null)
+            return NotFound(new PlainError("Address not found"));
+
+        if (address.Users.Count > 0)
+            return Conflict(new PlainError("Address already contains user"));
+
+        var user = await _db.Users.FirstOrDefaultAsync(u => u.UserId == userId);
+
+        if (user == null)
+            return NotFound(new PlainError("User not found"));
+
+        address.Users.Add(user);
+        await _db.SaveChangesAsync();
+
+        return NoContent();
+    }
+
+    [HttpDelete("{addressId}/users/{userId}", Name = "RemoveAddressUser")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status409Conflict)]
+    public async Task<IActionResult> RemoveAddressUserAsync(int addressId, int userId)
+    {
+        var address = await _db.Addresses
+            .Include(d => d.Users.Where(u => u.UserId == userId))
+            .Where(d => d.DomainId == addressId)
+            .FirstOrDefaultAsync();
+
+        if (address == null)
+            return NotFound(new PlainError("Address not found"));
+
+        if (address.Users.Count > 0)
+            return Conflict(new PlainError("User already removed from address"));
+
+        address.Users.RemoveAt(0);
         await _db.SaveChangesAsync();
 
         return NoContent();

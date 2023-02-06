@@ -1,6 +1,13 @@
 namespace poshtar.Models;
 
-public class ValidationError
+public class PlainError
+{
+    public PlainError() { Message = "Validation error"; }
+    public PlainError(string message) { Message = message; }
+    public string Message { get; set; }
+}
+
+public class ValidationError : PlainError
 {
     public ValidationError() { }
     public ValidationError(Dictionary<string, string> errors)
@@ -11,6 +18,5 @@ public class ValidationError
     {
         Errors.Add(key, message);
     }
-    public string Message { get; set; } = "Validation error";
     public Dictionary<string, string> Errors { get; set; } = new();
 }

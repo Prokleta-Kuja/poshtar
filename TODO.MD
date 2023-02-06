@@ -8,8 +8,10 @@ Master users cant login as themself
 Test SMTP server gracefull shutdown. Should be console logged after docker stop
 Reload certs https://doc.dovecot.org/admin_manual/doveadm_http_api/#doveadm-reload
 Vite + react swc + bootstrap 5.3.0
+API auth
 
 # Important dovecot conf
+
 - https://doc.dovecot.org/configuration_manual/lastlogin_plugin/
 
 - https://doc.dovecot.org/settings/core/#core_setting-auth_master_user_separator
@@ -47,4 +49,5 @@ Bind mailsolution/mail to /mail
 On first run a data folder is going to be created and it going to fail because you need to put cert.crt & cert.key in data/certs folder.
 
 # Other
+
 After changing system user or password via env, dovcot configuration must be reloaded or dovecot restarted.

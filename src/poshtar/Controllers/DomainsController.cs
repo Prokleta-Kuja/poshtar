@@ -9,10 +9,10 @@ namespace poshtar.Controllers;
 
 // [Authorize]
 [ApiController]
-[Route("api/[controller]")]
+[Route("api/domains")]
 [Tags(nameof(Entities.Domain))]
 [Produces("application/json")]
-[ProducesErrorResponseType(typeof(ValidationError))]
+[ProducesErrorResponseType(typeof(PlainError))]
 public class DomainsController : ControllerBase
 {
     readonly ILogger<DomainsController> _logger;
@@ -71,25 +71,25 @@ public class DomainsController : ControllerBase
         return Ok(new ListResponse<DomainLM>(req, count, items));
     }
 
-    [HttpGet("{id}", Name = "GetDomain")]
+    [HttpGet("{domainId}", Name = "GetDomain")]
     [ProducesResponseType(typeof(DomainVM), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> GetOneAsnyc(int id)
+    public async Task<IActionResult> GetOneAsnyc(int domainId)
     {
         var domain = await _db.Domains
-           .Where(d => d.DomainId == id)
+           .Where(d => d.DomainId == domainId)
            .Select(d => new DomainVM(d))
            .FirstOrDefaultAsync();
 
         if (domain == null)
-            return NotFound();
+            return NotFound(new PlainError("Not found"));
 
         return Ok(domain);
     }
 
     [HttpPost(Name = "CreateDomain")]
-    [ProducesResponseType(typeof(DomainVM), StatusCodes.Status201Created)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(DomainVM), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ValidationError), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> CreateAsync(DomainCM model)
     {
         model.Name = model.Name.Trim().ToLower();
@@ -124,17 +124,18 @@ public class DomainsController : ControllerBase
         return Ok(new DomainVM(domain));
     }
 
-    [HttpPut("{id}", Name = "UpdateDomain")]
+    [HttpPut("{domainId}", Name = "UpdateDomain")]
     [ProducesResponseType(typeof(DomainVM), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ValidationError), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> UpdateAsync(int id, DomainUM model)
+    public async Task<IActionResult> UpdateAsync(int domainId, DomainUM model)
     {
         var domain = await _db.Domains
-          .Where(d => d.DomainId == id)
+          .Where(d => d.DomainId == domainId)
           .FirstOrDefaultAsync();
 
         if (domain == null)
-            return NotFound();
+            return NotFound(new PlainError("Not found"));
 
         model.Name = model.Name.Trim().ToLower();
         model.Host = model.Host.Trim().ToLower();
@@ -168,19 +169,70 @@ public class DomainsController : ControllerBase
         return Ok(new DomainVM(domain));
     }
 
-    [HttpDelete("{id}", Name = "DeleteDomain")]
-    [ProducesResponseType(typeof(DomainVM), StatusCodes.Status204NoContent)]
+    [HttpDelete("{domainId}", Name = "DeleteDomain")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> DeleteAsync(int id)
+    public async Task<IActionResult> DeleteAsync(int domainId)
     {
         var domain = await _db.Domains
-          .Where(d => d.DomainId == id)
+          .Where(d => d.DomainId == domainId)
           .FirstOrDefaultAsync();
 
         if (domain == null)
-            return NotFound();
+            return NotFound(new PlainError("Not found"));
 
         _db.Domains.Remove(domain);
+        await _db.SaveChangesAsync();
+
+        return NoContent();
+    }
+
+    [HttpPost("{domainId}/users/{userId}", Name = "AddDomainUser")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status409Conflict)]
+    public async Task<IActionResult> AddDomainUserAsync(int domainId, int userId)
+    {
+        var domain = await _db.Domains
+            .Include(d => d.Users.Where(u => u.UserId == userId))
+            .Where(d => d.DomainId == domainId)
+            .FirstOrDefaultAsync();
+
+        if (domain == null)
+            return NotFound(new PlainError("Domain not found"));
+
+        if (domain.Users.Count > 0)
+            return Conflict(new PlainError("Domain already contains user"));
+
+        var user = await _db.Users.FirstOrDefaultAsync(u => u.UserId == userId);
+
+        if (user == null)
+            return NotFound(new PlainError("User not found"));
+
+        domain.Users.Add(user);
+        await _db.SaveChangesAsync();
+
+        return NoContent();
+    }
+
+    [HttpDelete("{domainId}/users/{userId}", Name = "RemoveDomainUser")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status409Conflict)]
+    public async Task<IActionResult> RemoveDomainUserAsync(int domainId, int userId)
+    {
+        var domain = await _db.Domains
+            .Include(d => d.Users.Where(u => u.UserId == userId))
+            .Where(d => d.DomainId == domainId)
+            .FirstOrDefaultAsync();
+
+        if (domain == null)
+            return NotFound(new PlainError("Domain not found"));
+
+        if (domain.Users.Count > 0)
+            return Conflict(new PlainError("User already removed from domain"));
+
+        domain.Users.RemoveAt(0);
         await _db.SaveChangesAsync();
 
         return NoContent();
