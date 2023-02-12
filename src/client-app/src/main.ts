@@ -1,10 +1,11 @@
 import { createApp } from "vue";
 import { createRouter, createWebHistory } from "vue-router";
+import "~bootstrap";
 import "./styles.scss";
 import App from "./App.vue";
 import Index from "./pages/Index.vue";
 import IndexId from "./pages/IndexId.vue";
-import "~bootstrap";
+import Domains from "./pages/Domains.vue";
 
 const router = createRouter({
   linkActiveClass: "active",
@@ -18,7 +19,7 @@ const router = createRouter({
     {
       path: "/domains",
       name: "route.domains",
-      component: Index,
+      component: Domains,
     },
     {
       path: "/domains/:id(\\d+)",
