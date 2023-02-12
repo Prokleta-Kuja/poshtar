@@ -1,10 +1,10 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-import type { DomainByIdResponse } from '../models/DomainByIdResponse';
-import type { DomainCreateResponse } from '../models/DomainCreateResponse';
-import type { DomainsResponse } from '../models/DomainsResponse';
-import type { DomainUpdateResponse } from '../models/DomainUpdateResponse';
+import type { DomainCM } from '../models/DomainCM';
+import type { DomainLMListResponse } from '../models/DomainLMListResponse';
+import type { DomainUM } from '../models/DomainUM';
+import type { DomainVM } from '../models/DomainVM';
 
 import type { CancelablePromise } from '../core/CancelablePromise';
 import { OpenAPI } from '../core/OpenAPI';
@@ -13,134 +13,174 @@ import { request as __request } from '../core/request';
 export class DomainService {
 
     /**
-     * @param searchTerm
+     * @param addressId
+     * @param notAddressId
+     * @param userId
+     * @param notUserId
      * @param size
      * @param page
      * @param ascending
      * @param sortBy
-     * @returns DomainsResponse Success
+     * @param searchTerm
+     * @returns DomainLMListResponse Success
      * @throws ApiError
      */
     public static getDomains(
-        searchTerm?: string,
+        addressId?: number,
+        notAddressId?: number,
+        userId?: number,
+        notUserId?: number,
         size?: number,
         page?: number,
         ascending?: boolean,
         sortBy?: string,
-    ): CancelablePromise<DomainsResponse> {
+        searchTerm?: string,
+    ): CancelablePromise<DomainLMListResponse> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/api/domains',
             query: {
-                'searchTerm': searchTerm,
+                'addressId': addressId,
+                'notAddressId': notAddressId,
+                'userId': userId,
+                'notUserId': notUserId,
                 'size': size,
                 'page': page,
                 'ascending': ascending,
                 'sortBy': sortBy,
-            },
-            errors: {
-                400: `Bad Request`,
-                403: `Forbidden`,
-                500: `Server Error`,
+                'searchTerm': searchTerm,
             },
         });
     }
 
     /**
-     * @param name
-     * @param host
-     * @param port
-     * @param isSecure
-     * @param username
-     * @param password
-     * @returns DomainCreateResponse Success
+     * @param requestBody
+     * @returns DomainVM Success
      * @throws ApiError
      */
     public static createDomain(
-        name: string,
-        host: string,
-        port: number,
-        isSecure: boolean,
-        username: string,
-        password: string,
-    ): CancelablePromise<DomainCreateResponse> {
+        requestBody?: DomainCM,
+    ): CancelablePromise<DomainVM> {
         return __request(OpenAPI, {
             method: 'POST',
             url: '/api/domains',
-            query: {
-                'name': name,
-                'host': host,
-                'port': port,
-                'isSecure': isSecure,
-                'username': username,
-                'password': password,
-            },
+            body: requestBody,
+            mediaType: 'application/json',
             errors: {
                 400: `Bad Request`,
-                403: `Forbidden`,
-                500: `Server Error`,
-            },
-        });
-    }
-
-    /**
-     * @param id
-     * @returns DomainByIdResponse Success
-     * @throws ApiError
-     */
-    public static getDomainById(
-        id: number,
-    ): CancelablePromise<DomainByIdResponse> {
-        return __request(OpenAPI, {
-            method: 'GET',
-            url: '/api/domains/{id}',
-            path: {
-                'id': id,
-            },
-            errors: {
-                400: `Bad Request`,
-                403: `Forbidden`,
-                500: `Server Error`,
             },
         });
     }
 
     /**
      * @param domainId
-     * @param name
-     * @param host
-     * @param port
-     * @param isSecure
-     * @param username
-     * @param newPassword
-     * @returns DomainUpdateResponse Success
+     * @returns DomainVM Success
+     * @throws ApiError
+     */
+    public static getDomain(
+        domainId: number,
+    ): CancelablePromise<DomainVM> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/api/domains/{domainId}',
+            path: {
+                'domainId': domainId,
+            },
+            errors: {
+                404: `Not Found`,
+            },
+        });
+    }
+
+    /**
+     * @param domainId
+     * @param requestBody
+     * @returns DomainVM Success
      * @throws ApiError
      */
     public static updateDomain(
         domainId: number,
-        name: string,
-        host: string,
-        port: number,
-        isSecure: boolean,
-        username: string,
-        newPassword?: string,
-    ): CancelablePromise<DomainUpdateResponse> {
+        requestBody?: DomainUM,
+    ): CancelablePromise<DomainVM> {
         return __request(OpenAPI, {
             method: 'PUT',
-            url: '/api/domains/{id}',
-            query: {
+            url: '/api/domains/{domainId}',
+            path: {
                 'domainId': domainId,
-                'name': name,
-                'host': host,
-                'port': port,
-                'isSecure': isSecure,
-                'username': username,
-                'newPassword': newPassword,
             },
+            body: requestBody,
+            mediaType: 'application/json',
             errors: {
                 400: `Bad Request`,
-                403: `Forbidden`,
-                500: `Server Error`,
+                404: `Not Found`,
+            },
+        });
+    }
+
+    /**
+     * @param domainId
+     * @returns void
+     * @throws ApiError
+     */
+    public static deleteDomain(
+        domainId: number,
+    ): CancelablePromise<void> {
+        return __request(OpenAPI, {
+            method: 'DELETE',
+            url: '/api/domains/{domainId}',
+            path: {
+                'domainId': domainId,
+            },
+            errors: {
+                404: `Not Found`,
+            },
+        });
+    }
+
+    /**
+     * @param domainId
+     * @param userId
+     * @returns void
+     * @throws ApiError
+     */
+    public static addDomainUser(
+        domainId: number,
+        userId: number,
+    ): CancelablePromise<void> {
+        return __request(OpenAPI, {
+            method: 'POST',
+            url: '/api/domains/{domainId}/users/{userId}',
+            path: {
+                'domainId': domainId,
+                'userId': userId,
+            },
+            errors: {
+                404: `Not Found`,
+                409: `Conflict`,
+            },
+        });
+    }
+
+    /**
+     * @param domainId
+     * @param userId
+     * @returns void
+     * @throws ApiError
+     */
+    public static removeDomainUser(
+        domainId: number,
+        userId: number,
+    ): CancelablePromise<void> {
+        return __request(OpenAPI, {
+            method: 'DELETE',
+            url: '/api/domains/{domainId}/users/{userId}',
+            path: {
+                'domainId': domainId,
+                'userId': userId,
+            },
+            errors: {
+                404: `Not Found`,
+                409: `Conflict`,
             },
         });
     }

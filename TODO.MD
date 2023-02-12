@@ -29,10 +29,10 @@ API auth
 
 # Installation
 
-Run mailica first to initialize dovecot configuration.
-Create mailsolution folder, eg. /opt/appdata/mailica, with subfolders config & mail.
+Run poshtar first to initialize dovecot configuration.
+Create mailsolution folder, eg. /opt/appdata/poshtar, with subfolders config & mail.
 
-## mailica container
+## poshtar container
 
 Bind crt and key files to /certs/cert.crt and /certs/cert.key
 Bind mailsolution/config to /config
