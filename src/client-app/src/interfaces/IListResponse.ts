@@ -3,5 +3,5 @@ export default interface IListResponse{
     page: number;
     total: number;
     ascending: boolean;
-    sortBy?: string | null;
+    sortBy?: string;
 }

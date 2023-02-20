@@ -10,18 +10,19 @@ import { request as __request } from '../core/request';
 export class LogEntryService {
 
     /**
-     * @param context
-     * @param from
-     * @param till
-     * @param size
-     * @param page
-     * @param ascending
-     * @param sortBy
-     * @param searchTerm
      * @returns LogEntryVMListResponse Success
      * @throws ApiError
      */
-    public static getLogEntries(
+    public static getLogEntries({
+        context,
+        from,
+        till,
+        size,
+        page,
+        ascending,
+        sortBy,
+        searchTerm,
+    }: {
         context?: string,
         from?: string,
         till?: string,
@@ -30,7 +31,7 @@ export class LogEntryService {
         ascending?: boolean,
         sortBy?: string,
         searchTerm?: string,
-    ): CancelablePromise<LogEntryVMListResponse> {
+    }): CancelablePromise<LogEntryVMListResponse> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/api/log-entires',

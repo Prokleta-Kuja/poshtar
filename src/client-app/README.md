@@ -1,7 +1,7 @@
 # OpenAPI
 
 ```
-npx openapi-typescript-codegen --input http://localhost:5000/swagger/v1/swagger.json --output ./src/api
+npx openapi-typescript-codegen --useOptions --input http://localhost:5000/swagger/v1/swagger.json --output ./src/api
 ```
 
 # Vue 3 + TypeScript + Vite

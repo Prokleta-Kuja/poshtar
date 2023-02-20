@@ -13,19 +13,20 @@ import { request as __request } from '../core/request';
 export class UserService {
 
     /**
-     * @param addressId
-     * @param notAddressId
-     * @param domainId
-     * @param notDomainId
-     * @param size
-     * @param page
-     * @param ascending
-     * @param sortBy
-     * @param searchTerm
      * @returns UserLMListResponse Success
      * @throws ApiError
      */
-    public static getUsers(
+    public static getUsers({
+        addressId,
+        notAddressId,
+        domainId,
+        notDomainId,
+        size,
+        page,
+        ascending,
+        sortBy,
+        searchTerm,
+    }: {
         addressId?: number,
         notAddressId?: number,
         domainId?: number,
@@ -35,7 +36,7 @@ export class UserService {
         ascending?: boolean,
         sortBy?: string,
         searchTerm?: string,
-    ): CancelablePromise<UserLMListResponse> {
+    }): CancelablePromise<UserLMListResponse> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/api/users',
@@ -54,13 +55,14 @@ export class UserService {
     }
 
     /**
-     * @param requestBody
      * @returns UserVM Success
      * @throws ApiError
      */
-    public static createUser(
+    public static createUser({
+        requestBody,
+    }: {
         requestBody?: UserCM,
-    ): CancelablePromise<UserVM> {
+    }): CancelablePromise<UserVM> {
         return __request(OpenAPI, {
             method: 'POST',
             url: '/api/users',
@@ -73,13 +75,14 @@ export class UserService {
     }
 
     /**
-     * @param userId
      * @returns UserVM Success
      * @throws ApiError
      */
-    public static getUser(
+    public static getUser({
+        userId,
+    }: {
         userId: number,
-    ): CancelablePromise<UserVM> {
+    }): CancelablePromise<UserVM> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/api/users/{userId}',
@@ -93,17 +96,18 @@ export class UserService {
     }
 
     /**
-     * @param userId
-     * @param id
-     * @param requestBody
      * @returns UserVM Success
      * @throws ApiError
      */
-    public static updateUser(
+    public static updateUser({
+        userId,
+        id,
+        requestBody,
+    }: {
         userId: string,
         id?: number,
         requestBody?: UserUM,
-    ): CancelablePromise<UserVM> {
+    }): CancelablePromise<UserVM> {
         return __request(OpenAPI, {
             method: 'PUT',
             url: '/api/users/{userId}',
@@ -123,13 +127,14 @@ export class UserService {
     }
 
     /**
-     * @param userId
      * @returns void
      * @throws ApiError
      */
-    public static deleteUser(
+    public static deleteUser({
+        userId,
+    }: {
         userId: number,
-    ): CancelablePromise<void> {
+    }): CancelablePromise<void> {
         return __request(OpenAPI, {
             method: 'DELETE',
             url: '/api/users/{userId}',

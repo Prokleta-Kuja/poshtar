@@ -13,19 +13,20 @@ import { request as __request } from '../core/request';
 export class DomainService {
 
     /**
-     * @param addressId
-     * @param notAddressId
-     * @param userId
-     * @param notUserId
-     * @param size
-     * @param page
-     * @param ascending
-     * @param sortBy
-     * @param searchTerm
      * @returns DomainLMListResponse Success
      * @throws ApiError
      */
-    public static getDomains(
+    public static getDomains({
+        addressId,
+        notAddressId,
+        userId,
+        notUserId,
+        size,
+        page,
+        ascending,
+        sortBy,
+        searchTerm,
+    }: {
         addressId?: number,
         notAddressId?: number,
         userId?: number,
@@ -35,7 +36,7 @@ export class DomainService {
         ascending?: boolean,
         sortBy?: string,
         searchTerm?: string,
-    ): CancelablePromise<DomainLMListResponse> {
+    }): CancelablePromise<DomainLMListResponse> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/api/domains',
@@ -54,13 +55,14 @@ export class DomainService {
     }
 
     /**
-     * @param requestBody
      * @returns DomainVM Success
      * @throws ApiError
      */
-    public static createDomain(
+    public static createDomain({
+        requestBody,
+    }: {
         requestBody?: DomainCM,
-    ): CancelablePromise<DomainVM> {
+    }): CancelablePromise<DomainVM> {
         return __request(OpenAPI, {
             method: 'POST',
             url: '/api/domains',
@@ -73,13 +75,14 @@ export class DomainService {
     }
 
     /**
-     * @param domainId
      * @returns DomainVM Success
      * @throws ApiError
      */
-    public static getDomain(
+    public static getDomain({
+        domainId,
+    }: {
         domainId: number,
-    ): CancelablePromise<DomainVM> {
+    }): CancelablePromise<DomainVM> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/api/domains/{domainId}',
@@ -93,15 +96,16 @@ export class DomainService {
     }
 
     /**
-     * @param domainId
-     * @param requestBody
      * @returns DomainVM Success
      * @throws ApiError
      */
-    public static updateDomain(
+    public static updateDomain({
+        domainId,
+        requestBody,
+    }: {
         domainId: number,
         requestBody?: DomainUM,
-    ): CancelablePromise<DomainVM> {
+    }): CancelablePromise<DomainVM> {
         return __request(OpenAPI, {
             method: 'PUT',
             url: '/api/domains/{domainId}',
@@ -118,13 +122,14 @@ export class DomainService {
     }
 
     /**
-     * @param domainId
      * @returns void
      * @throws ApiError
      */
-    public static deleteDomain(
+    public static deleteDomain({
+        domainId,
+    }: {
         domainId: number,
-    ): CancelablePromise<void> {
+    }): CancelablePromise<void> {
         return __request(OpenAPI, {
             method: 'DELETE',
             url: '/api/domains/{domainId}',
@@ -138,15 +143,16 @@ export class DomainService {
     }
 
     /**
-     * @param domainId
-     * @param userId
      * @returns void
      * @throws ApiError
      */
-    public static addDomainUser(
+    public static addDomainUser({
+        domainId,
+        userId,
+    }: {
         domainId: number,
         userId: number,
-    ): CancelablePromise<void> {
+    }): CancelablePromise<void> {
         return __request(OpenAPI, {
             method: 'POST',
             url: '/api/domains/{domainId}/users/{userId}',
@@ -162,15 +168,16 @@ export class DomainService {
     }
 
     /**
-     * @param domainId
-     * @param userId
      * @returns void
      * @throws ApiError
      */
-    public static removeDomainUser(
+    public static removeDomainUser({
+        domainId,
+        userId,
+    }: {
         domainId: number,
         userId: number,
-    ): CancelablePromise<void> {
+    }): CancelablePromise<void> {
         return __request(OpenAPI, {
             method: 'DELETE',
             url: '/api/domains/{domainId}/users/{userId}',

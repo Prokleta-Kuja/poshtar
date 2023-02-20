@@ -13,19 +13,20 @@ import { request as __request } from '../core/request';
 export class AddressService {
 
     /**
-     * @param domainId
-     * @param notDomainId
-     * @param userId
-     * @param notUserId
-     * @param size
-     * @param page
-     * @param ascending
-     * @param sortBy
-     * @param searchTerm
      * @returns AddressLMListResponse Success
      * @throws ApiError
      */
-    public static getAddresses(
+    public static getAddresses({
+        domainId,
+        notDomainId,
+        userId,
+        notUserId,
+        size,
+        page,
+        ascending,
+        sortBy,
+        searchTerm,
+    }: {
         domainId?: number,
         notDomainId?: number,
         userId?: number,
@@ -35,7 +36,7 @@ export class AddressService {
         ascending?: boolean,
         sortBy?: string,
         searchTerm?: string,
-    ): CancelablePromise<AddressLMListResponse> {
+    }): CancelablePromise<AddressLMListResponse> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/api/addresses',
@@ -54,13 +55,14 @@ export class AddressService {
     }
 
     /**
-     * @param requestBody
      * @returns AddressVM Success
      * @throws ApiError
      */
-    public static createAddress(
+    public static createAddress({
+        requestBody,
+    }: {
         requestBody?: AddressCM,
-    ): CancelablePromise<AddressVM> {
+    }): CancelablePromise<AddressVM> {
         return __request(OpenAPI, {
             method: 'POST',
             url: '/api/addresses',
@@ -73,13 +75,14 @@ export class AddressService {
     }
 
     /**
-     * @param addressId
      * @returns AddressVM Success
      * @throws ApiError
      */
-    public static getAddress(
+    public static getAddress({
+        addressId,
+    }: {
         addressId: number,
-    ): CancelablePromise<AddressVM> {
+    }): CancelablePromise<AddressVM> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/api/addresses/{addressId}',
@@ -93,15 +96,16 @@ export class AddressService {
     }
 
     /**
-     * @param addressId
-     * @param requestBody
      * @returns AddressVM Success
      * @throws ApiError
      */
-    public static updateAddress(
+    public static updateAddress({
+        addressId,
+        requestBody,
+    }: {
         addressId: number,
         requestBody?: AddressUM,
-    ): CancelablePromise<AddressVM> {
+    }): CancelablePromise<AddressVM> {
         return __request(OpenAPI, {
             method: 'PUT',
             url: '/api/addresses/{addressId}',
@@ -118,13 +122,14 @@ export class AddressService {
     }
 
     /**
-     * @param addressId
      * @returns void
      * @throws ApiError
      */
-    public static deleteAddress(
+    public static deleteAddress({
+        addressId,
+    }: {
         addressId: number,
-    ): CancelablePromise<void> {
+    }): CancelablePromise<void> {
         return __request(OpenAPI, {
             method: 'DELETE',
             url: '/api/addresses/{addressId}',
@@ -138,15 +143,16 @@ export class AddressService {
     }
 
     /**
-     * @param addressId
-     * @param userId
      * @returns void
      * @throws ApiError
      */
-    public static addAddressUser(
+    public static addAddressUser({
+        addressId,
+        userId,
+    }: {
         addressId: number,
         userId: number,
-    ): CancelablePromise<void> {
+    }): CancelablePromise<void> {
         return __request(OpenAPI, {
             method: 'POST',
             url: '/api/addresses/{addressId}/users/{userId}',
@@ -162,15 +168,16 @@ export class AddressService {
     }
 
     /**
-     * @param addressId
-     * @param userId
      * @returns void
      * @throws ApiError
      */
-    public static removeAddressUser(
+    public static removeAddressUser({
+        addressId,
+        userId,
+    }: {
         addressId: number,
         userId: number,
-    ): CancelablePromise<void> {
+    }): CancelablePromise<void> {
         return __request(OpenAPI, {
             method: 'DELETE',
             url: '/api/addresses/{addressId}/users/{userId}',
