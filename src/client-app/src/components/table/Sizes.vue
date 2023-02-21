@@ -1,21 +1,15 @@
 <script setup lang="ts">
-import { ref } from 'vue';
-import IListResponse from '../../interfaces/IListResponse';
+import { ITableParams, defaultPageSizes } from '.';
 
-const props = defineProps<{ all?: boolean, params: IListResponse, onChange: (params: IListResponse) => void }>();
-const current = ref(props.params.size);
-const sizes = [10, 25, 50, 100];
+const props = defineProps<{ params: ITableParams, onChange: (params: ITableParams) => void }>();
 const change = () => {
-    props.params.size = current.value;
+    props.params.page = 1;
     props.onChange(props.params);
 }
 </script>
 <template>
-    <div>
-        <select class="form-select" v-model="current" @change="change">
-            <option v-for="size in sizes" :key="size" :value="size">{{ size }}</option>
-            <option v-if="props.all" value="0">All</option>
-        </select>
-        <span>&nbsp;per page</span>
-    </div>
+    <label for="items-per-page" class="form-label">Items per page</label>
+    <select id="items-per-page" class="form-select" v-model="props.params.size" @change="change">
+        <option v-for="size in defaultPageSizes" :key="size" :value="size">{{ size }}</option>
+    </select>
 </template>

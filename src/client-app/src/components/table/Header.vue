@@ -1,13 +1,13 @@
 <script setup lang="ts">
 import { computed } from 'vue';
-import IListResponse from '../../interfaces/IListResponse';
+import { ITableParams } from '.';
 
-const props = defineProps<{ params: IListResponse, onSort: (params: IListResponse) => void, column: string, display?: string, unsortable?: boolean }>();
+const props = defineProps<{ params: ITableParams, onSort: (params: ITableParams) => void, column: string, display?: string, unsortable?: boolean }>();
 
 const text = computed(() => {
     if (props.display)
         return props.display;
-
+    props.params.page = 1;
     return props.column[0].toUpperCase() + props.column.substring(1).toLowerCase();
 })
 

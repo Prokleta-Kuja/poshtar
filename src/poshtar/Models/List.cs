@@ -12,7 +12,7 @@ public class FilterQuery
     }
     private int size;
     private int page;
-    public int? Size { get => size; set => size = value.HasValue ? value.Value > 100 ? 100 : value.Value < 1 ? 1 : value.Value : 25; }
+    public int? Size { get => size; set => size = value.HasValue ? value.Value > 100 ? 100 : value.Value < 1 ? 10 : value.Value : 25; }
     public int? Page { get => page; set => page = value.HasValue ? value.Value <= 0 ? 1 : value.Value : 1; }
     public bool? Ascending { get; set; }
     public string? SortBy { get; set; }
