@@ -1,16 +1,16 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue';
 
+const el = ref<HTMLInputElement | null>(null);
 const props = defineProps<{ autoFocus?: boolean, modelValue?: string, onChange: () => void }>();
 const emit = defineEmits<{ (e: 'update:modelValue', modelValue?: string): void }>()
+
 const clear = () => { emit('update:modelValue', undefined); props.onChange(); }
 const search = (e: Event) => {
     const input = e.target as HTMLInputElement;
     emit('update:modelValue', input.value);
     props.onChange();
 }
-const el = ref<HTMLInputElement | null>(null)
-
 onMounted(() => {
     if (props.autoFocus)
         el.value?.focus()
