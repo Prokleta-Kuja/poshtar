@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { reactive } from "vue";
 import { DomainLM, DomainService } from "../api";
+import Search from '../components/form/Search.vue'
 import { Header, Pages, Sizes, ITableParams, initParams, updateParams } from "../components/table"
 
 interface IDomainParams extends ITableParams {
@@ -15,27 +16,15 @@ const refresh = (params?: ITableParams) => {
     DomainService.getDomains({ ...data.params }).then(r => { data.items = r.items; updateParams(data.params, r) });
 };
 
-const query = () => refresh();
-const clearSearch = () => { data.params.searchTerm = undefined; query(); }
+const search = (term?: string) => { data.params.searchTerm = term; refresh(); }
 
 refresh();
 </script>
 <template>
-    <form class="d-flex flex-wrap" @submit.prevent="query">
-        <div class="me-3 mb-2" style="width:8rem">
-            <Sizes :params="data.params" :on-change="refresh" />
-        </div>
-
-        <div class="me-3 mb-2">
-            <label for="search" class="form-label">Search</label>
-            <div class="input-group">
-                <input class="form-control" id="search" placeholder="Name, Host" v-model="data.params.searchTerm">
-                <button class="btn btn-outline-secondary" type="submit">Search</button>
-                <button class="btn btn-outline-secondary" type="button" @click.prevent="clearSearch">Clear</button>
-            </div>
-        </div>
-
-    </form>
+    <div class="d-flex flex-wrap">
+        <Sizes class="me-3 mb-2" style="max-width:8rem" :params="data.params" :on-change="refresh" />
+        <Search autoFocus class="me-3 mb-2" style="max-width:16rem" v-model="data.params.searchTerm" :on-change="refresh" />
+    </div>
     <div class="table-responsive">
         <table class="table">
             <thead>

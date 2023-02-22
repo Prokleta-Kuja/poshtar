@@ -8,8 +8,10 @@ const change = () => {
 }
 </script>
 <template>
-    <label for="items-per-page" class="form-label">Items per page</label>
-    <select id="items-per-page" class="form-select" v-model="props.params.size" @change="change">
-        <option v-for="size in defaultPageSizes" :key="size" :value="size">{{ size }}</option>
-    </select>
+    <div>
+        <label for="items-per-page" class="form-label">Items per page</label>
+        <select id="items-per-page" class="form-select" v-model="props.params.size" @change="change">
+            <option v-for="size in defaultPageSizes" :key="size" :value="size">{{ size }}</option>
+        </select>
+    </div>
 </template>
