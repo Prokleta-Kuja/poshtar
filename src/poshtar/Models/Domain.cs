@@ -60,7 +60,6 @@ public class DomainCM
         if (string.IsNullOrWhiteSpace(Password))
             errorModel.Errors.Add(nameof(Password), "Required");
 
-
         return errorModel.Errors.Count > 0;
     }
 }
@@ -89,7 +88,6 @@ public class DomainUM
 
         if (string.IsNullOrWhiteSpace(Username))
             errorModel.Errors.Add(nameof(Username), "Required");
-
 
         return errorModel.Errors.Count > 0;
     }

@@ -21,7 +21,7 @@ onMounted(() => {
         <label for="search" class="form-label">Search</label>
         <div class="input-group">
             <input ref="el" class="form-control" id="search" placeholder="Name, Host" :value="props.modelValue"
-                @keyup.enter="search">
+                @keyup.enter="search" type="search">
             <button class="btn btn-outline-danger" type="button" @click.prevent="clear">
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-x-lg"
                     viewBox="0 0 16 16">
