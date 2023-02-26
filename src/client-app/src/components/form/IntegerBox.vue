@@ -5,7 +5,7 @@ export interface IIntegerBox {
     autoFocus?: boolean;
     required?: boolean;
     placeholder?: string;
-    modelValue?: number;
+    modelValue?: number | null;
     help?: string;
     error?: string;
 }

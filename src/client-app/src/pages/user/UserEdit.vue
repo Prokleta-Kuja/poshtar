@@ -1,21 +1,21 @@
 <script setup lang="ts">
 import { reactive } from 'vue';
-import { DomainCM, DomainService, DomainUM, DomainVM, ValidationError } from '../../api';
+import { UserService, UserUM, UserVM, ValidationError } from '../../api';
 import CheckBox from '../../components/form/CheckBox.vue';
 import IntegerBox from '../../components/form/IntegerBox.vue';
 import SpinButton from '../../components/form/SpinButton.vue';
 import Text from '../../components/form/TextBox.vue';
 
 const props = defineProps<{ id: number }>()
-const state = reactive<{ saving?: boolean, model?: DomainUM, error?: ValidationError }>({});
+const state = reactive<{ saving?: boolean, model?: UserUM, error?: ValidationError }>({});
 
-const mapModel = (m: DomainVM) => {
+const mapModel = (m: UserVM) => {
     state.model = {
         name: m.name,
-        host: m.host,
-        username: m.username,
-        port: m.port,
-        isSecure: m.isSecure,
+        description: m.description,
+        isMaster: m.isMaster,
+        quota: m.quotaMegaBytes,
+        disabled: m.disabled ? true : false,
     }
 }
 
@@ -25,33 +25,31 @@ const submit = () => {
 
     state.saving = true;
     state.error = undefined;
-    DomainService.updateDomain({ domainId: props.id, requestBody: state.model })
+    UserService.updateUser({ userId: props.id, requestBody: state.model })
         .then(mapModel)
         .catch(r => state.error = r.body)
         .finally(() => state.saving = false);
 };
 
-DomainService.getDomain({ domainId: props.id })
+UserService.getUser({ userId: props.id })
     .then(mapModel)
     .catch(r => state.error = r.body);
 
 </script>
 <template>
-    <h1 class="display-6">Edit domain</h1>
+    <h1 class="display-6">Edit user</h1>
     <div class="row">
         <form class="col-md-4" v-if="state.model" @submit.prevent="submit">
-            <Text class="mb-3" label="Domain" :placeholder="'example.com'" autoFocus v-model="state.model.name" required />
-            <fieldset>
-                <legend>Outgoing SMTP server</legend>
-                <Text class="mb-3" label="Host" :placeholder="'mail.example.com'" v-model="state.model.host" required />
-                <Text class="mb-3" label="Username" :autoComplete="'off'" v-model="state.model.username" required />
-                <Text class="mb-3" label="Replace password" :autoComplete="'off'" :type="'password'"
-                    v-model="state.model.newPassword" />
-                <IntegerBox class="mb-3" label="Port" v-model="state.model.port" required
-                    :error="state.error?.errors?.Port" />
-                <CheckBox class="mb-3" label="Use TLS" v-model="state.model.isSecure" />
-                <SpinButton class="btn-primary" :loading="state.saving" text="Save" loadingText="Saving" isSubmit />
-            </fieldset>
+            <Text class="mb-3" label="Username" autoFocus v-model="state.model.name" required
+                :error="state.error?.errors?.name" />
+            <Text class="mb-3" label="Description" autoFocus v-model="state.model.description"
+                :error="state.error?.errors?.description" />
+            <Text class="mb-3" label="Replace password" :autoComplete="'off'" :type="'password'"
+                v-model="state.model.newPassword" :error="state.error?.errors?.newPassword" />
+            <IntegerBox class="mb-3" label="Quota in MB" v-model="state.model.quota" :error="state.error?.errors?.quota" />
+            <CheckBox class="mb-3" label="Master" v-model="state.model.isMaster" :error="state.error?.errors?.isMaster" />
+            <CheckBox class="mb-3" label="Disabled" v-model="state.model.disabled" :error="state.error?.errors?.disabled" />
+            <SpinButton class="btn-primary" :loading="state.saving" text="Save" loadingText="Saving" isSubmit />
         </form>
         <p v-else-if="state.error">{{ state.error.message }}</p>
         <p v-else>Loading...</p>

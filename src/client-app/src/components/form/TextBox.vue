@@ -29,8 +29,8 @@ onMounted(() => {
 <template>
     <div>
         <label v-if="label" :for="state.id" class="form-label">{{ label }} <span v-if="required">*</span></label>
-        <input ref="el" class="form-control" :id="state.id" :placeholder="placeholder" :value="modelValue" @input="update"
-            :required="required" :type="type" :autocomplete="autoComplete">
+        <input ref="el" class="form-control" :id="state.id" :class="{ 'is-invalid': error }" :placeholder="placeholder"
+            :value="modelValue" @input="update" :required="required" :type="type" :autocomplete="autoComplete">
         <div v-if="error" class="invalid-feedback">{{ error }}</div>
         <div v-else-if="help" class="form-text">{{ help }}</div>
     </div>

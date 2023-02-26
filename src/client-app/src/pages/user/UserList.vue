@@ -4,11 +4,11 @@ import { UserLM, UserService } from "../../api";
 import Search from '../../components/form/Search.vue'
 import { Header, Pages, Sizes, ITableParams, initParams, updateParams } from "../../components/table"
 
-interface IDomainParams extends ITableParams {
+interface IUserParams extends ITableParams {
     searchTerm?: string;
 }
 
-const data = reactive<{ params: IDomainParams, items: UserLM[] }>({ params: initParams(), items: [] });
+const data = reactive<{ params: IUserParams, items: UserLM[] }>({ params: initParams(), items: [] });
 const refresh = (params?: ITableParams) => {
     if (params)
         data.params = params;
@@ -73,7 +73,7 @@ refresh();
                         </svg>
                     </td>
                     <td>
-                        <span v-if="item.quotaMegaBytes !== null">{{ item.quotaMegaBytes }} MB</span>
+                        <span v-if="item.quotaMegaBytes">{{ item.quotaMegaBytes }} MB</span>
                         <svg v-else xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
                             class="bi bi-infinity" viewBox="0 0 16 16">
                             <path

@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Text.Json;
 using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.HttpOverrides;
@@ -66,13 +67,13 @@ public class Program
                 options.SupportNonNullableReferenceTypes();
                 options.UseAllOfToExtendReferenceSchemas();
             });
-            builder.Services.ConfigureHttpJsonOptions(o =>
+
+            builder.Services.AddControllers().AddJsonOptions(o =>
             {
-                o.SerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingDefault | JsonIgnoreCondition.WhenWritingNull;
+                o.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingDefault | JsonIgnoreCondition.WhenWritingNull;
+                o.JsonSerializerOptions.DictionaryKeyPolicy = JsonNamingPolicy.CamelCase;
+                o.JsonSerializerOptions.WriteIndented = true;
             });
-
-
-            builder.Services.AddControllers();
             // In production, the React files will be served from this directory
             builder.Services.AddSpaStaticFiles(c => { c.RootPath = "spa"; });
 

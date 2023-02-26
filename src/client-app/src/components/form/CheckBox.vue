@@ -4,7 +4,7 @@ export interface ICheckBox {
     label: string;
     autoFocus?: boolean;
     required?: boolean;
-    modelValue?: boolean;
+    modelValue?: boolean | null;
     help?: string;
     error?: string;
 }
@@ -26,8 +26,8 @@ onMounted(() => {
 <template>
     <div>
         <div class="form-check">
-            <input ref="el" class="form-check-input" @input="update" type="checkbox" :checked="modelValue" :id="state.id"
-                :required="required">
+            <input ref="el" class="form-check-input" :class="{ 'is-invalid': error }" @input="update" type="checkbox"
+                :checked="modelValue ?? false" :id="state.id" :required="required">
             <label class="form-check-label" :for="state.id">{{ label }}<span v-if="required">*</span></label>
             <div v-if="error" class="invalid-feedback">{{ error }}</div>
             <div v-else-if="help" class="form-text">{{ help }}</div>

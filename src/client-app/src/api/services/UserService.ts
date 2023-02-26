@@ -101,11 +101,9 @@ export class UserService {
      */
     public static updateUser({
         userId,
-        id,
         requestBody,
     }: {
-        userId: string,
-        id?: number,
+        userId: number,
         requestBody?: UserUM,
     }): CancelablePromise<UserVM> {
         return __request(OpenAPI, {
@@ -113,9 +111,6 @@ export class UserService {
             url: '/api/users/{userId}',
             path: {
                 'userId': userId,
-            },
-            query: {
-                'id': id,
             },
             body: requestBody,
             mediaType: 'application/json',

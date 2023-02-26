@@ -133,10 +133,10 @@ public class UsersController : ControllerBase
     [ProducesResponseType(typeof(UserVM), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ValidationError), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> UpdateAsync(int id, UserUM model)
+    public async Task<IActionResult> UpdateAsync(int userId, UserUM model)
     {
         var user = await _db.Users
-          .Where(u => u.UserId == id)
+          .Where(u => u.UserId == userId)
           .FirstOrDefaultAsync();
 
         if (user == null)
