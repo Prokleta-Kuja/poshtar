@@ -1,8 +1,15 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue';
+export interface ISearch {
+    label?: string;
+    autoFocus?: boolean;
+    placeholder?: string;
+    modelValue?: string;
+    onChange: () => void;
+}
 
 const el = ref<HTMLInputElement | null>(null);
-const props = defineProps<{ autoFocus?: boolean, modelValue?: string, onChange: () => void }>();
+const props = defineProps<ISearch>();
 const emit = defineEmits<{ (e: 'update:modelValue', modelValue?: string): void }>()
 
 const clear = () => { emit('update:modelValue', undefined); props.onChange(); }
@@ -18,9 +25,12 @@ onMounted(() => {
 </script>
 <template>
     <div>
-        <label for="search" class="form-label">Search</label>
+        <label for="search" class="form-label">
+            <span v-if="label">{{ label }}</span>
+            <span v-else>Search</span>
+        </label>
         <div class="input-group">
-            <input ref="el" class="form-control" id="search" placeholder="Name, Host" :value="props.modelValue"
+            <input ref="el" class="form-control" id="search" :placeholder="placeholder" :value="props.modelValue"
                 @keyup.enter="search" type="search">
             <button class="btn btn-outline-danger" type="button" @click.prevent="clear">
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-x-lg"

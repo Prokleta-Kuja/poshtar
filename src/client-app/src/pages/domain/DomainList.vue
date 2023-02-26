@@ -8,7 +8,7 @@ interface IDomainParams extends ITableParams {
     searchTerm?: string;
 }
 
-const data = reactive<{ loaded?: boolean, params: IDomainParams, items: DomainLM[] }>({ params: initParams(), items: [] });
+const data = reactive<{ params: IDomainParams, items: DomainLM[] }>({ params: initParams(), items: [] });
 const refresh = (params?: ITableParams) => {
     if (params)
         data.params = params;
@@ -33,7 +33,8 @@ refresh();
     </div>
     <div class="d-flex flex-wrap">
         <Sizes class="me-3 mb-2" style="max-width:8rem" :params="data.params" :on-change="refresh" />
-        <Search autoFocus class="me-3 mb-2" style="max-width:16rem" v-model="data.params.searchTerm" :on-change="refresh" />
+        <Search autoFocus class="me-3 mb-2" style="max-width:16rem" placeholder="Name, Host"
+            v-model="data.params.searchTerm" :on-change="refresh" />
     </div>
     <div class="table-responsive">
         <table class="table">
