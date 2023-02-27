@@ -89,9 +89,9 @@ public partial class AppDbContext : DbContext, IDataProtectionKeyContext
         ica.Users.Add(slaveUser);
 
 
-        var mailMaster = new Address { Pattern = "master", Description = "Master mainš", Domain = ica, IsStatic = true, };
-        var mailSlave = new Address { Pattern = "slave", Description = "Slave mainŠ", Domain = ica, IsStatic = true, };
-        var mailSales = new Address { Pattern = @"slave\..+", Description = "Slave wildcard after dot", Domain = ica, };
+        var mailMaster = new Address { Pattern = "master", Description = "Master main", Domain = ica, Type = AddressType.Exact, };
+        var mailSlave = new Address { Pattern = "slave", Description = "Slave main", Domain = ica, Type = AddressType.Exact, };
+        var mailSales = new Address { Pattern = "slave.", Description = "Slave prefix", Domain = ica, Type = AddressType.Prefix };
         mailMaster.Users.Add(masterUser);
         mailSlave.Users.Add(slaveUser);
         mailSales.Users.Add(slaveUser);

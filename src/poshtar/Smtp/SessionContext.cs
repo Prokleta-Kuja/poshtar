@@ -123,13 +123,14 @@ public class SessionContext : IDisposable
             var authorizedToSend = false;
             foreach (var address in domain.Addresses)
             {
-                if (address.IsStatic)
-                    authorizedToSend = address.Pattern.Equals(@from.User, StringComparison.InvariantCultureIgnoreCase);
-                else
-                    authorizedToSend = Regex.IsMatch(@from.User, address.Pattern, RegexOptions.IgnoreCase);
+                // TODO: convert to AddressTypeEnum
+                // if (address.IsStatic)
+                //     authorizedToSend = address.Pattern.Equals(@from.User, StringComparison.InvariantCultureIgnoreCase);
+                // else
+                //     authorizedToSend = Regex.IsMatch(@from.User, address.Pattern, RegexOptions.IgnoreCase);
 
-                if (authorizedToSend)
-                    break;
+                // if (authorizedToSend)
+                //     break;
             }
 
             if (authorizedToSend)
@@ -161,17 +162,19 @@ public class SessionContext : IDisposable
             return MailboxFilterResult.NoPermanently;
         }
         // TODO: when matched, add matched users to transaction so we already know which users to deliver to
-        foreach (var address in domain.Addresses)
-            if (address.IsStatic && address.Pattern.Equals(to.User, StringComparison.InvariantCultureIgnoreCase))
-            {
-                Log("Matched recipient to address", new { recipient = to.ToString(), address = to.User, });
-                return MailboxFilterResult.Yes;
-            }
-            else if (Regex.IsMatch(to.User, address.Pattern, RegexOptions.IgnoreCase))
-            {
-                Log("Matched recipient to address", new { recipient = to.ToString(), address = to.User, });
-                return MailboxFilterResult.Yes;
-            }
+
+        // TODO: convert to AddressTypeEnum
+        //foreach (var address in domain.Addresses)
+        // if (address.IsStatic && address.Pattern.Equals(to.User, StringComparison.InvariantCultureIgnoreCase))
+        // {
+        //     Log("Matched recipient to address", new { recipient = to.ToString(), address = to.User, });
+        //     return MailboxFilterResult.Yes;
+        // }
+        // else if (Regex.IsMatch(to.User, address.Pattern, RegexOptions.IgnoreCase))
+        // {
+        //     Log("Matched recipient to address", new { recipient = to.ToString(), address = to.User, });
+        //     return MailboxFilterResult.Yes;
+        // }
 
         return MailboxFilterResult.NoTemporarily;
     }

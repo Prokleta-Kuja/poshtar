@@ -9,6 +9,7 @@ export type { OpenAPIConfig } from './core/OpenAPI';
 export type { AddressCM } from './models/AddressCM';
 export type { AddressLM } from './models/AddressLM';
 export type { AddressLMListResponse } from './models/AddressLMListResponse';
+export { AddressType } from './models/AddressType';
 export type { AddressUM } from './models/AddressUM';
 export type { AddressVM } from './models/AddressVM';
 export type { DomainCM } from './models/DomainCM';

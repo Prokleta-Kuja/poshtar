@@ -50,7 +50,6 @@ public class AddressesController : ControllerBase
             {
                 AddressesSortBy.Pattern => query.Order(a => a.Pattern, req.Ascending),
                 AddressesSortBy.Description => query.Order(a => a.Description, req.Ascending),
-                AddressesSortBy.IsStatic => query.Order(a => a.IsStatic, req.Ascending),
                 AddressesSortBy.Domain => query.Order(a => a.Domain!.Name, req.Ascending),
                 _ => query
             };
@@ -64,7 +63,7 @@ public class AddressesController : ControllerBase
                 DomainName = a.Domain!.Name,
                 Pattern = a.Pattern,
                 Description = a.Description,
-                IsStatic = a.IsStatic,
+                Type = a.Type,
                 Disabled = a.Disabled,
                 UserCount = a.Users.Count,
             })
@@ -94,15 +93,14 @@ public class AddressesController : ControllerBase
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> CreateAsync(AddressCM model)
     {
-        if (model.IsStatic)
-            model.Pattern = model.Pattern.Trim().ToLower();
+        model.Pattern = model.Pattern.Trim().ToLower();
 
         if (model.IsInvalid(out var errorModel))
             return BadRequest(errorModel);
 
         var isDuplicate = await _db.Addresses
             .AsNoTracking()
-            .Where(a => a.Pattern == model.Pattern && a.IsStatic == model.IsStatic)
+            .Where(a => a.Pattern == model.Pattern && a.Type == model.Type)
             .AnyAsync();
 
         if (isDuplicate)
@@ -116,7 +114,7 @@ public class AddressesController : ControllerBase
         {
             Pattern = model.Pattern,
             Description = model.Description,
-            IsStatic = model.IsStatic,
+            Type = model.Type,
         };
 
         _db.Addresses.Add(address);
@@ -138,15 +136,14 @@ public class AddressesController : ControllerBase
         if (address == null)
             return NotFound(new PlainError("Not found"));
 
-        if (model.IsStatic)
-            model.Pattern = model.Pattern.Trim().ToLower();
+        model.Pattern = model.Pattern.Trim().ToLower();
 
         if (model.IsInvalid(out var errorModel))
             return BadRequest(errorModel);
 
         var isDuplicate = await _db.Addresses
             .AsNoTracking()
-            .Where(a => a.AddressId != addressId && a.Pattern == model.Pattern && a.IsStatic == model.IsStatic)
+            .Where(a => a.AddressId != addressId && a.Pattern == model.Pattern && a.Type == model.Type)
             .AnyAsync();
 
         if (isDuplicate)
@@ -158,7 +155,7 @@ public class AddressesController : ControllerBase
 
         address.Pattern = model.Pattern;
         address.Description = model.Description;
-        address.IsStatic = model.IsStatic;
+        address.Type = model.Type;
         if (model.Disabled.HasValue)
             address.Disabled = model.Disabled.Value ? address.Disabled.HasValue ? address.Disabled : DateTime.UtcNow : null;
 
@@ -249,6 +246,5 @@ public enum AddressesSortBy
 {
     Pattern = 0,
     Description = 1,
-    IsStatic = 2,
-    Domain = 3,
+    Domain = 2,
 }

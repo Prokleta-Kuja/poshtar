@@ -11,14 +11,14 @@ public class AddressVM
         DomainId = a.DomainId;
         Pattern = a.Pattern;
         Description = a.Description;
-        IsStatic = a.IsStatic;
+        Type = a.Type;
         Disabled = a.Disabled;
     }
     [Required] public int Id { get; set; }
     [Required] public int DomainId { get; set; }
     [Required] public string Pattern { get; set; }
     public string? Description { get; set; }
-    [Required] public bool IsStatic { get; set; }
+    [Required] public AddressType Type { get; set; }
     public DateTime? Disabled { get; set; }
 }
 
@@ -29,7 +29,7 @@ public class AddressLM
     [Required] public required string DomainName { get; set; }
     [Required] public required string Pattern { get; set; }
     public string? Description { get; set; }
-    [Required] public bool IsStatic { get; set; }
+    [Required] public AddressType Type { get; set; }
     public DateTime? Disabled { get; set; }
     [Required] public required int UserCount { get; set; }
 }
@@ -39,7 +39,7 @@ public class AddressCM
     [Required] public int DomainId { get; set; }
     [Required] public required string Pattern { get; set; }
     public string? Description { get; set; }
-    [Required] public bool IsStatic { get; set; }
+    [Required] public AddressType Type { get; set; }
     public bool IsInvalid(out ValidationError errorModel)
     {
         errorModel = new();
@@ -56,7 +56,7 @@ public class AddressUM
     [Required] public int DomainId { get; set; }
     [Required] public required string Pattern { get; set; }
     public string? Description { get; set; }
-    [Required] public bool IsStatic { get; set; }
+    [Required] public AddressType Type { get; set; }
     public bool? Disabled { get; set; }
     public bool IsInvalid(out ValidationError errorModel)
     {
