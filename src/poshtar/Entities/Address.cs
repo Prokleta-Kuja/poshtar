@@ -10,6 +10,7 @@ public class Address
     public required string Pattern { get; set; }
     public string? Description { get; set; }
     public AddressType Type { get; set; }
+    public string? Expression { get; set; }
     public DateTime? Disabled { get; set; }
 
     public Domain? Domain { get; set; }

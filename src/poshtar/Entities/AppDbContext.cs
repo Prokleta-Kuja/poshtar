@@ -26,6 +26,7 @@ public partial class AppDbContext : DbContext, IDataProtectionKeyContext
             e.HasKey(e => e.AddressId);
             e.HasOne(e => e.Domain).WithMany(e => e.Addresses).HasForeignKey(e => e.DomainId).IsRequired().OnDelete(DeleteBehavior.Cascade);
             e.HasIndex(e => e.Pattern).IsUnique();
+            e.Property(e => e.Expression).HasComputedColumnSql("CASE type WHEN 0 THEN pattern WHEN 1 THEN pattern || '%' WHEN 2 THEN '%' || pattern ELSE NULL END", true);
         });
 
         builder.Entity<Domain>(e =>
