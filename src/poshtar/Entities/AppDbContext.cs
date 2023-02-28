@@ -42,24 +42,24 @@ public partial class AppDbContext : DbContext, IDataProtectionKeyContext
         });
 
         // SQLite conversions
-        if (Database.IsSqlite())
-            foreach (var entityType in builder.Model.GetEntityTypes())
-            {
-                var dtProperties = entityType.ClrType.GetProperties()
-                    .Where(p => p.PropertyType == typeof(DateTime) || p.PropertyType == typeof(DateTime?));
-                foreach (var property in dtProperties)
-                    builder.Entity(entityType.Name).Property(property.Name).HasConversion(new DateTimeToBinaryConverter());
+        // if (Database.IsSqlite())
+        //     foreach (var entityType in builder.Model.GetEntityTypes())
+        //     {
+        //         var dtProperties = entityType.ClrType.GetProperties()
+        //             .Where(p => p.PropertyType == typeof(DateTime) || p.PropertyType == typeof(DateTime?));
+        //         foreach (var property in dtProperties)
+        //             builder.Entity(entityType.Name).Property(property.Name).HasConversion(new DateTimeToBinaryConverter());
 
-                var decProperties = entityType.ClrType.GetProperties()
-                    .Where(p => p.PropertyType == typeof(decimal) || p.PropertyType == typeof(decimal?));
-                foreach (var property in decProperties)
-                    builder.Entity(entityType.Name).Property(property.Name).HasConversion<double>();
+        //         var decProperties = entityType.ClrType.GetProperties()
+        //             .Where(p => p.PropertyType == typeof(decimal) || p.PropertyType == typeof(decimal?));
+        //         foreach (var property in decProperties)
+        //             builder.Entity(entityType.Name).Property(property.Name).HasConversion<double>();
 
-                var spanProperties = entityType.ClrType.GetProperties()
-                    .Where(p => p.PropertyType == typeof(TimeSpan) || p.PropertyType == typeof(TimeSpan?));
-                foreach (var property in spanProperties)
-                    builder.Entity(entityType.Name).Property(property.Name).HasConversion<double>();
-            }
+        //         var spanProperties = entityType.ClrType.GetProperties()
+        //             .Where(p => p.PropertyType == typeof(TimeSpan) || p.PropertyType == typeof(TimeSpan?));
+        //         foreach (var property in spanProperties)
+        //             builder.Entity(entityType.Name).Property(property.Name).HasConversion<double>();
+        //     }
     }
     public async ValueTask InitializeDefaults(IDataProtectionProvider dpProvider)
     {

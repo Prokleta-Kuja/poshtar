@@ -36,22 +36,22 @@ public class Program
             builder.Services.AddSmtp();
             builder.Services.Configure<ForwardedHeadersOptions>(options => options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto);
             builder.Services.AddDataProtection().PersistKeysToDbContext<AppDbContext>();
-            builder.Services.AddDbContextFactory<AppDbContext>(builder =>
+            builder.Services.AddDbContextFactory<AppDbContext>(b =>
             {
-                builder.UseSqlite(C.Paths.AppDbConnectionString);
+                b.UseNpgsql(builder.Configuration.GetConnectionString("AppDb"));
                 if (C.IsDebug)
                 {
-                    builder.EnableSensitiveDataLogging();
-                    builder.LogTo(message => Debug.WriteLine(message), new[] { RelationalEventId.CommandExecuted });
+                    b.EnableSensitiveDataLogging();
+                    b.LogTo(message => Debug.WriteLine(message), new[] { RelationalEventId.CommandExecuted });
                 }
             });
-            builder.Services.AddDbContext<AppDbContext>(builder =>
+            builder.Services.AddDbContext<AppDbContext>(b =>
             {
-                builder.UseSqlite(C.Paths.AppDbConnectionString);
+                b.UseNpgsql(builder.Configuration.GetConnectionString("AppDb"));
                 if (C.IsDebug)
                 {
-                    builder.EnableSensitiveDataLogging();
-                    builder.LogTo(message => Debug.WriteLine(message), new[] { RelationalEventId.CommandExecuted });
+                    b.EnableSensitiveDataLogging();
+                    b.LogTo(message => Debug.WriteLine(message), new[] { RelationalEventId.CommandExecuted });
                 }
             });
 
