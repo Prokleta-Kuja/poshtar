@@ -12,7 +12,7 @@ using poshtar.Entities;
 namespace poshtar.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20230228122441_Initial")]
+    [Migration("20230228133423_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -28,191 +28,238 @@ namespace poshtar.Migrations
             modelBuilder.Entity("AddressUser", b =>
                 {
                     b.Property<int>("AddressesAddressId")
-                        .HasColumnType("integer");
+                        .HasColumnType("integer")
+                        .HasColumnName("addresses_address_id");
 
                     b.Property<int>("UsersUserId")
-                        .HasColumnType("integer");
+                        .HasColumnType("integer")
+                        .HasColumnName("users_user_id");
 
-                    b.HasKey("AddressesAddressId", "UsersUserId");
+                    b.HasKey("AddressesAddressId", "UsersUserId")
+                        .HasName("pk_address_user");
 
-                    b.HasIndex("UsersUserId");
+                    b.HasIndex("UsersUserId")
+                        .HasDatabaseName("ix_address_user_users_user_id");
 
-                    b.ToTable("AddressUser");
+                    b.ToTable("address_user", (string)null);
                 });
 
             modelBuilder.Entity("DomainUser", b =>
                 {
                     b.Property<int>("DomainsDomainId")
-                        .HasColumnType("integer");
+                        .HasColumnType("integer")
+                        .HasColumnName("domains_domain_id");
 
                     b.Property<int>("UsersUserId")
-                        .HasColumnType("integer");
+                        .HasColumnType("integer")
+                        .HasColumnName("users_user_id");
 
-                    b.HasKey("DomainsDomainId", "UsersUserId");
+                    b.HasKey("DomainsDomainId", "UsersUserId")
+                        .HasName("pk_domain_user");
 
-                    b.HasIndex("UsersUserId");
+                    b.HasIndex("UsersUserId")
+                        .HasDatabaseName("ix_domain_user_users_user_id");
 
-                    b.ToTable("DomainUser");
+                    b.ToTable("domain_user", (string)null);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.DataProtection.EntityFrameworkCore.DataProtectionKey", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
+                        .HasColumnType("integer")
+                        .HasColumnName("id");
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<string>("FriendlyName")
-                        .HasColumnType("text");
+                        .HasColumnType("text")
+                        .HasColumnName("friendly_name");
 
                     b.Property<string>("Xml")
-                        .HasColumnType("text");
+                        .HasColumnType("text")
+                        .HasColumnName("xml");
 
-                    b.HasKey("Id");
+                    b.HasKey("Id")
+                        .HasName("pk_data_protection_keys");
 
-                    b.ToTable("DataProtectionKeys");
+                    b.ToTable("data_protection_keys", (string)null);
                 });
 
             modelBuilder.Entity("poshtar.Entities.Address", b =>
                 {
                     b.Property<int>("AddressId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
+                        .HasColumnType("integer")
+                        .HasColumnName("address_id");
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("AddressId"));
 
                     b.Property<string>("Description")
-                        .HasColumnType("text");
+                        .HasColumnType("text")
+                        .HasColumnName("description");
 
                     b.Property<DateTime?>("Disabled")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("disabled");
 
                     b.Property<int>("DomainId")
-                        .HasColumnType("integer");
+                        .HasColumnType("integer")
+                        .HasColumnName("domain_id");
 
                     b.Property<string>("Pattern")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasColumnType("text")
+                        .HasColumnName("pattern");
 
                     b.Property<int>("Type")
-                        .HasColumnType("integer");
+                        .HasColumnType("integer")
+                        .HasColumnName("type");
 
-                    b.HasKey("AddressId");
+                    b.HasKey("AddressId")
+                        .HasName("pk_addresses");
 
-                    b.HasIndex("DomainId");
+                    b.HasIndex("DomainId")
+                        .HasDatabaseName("ix_addresses_domain_id");
 
                     b.HasIndex("Pattern")
-                        .IsUnique();
+                        .IsUnique()
+                        .HasDatabaseName("ix_addresses_pattern");
 
-                    b.ToTable("Addresses");
+                    b.ToTable("addresses", (string)null);
                 });
 
             modelBuilder.Entity("poshtar.Entities.Domain", b =>
                 {
                     b.Property<int>("DomainId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
+                        .HasColumnType("integer")
+                        .HasColumnName("domain_id");
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("DomainId"));
 
                     b.Property<DateTime?>("Disabled")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("disabled");
 
                     b.Property<string>("Host")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasColumnType("text")
+                        .HasColumnName("host");
 
                     b.Property<bool>("IsSecure")
-                        .HasColumnType("boolean");
+                        .HasColumnType("boolean")
+                        .HasColumnName("is_secure");
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasColumnType("text")
+                        .HasColumnName("name");
 
                     b.Property<string>("Password")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasColumnType("text")
+                        .HasColumnName("password");
 
                     b.Property<int>("Port")
-                        .HasColumnType("integer");
+                        .HasColumnType("integer")
+                        .HasColumnName("port");
 
                     b.Property<string>("Username")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasColumnType("text")
+                        .HasColumnName("username");
 
-                    b.HasKey("DomainId");
+                    b.HasKey("DomainId")
+                        .HasName("pk_domains");
 
-                    b.HasIndex("Name");
+                    b.HasIndex("Name")
+                        .HasDatabaseName("ix_domains_name");
 
-                    b.ToTable("Domains");
+                    b.ToTable("domains", (string)null);
                 });
 
             modelBuilder.Entity("poshtar.Entities.LogEntry", b =>
                 {
                     b.Property<int>("LogEntryId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
+                        .HasColumnType("integer")
+                        .HasColumnName("log_entry_id");
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("LogEntryId"));
 
                     b.Property<Guid>("Context")
-                        .HasColumnType("uuid");
+                        .HasColumnType("uuid")
+                        .HasColumnName("context");
 
                     b.Property<string>("Message")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasColumnType("text")
+                        .HasColumnName("message");
 
                     b.Property<string>("Properties")
-                        .HasColumnType("text");
+                        .HasColumnType("text")
+                        .HasColumnName("properties");
 
                     b.Property<DateTime>("Timestamp")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("timestamp");
 
-                    b.HasKey("LogEntryId");
+                    b.HasKey("LogEntryId")
+                        .HasName("pk_logs");
 
-                    b.ToTable("Logs");
+                    b.ToTable("logs", (string)null);
                 });
 
             modelBuilder.Entity("poshtar.Entities.User", b =>
                 {
                     b.Property<int>("UserId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
+                        .HasColumnType("integer")
+                        .HasColumnName("user_id");
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("UserId"));
 
                     b.Property<string>("Description")
-                        .HasColumnType("text");
+                        .HasColumnType("text")
+                        .HasColumnName("description");
 
                     b.Property<DateTime?>("Disabled")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("disabled");
 
                     b.Property<string>("Hash")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasColumnType("text")
+                        .HasColumnName("hash");
 
                     b.Property<bool>("IsMaster")
-                        .HasColumnType("boolean");
+                        .HasColumnType("boolean")
+                        .HasColumnName("is_master");
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasColumnType("text")
+                        .HasColumnName("name");
 
                     b.Property<string>("Password")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasColumnType("text")
+                        .HasColumnName("password");
 
                     b.Property<int?>("Quota")
-                        .HasColumnType("integer");
+                        .HasColumnType("integer")
+                        .HasColumnName("quota");
 
                     b.Property<string>("Salt")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasColumnType("text")
+                        .HasColumnName("salt");
 
-                    b.HasKey("UserId");
+                    b.HasKey("UserId")
+                        .HasName("pk_users");
 
-                    b.ToTable("Users");
+                    b.ToTable("users", (string)null);
                 });
 
             modelBuilder.Entity("AddressUser", b =>
@@ -221,13 +268,15 @@ namespace poshtar.Migrations
                         .WithMany()
                         .HasForeignKey("AddressesAddressId")
                         .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .IsRequired()
+                        .HasConstraintName("fk_address_user_addresses_addresses_address_id");
 
                     b.HasOne("poshtar.Entities.User", null)
                         .WithMany()
                         .HasForeignKey("UsersUserId")
                         .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .IsRequired()
+                        .HasConstraintName("fk_address_user_users_users_user_id");
                 });
 
             modelBuilder.Entity("DomainUser", b =>
@@ -236,13 +285,15 @@ namespace poshtar.Migrations
                         .WithMany()
                         .HasForeignKey("DomainsDomainId")
                         .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .IsRequired()
+                        .HasConstraintName("fk_domain_user_domains_domains_domain_id");
 
                     b.HasOne("poshtar.Entities.User", null)
                         .WithMany()
                         .HasForeignKey("UsersUserId")
                         .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .IsRequired()
+                        .HasConstraintName("fk_domain_user_users_users_user_id");
                 });
 
             modelBuilder.Entity("poshtar.Entities.Address", b =>
@@ -251,7 +302,8 @@ namespace poshtar.Migrations
                         .WithMany("Addresses")
                         .HasForeignKey("DomainId")
                         .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .IsRequired()
+                        .HasConstraintName("fk_addresses_domains_domain_id");
 
                     b.Navigation("Domain");
                 });

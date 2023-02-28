@@ -47,6 +47,26 @@ Bind mailsolution/mail to /mail
 
 On first run a data folder is going to be created and it going to fail because you need to put cert.crt & cert.key in data/certs folder.
 
+## postgres
+
+```
+SELECT *, pg_terminate_backend(pid)
+FROM pg_stat_activity
+WHERE pid <> pg_backend_pid()
+AND datname = 'dev_poshtar';
+
+DROP DATABASE dev_poshtar;
+
+CREATE DATABASE dev_poshtar
+    WITH
+    OWNER = dev
+    ENCODING = 'UTF8'
+    LC_COLLATE = 'hr_HR.utf8'
+    LC_CTYPE = 'hr_HR.utf8'
+    CONNECTION LIMIT = -1
+    IS_TEMPLATE = False;
+```
+
 # Other
 
 After changing system user or password via env, dovcot configuration must be reloaded or dovecot restarted.

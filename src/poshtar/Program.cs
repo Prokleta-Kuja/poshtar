@@ -38,7 +38,7 @@ public class Program
             builder.Services.AddDataProtection().PersistKeysToDbContext<AppDbContext>();
             builder.Services.AddDbContextFactory<AppDbContext>(b =>
             {
-                b.UseNpgsql(builder.Configuration.GetConnectionString("AppDb"));
+                b.UseNpgsql(builder.Configuration.GetConnectionString("AppDb")).UseSnakeCaseNamingConvention(); ;
                 if (C.IsDebug)
                 {
                     b.EnableSensitiveDataLogging();
@@ -47,7 +47,7 @@ public class Program
             });
             builder.Services.AddDbContext<AppDbContext>(b =>
             {
-                b.UseNpgsql(builder.Configuration.GetConnectionString("AppDb"));
+                b.UseNpgsql(builder.Configuration.GetConnectionString("AppDb")).UseSnakeCaseNamingConvention(); ;
                 if (C.IsDebug)
                 {
                     b.EnableSensitiveDataLogging();
