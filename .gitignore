@@ -10,10 +10,8 @@
 *.userosscache
 *.sln.docstates
 appsettings.*.json
-certs/
-src/poshtar/data/*
-/dovecot/data
-/dovecot/config/*.conf
+data/
+.env
 
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs

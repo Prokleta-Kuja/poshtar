@@ -47,6 +47,15 @@ Bind mailsolution/mail to /mail
 
 On first run a data folder is going to be created and it going to fail because you need to put cert.crt & cert.key in data/certs folder.
 
+## Migrations
+
+```
+dotnet build
+dotnet ef migrations add --no-build -c SqliteDbContext -o ./Entities/Migrations/Sqlite Initial
+dotnet ef migrations add --no-build -c PostgresDbContext -o ./Entities/Migrations/Postgres Initial
+dotnet ef migrations add --no-build -c MysqlDbContext -o ./Entities/Migrations/Mysql Initial
+```
+
 ## postgres
 
 ```

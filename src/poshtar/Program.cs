@@ -33,27 +33,14 @@ public class Program
         {
             var builder = WebApplication.CreateBuilder(args);
             builder.Host.UseSerilog();
-            builder.Services.AddSmtp();
             builder.Services.Configure<ForwardedHeadersOptions>(options => options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto);
             builder.Services.AddDataProtection().PersistKeysToDbContext<AppDbContext>();
-            builder.Services.AddDbContextFactory<AppDbContext>(b =>
+            switch (C.DbContextType)
             {
-                b.UseNpgsql(builder.Configuration.GetConnectionString("AppDb")).UseSnakeCaseNamingConvention(); ;
-                if (C.IsDebug)
-                {
-                    b.EnableSensitiveDataLogging();
-                    b.LogTo(message => Debug.WriteLine(message), new[] { RelationalEventId.CommandExecuted });
-                }
-            });
-            builder.Services.AddDbContext<AppDbContext>(b =>
-            {
-                b.UseNpgsql(builder.Configuration.GetConnectionString("AppDb")).UseSnakeCaseNamingConvention(); ;
-                if (C.IsDebug)
-                {
-                    b.EnableSensitiveDataLogging();
-                    b.LogTo(message => Debug.WriteLine(message), new[] { RelationalEventId.CommandExecuted });
-                }
-            });
+                case DbContextType.PostgreSQL: builder.Services.AddDbContext<AppDbContext, PostgresDbContext>(); break;
+                case DbContextType.MySQL: builder.Services.AddDbContext<AppDbContext, MysqlDbContext>(); break;
+                case DbContextType.SQLite: builder.Services.AddDbContext<AppDbContext, SqliteDbContext>(); break;
+            }
 
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
@@ -80,14 +67,6 @@ public class Program
             var app = builder.Build();
             await Initialize(app.Services);
 
-            // app.UseSmtp();
-            //////////////
-            var cts = new CancellationTokenSource();
-            var cert = System.Security.Cryptography.X509Certificates.X509Certificate2.CreateFromPemFile(C.Paths.CertCrt, C.Paths.CertKey);
-            var opt = new Smtp.ServerOptions("abcd.ica.hr", cert);
-            var server = new Smtp.Server(opt, app.Services);
-            _ = server.StartAsync(cts.Token);
-            /////////////
             if (app.Environment.IsDevelopment())
             {
                 app.UseSwagger();
@@ -132,9 +111,9 @@ public class Program
     {
         if (C.IsDebug)
         {
-            Directory.CreateDirectory(C.Paths.MailData);
-            Directory.CreateDirectory(C.Paths.ConfigData);
             Directory.CreateDirectory(C.Paths.CertData);
+            Directory.CreateDirectory(C.Paths.ConfigData);
+            Directory.CreateDirectory(C.Paths.MailData);
         }
 
         if (string.IsNullOrWhiteSpace(C.Hostname))
@@ -146,12 +125,11 @@ public class Program
         if (!File.Exists(C.Paths.CertCrt) || !File.Exists(C.Paths.CertKey))
             throw new Exception($"Could not load certs from {C.Paths.CertData}");
 
-        if (!Directory.GetFiles(C.Paths.ConfigData).Any())
-            DovecotConfiguration.Initial();
+        // if (!Directory.GetFiles(C.Paths.ConfigData).Any())
+        //     DovecotConfiguration.Initial();
 
-        var dbFactory = provider.GetRequiredService<IDbContextFactory<AppDbContext>>();
-        using var db = dbFactory.CreateDbContext();
-
+        using var scope = provider.CreateScope();
+        using var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
         if (db.Database.GetMigrations().Any())
             await db.Database.MigrateAsync();
         else
@@ -160,7 +138,7 @@ public class Program
         // Demo data
         if (C.IsDebug && !db.Domains.Any())
         {
-            var dpProvider = provider.GetRequiredService<IDataProtectionProvider>();
+            var dpProvider = scope.ServiceProvider.GetRequiredService<IDataProtectionProvider>();
             await db.InitializeDefaults(dpProvider);
         }
     }

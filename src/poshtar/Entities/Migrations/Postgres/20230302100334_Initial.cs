@@ -4,7 +4,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
-namespace poshtar.Migrations
+namespace poshtar.Entities.Migrations.Postgres
 {
     /// <inheritdoc />
     public partial class Initial : Migration
@@ -46,22 +46,6 @@ namespace poshtar.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "logs",
-                columns: table => new
-                {
-                    log_entry_id = table.Column<int>(type: "integer", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    timestamp = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    context = table.Column<Guid>(type: "uuid", nullable: false),
-                    message = table.Column<string>(type: "text", nullable: false),
-                    properties = table.Column<string>(type: "text", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("pk_logs", x => x.log_entry_id);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "users",
                 columns: table => new
                 {
@@ -91,6 +75,7 @@ namespace poshtar.Migrations
                     pattern = table.Column<string>(type: "text", nullable: false),
                     description = table.Column<string>(type: "text", nullable: true),
                     type = table.Column<int>(type: "integer", nullable: false),
+                    expression = table.Column<string>(type: "text", nullable: true, computedColumnSql: "CASE type WHEN 0 THEN pattern WHEN 1 THEN pattern || '%' WHEN 2 THEN '%' || pattern ELSE NULL END", stored: true),
                     disabled = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
                 },
                 constraints: table =>
@@ -190,9 +175,6 @@ namespace poshtar.Migrations
 
             migrationBuilder.DropTable(
                 name: "domain_user");
-
-            migrationBuilder.DropTable(
-                name: "logs");
 
             migrationBuilder.DropTable(
                 name: "addresses");
