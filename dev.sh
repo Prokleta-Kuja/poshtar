@@ -17,8 +17,9 @@ sudo apt-get update && sudo apt-get install -y --no-install-recommends \
     ; \
 	sudo rm -rf /var/lib/apt/lists/*
 
-# monitoring
-
+# all
+sudo postfix -c /workspaces/poshtar/src/poshtar/data/config/postfix start
+sudo dovecot -c /workspaces/poshtar/src/poshtar/data/config/dovecot/dovecot.conf
 
 # postfix 
 sudo postfix stop && sudo postfix -c /workspaces/poshtar/src/poshtar/data/config/postfix start
