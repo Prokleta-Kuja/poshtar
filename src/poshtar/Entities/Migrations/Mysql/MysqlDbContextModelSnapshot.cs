@@ -38,25 +38,6 @@ namespace poshtar.Entities.Migrations.Mysql
                     b.ToTable("address_user", (string)null);
                 });
 
-            modelBuilder.Entity("DomainUser", b =>
-                {
-                    b.Property<int>("DomainsDomainId")
-                        .HasColumnType("int")
-                        .HasColumnName("domains_domain_id");
-
-                    b.Property<int>("UsersUserId")
-                        .HasColumnType("int")
-                        .HasColumnName("users_user_id");
-
-                    b.HasKey("DomainsDomainId", "UsersUserId")
-                        .HasName("pk_domain_user");
-
-                    b.HasIndex("UsersUserId")
-                        .HasDatabaseName("ix_domain_user_users_user_id");
-
-                    b.ToTable("domain_user", (string)null);
-                });
-
             modelBuilder.Entity("Microsoft.AspNetCore.DataProtection.EntityFrameworkCore.DataProtectionKey", b =>
                 {
                     b.Property<int>("Id")
@@ -105,7 +86,7 @@ namespace poshtar.Entities.Migrations.Mysql
 
                     b.Property<string>("Pattern")
                         .IsRequired()
-                        .HasColumnType("varchar(255)")
+                        .HasColumnType("longtext")
                         .HasColumnName("pattern");
 
                     b.Property<int>("Type")
@@ -117,10 +98,6 @@ namespace poshtar.Entities.Migrations.Mysql
 
                     b.HasIndex("DomainId")
                         .HasDatabaseName("ix_addresses_domain_id");
-
-                    b.HasIndex("Pattern")
-                        .IsUnique()
-                        .HasDatabaseName("ix_addresses_pattern");
 
                     b.ToTable("addresses", (string)null);
                 });
@@ -237,23 +214,6 @@ namespace poshtar.Entities.Migrations.Mysql
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
                         .HasConstraintName("fk_address_user_users_users_user_id");
-                });
-
-            modelBuilder.Entity("DomainUser", b =>
-                {
-                    b.HasOne("poshtar.Entities.Domain", null)
-                        .WithMany()
-                        .HasForeignKey("DomainsDomainId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
-                        .HasConstraintName("fk_domain_user_domains_domains_domain_id");
-
-                    b.HasOne("poshtar.Entities.User", null)
-                        .WithMany()
-                        .HasForeignKey("UsersUserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
-                        .HasConstraintName("fk_domain_user_users_users_user_id");
                 });
 
             modelBuilder.Entity("poshtar.Entities.Address", b =>

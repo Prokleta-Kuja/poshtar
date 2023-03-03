@@ -31,7 +31,6 @@ public class UserLM
     public int? QuotaMegaBytes { get; set; }
     public DateTime? Disabled { get; set; }
     [Required] public int AddressCount { get; set; }
-    [Required] public int DomainCount { get; set; }
 }
 
 public class UserCM

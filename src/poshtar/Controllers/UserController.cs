@@ -41,11 +41,6 @@ public class UsersController : ControllerBase
         else if (req.NotAddressId.HasValue)
             query = query.Where(u => u.Addresses.Any(a => a.AddressId != req.NotAddressId.Value));
 
-        if (req.DomainId.HasValue)
-            query = query.Where(u => u.Domains.Any(d => d.DomainId == req.DomainId.Value));
-        else if (req.NotDomainId.HasValue)
-            query = query.Where(u => u.Domains.Any(d => d.DomainId != req.NotDomainId.Value));
-
         var count = await query.CountAsync();
 
         if (!string.IsNullOrWhiteSpace(req.SortBy) && Enum.TryParse<UsersSortBy>(req.SortBy, true, out var sortBy))
@@ -69,7 +64,6 @@ public class UsersController : ControllerBase
                 QuotaMegaBytes = u.Quota / 1024 / 1024,
                 Disabled = u.Disabled,
                 AddressCount = u.Addresses.Count,
-                DomainCount = u.Domains.Count,
             })
             .ToListAsync();
 
@@ -197,8 +191,6 @@ public class UserQuery : FilterQuery
 {
     public int? AddressId { get; set; }
     public int? NotAddressId { get; set; }
-    public int? DomainId { get; set; }
-    public int? NotDomainId { get; set; }
 }
 
 public enum UsersSortBy

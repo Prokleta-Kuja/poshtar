@@ -4,35 +4,30 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using poshtar.Entities;
 
 #nullable disable
 
-namespace poshtar.Entities.Migrations.Postgres
+namespace poshtar.Entities.Migrations.Sqlite
 {
-    [DbContext(typeof(PostgresDbContext))]
-    [Migration("20230302100334_Initial")]
+    [DbContext(typeof(SqliteDbContext))]
+    [Migration("20230303095818_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
-            modelBuilder
-                .HasAnnotation("ProductVersion", "7.0.3")
-                .HasAnnotation("Relational:MaxIdentifierLength", 63);
-
-            NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
+            modelBuilder.HasAnnotation("ProductVersion", "7.0.3");
 
             modelBuilder.Entity("AddressUser", b =>
                 {
                     b.Property<int>("AddressesAddressId")
-                        .HasColumnType("integer")
+                        .HasColumnType("INTEGER")
                         .HasColumnName("addresses_address_id");
 
                     b.Property<int>("UsersUserId")
-                        .HasColumnType("integer")
+                        .HasColumnType("INTEGER")
                         .HasColumnName("users_user_id");
 
                     b.HasKey("AddressesAddressId", "UsersUserId")
@@ -44,40 +39,19 @@ namespace poshtar.Entities.Migrations.Postgres
                     b.ToTable("address_user", (string)null);
                 });
 
-            modelBuilder.Entity("DomainUser", b =>
-                {
-                    b.Property<int>("DomainsDomainId")
-                        .HasColumnType("integer")
-                        .HasColumnName("domains_domain_id");
-
-                    b.Property<int>("UsersUserId")
-                        .HasColumnType("integer")
-                        .HasColumnName("users_user_id");
-
-                    b.HasKey("DomainsDomainId", "UsersUserId")
-                        .HasName("pk_domain_user");
-
-                    b.HasIndex("UsersUserId")
-                        .HasDatabaseName("ix_domain_user_users_user_id");
-
-                    b.ToTable("domain_user", (string)null);
-                });
-
             modelBuilder.Entity("Microsoft.AspNetCore.DataProtection.EntityFrameworkCore.DataProtectionKey", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
+                        .HasColumnType("INTEGER")
                         .HasColumnName("id");
 
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
                     b.Property<string>("FriendlyName")
-                        .HasColumnType("text")
+                        .HasColumnType("TEXT")
                         .HasColumnName("friendly_name");
 
                     b.Property<string>("Xml")
-                        .HasColumnType("text")
+                        .HasColumnType("TEXT")
                         .HasColumnName("xml");
 
                     b.HasKey("Id")
@@ -90,36 +64,34 @@ namespace poshtar.Entities.Migrations.Postgres
                 {
                     b.Property<int>("AddressId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
+                        .HasColumnType("INTEGER")
                         .HasColumnName("address_id");
 
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("AddressId"));
-
                     b.Property<string>("Description")
-                        .HasColumnType("text")
+                        .HasColumnType("TEXT")
                         .HasColumnName("description");
 
-                    b.Property<DateTime?>("Disabled")
-                        .HasColumnType("timestamp with time zone")
+                    b.Property<long?>("Disabled")
+                        .HasColumnType("INTEGER")
                         .HasColumnName("disabled");
 
                     b.Property<int>("DomainId")
-                        .HasColumnType("integer")
+                        .HasColumnType("INTEGER")
                         .HasColumnName("domain_id");
 
                     b.Property<string>("Expression")
                         .ValueGeneratedOnAddOrUpdate()
-                        .HasColumnType("text")
+                        .HasColumnType("TEXT")
                         .HasColumnName("expression")
                         .HasComputedColumnSql("CASE type WHEN 0 THEN pattern WHEN 1 THEN pattern || '%' WHEN 2 THEN '%' || pattern ELSE NULL END", true);
 
                     b.Property<string>("Pattern")
                         .IsRequired()
-                        .HasColumnType("text")
+                        .HasColumnType("TEXT")
                         .HasColumnName("pattern");
 
                     b.Property<int>("Type")
-                        .HasColumnType("integer")
+                        .HasColumnType("INTEGER")
                         .HasColumnName("type");
 
                     b.HasKey("AddressId")
@@ -128,10 +100,6 @@ namespace poshtar.Entities.Migrations.Postgres
                     b.HasIndex("DomainId")
                         .HasDatabaseName("ix_addresses_domain_id");
 
-                    b.HasIndex("Pattern")
-                        .IsUnique()
-                        .HasDatabaseName("ix_addresses_pattern");
-
                     b.ToTable("addresses", (string)null);
                 });
 
@@ -139,41 +107,39 @@ namespace poshtar.Entities.Migrations.Postgres
                 {
                     b.Property<int>("DomainId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
+                        .HasColumnType("INTEGER")
                         .HasColumnName("domain_id");
 
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("DomainId"));
-
-                    b.Property<DateTime?>("Disabled")
-                        .HasColumnType("timestamp with time zone")
+                    b.Property<long?>("Disabled")
+                        .HasColumnType("INTEGER")
                         .HasColumnName("disabled");
 
                     b.Property<string>("Host")
                         .IsRequired()
-                        .HasColumnType("text")
+                        .HasColumnType("TEXT")
                         .HasColumnName("host");
 
                     b.Property<bool>("IsSecure")
-                        .HasColumnType("boolean")
+                        .HasColumnType("INTEGER")
                         .HasColumnName("is_secure");
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("text")
+                        .HasColumnType("TEXT")
                         .HasColumnName("name");
 
                     b.Property<string>("Password")
                         .IsRequired()
-                        .HasColumnType("text")
+                        .HasColumnType("TEXT")
                         .HasColumnName("password");
 
                     b.Property<int>("Port")
-                        .HasColumnType("integer")
+                        .HasColumnType("INTEGER")
                         .HasColumnName("port");
 
                     b.Property<string>("Username")
                         .IsRequired()
-                        .HasColumnType("text")
+                        .HasColumnType("TEXT")
                         .HasColumnName("username");
 
                     b.HasKey("DomainId")
@@ -189,45 +155,43 @@ namespace poshtar.Entities.Migrations.Postgres
                 {
                     b.Property<int>("UserId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
+                        .HasColumnType("INTEGER")
                         .HasColumnName("user_id");
 
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("UserId"));
-
                     b.Property<string>("Description")
-                        .HasColumnType("text")
+                        .HasColumnType("TEXT")
                         .HasColumnName("description");
 
-                    b.Property<DateTime?>("Disabled")
-                        .HasColumnType("timestamp with time zone")
+                    b.Property<long?>("Disabled")
+                        .HasColumnType("INTEGER")
                         .HasColumnName("disabled");
 
                     b.Property<string>("Hash")
                         .IsRequired()
-                        .HasColumnType("text")
+                        .HasColumnType("TEXT")
                         .HasColumnName("hash");
 
                     b.Property<bool>("IsMaster")
-                        .HasColumnType("boolean")
+                        .HasColumnType("INTEGER")
                         .HasColumnName("is_master");
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("text")
+                        .HasColumnType("TEXT")
                         .HasColumnName("name");
 
                     b.Property<string>("Password")
                         .IsRequired()
-                        .HasColumnType("text")
+                        .HasColumnType("TEXT")
                         .HasColumnName("password");
 
                     b.Property<int?>("Quota")
-                        .HasColumnType("integer")
+                        .HasColumnType("INTEGER")
                         .HasColumnName("quota");
 
                     b.Property<string>("Salt")
                         .IsRequired()
-                        .HasColumnType("text")
+                        .HasColumnType("TEXT")
                         .HasColumnName("salt");
 
                     b.HasKey("UserId")
@@ -251,23 +215,6 @@ namespace poshtar.Entities.Migrations.Postgres
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
                         .HasConstraintName("fk_address_user_users_users_user_id");
-                });
-
-            modelBuilder.Entity("DomainUser", b =>
-                {
-                    b.HasOne("poshtar.Entities.Domain", null)
-                        .WithMany()
-                        .HasForeignKey("DomainsDomainId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
-                        .HasConstraintName("fk_domain_user_domains_domains_domain_id");
-
-                    b.HasOne("poshtar.Entities.User", null)
-                        .WithMany()
-                        .HasForeignKey("UsersUserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
-                        .HasConstraintName("fk_domain_user_users_users_user_id");
                 });
 
             modelBuilder.Entity("poshtar.Entities.Address", b =>

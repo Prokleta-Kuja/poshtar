@@ -15,5 +15,4 @@ public class Domain
     public DateTime? Disabled { get; set; }
 
     public virtual List<Address> Addresses { get; set; } = new();
-    public virtual List<User> Users { get; set; } = new();
 }

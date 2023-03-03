@@ -90,30 +90,6 @@ namespace poshtar.Entities.Migrations.Postgres
                 });
 
             migrationBuilder.CreateTable(
-                name: "domain_user",
-                columns: table => new
-                {
-                    domains_domain_id = table.Column<int>(type: "integer", nullable: false),
-                    users_user_id = table.Column<int>(type: "integer", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("pk_domain_user", x => new { x.domains_domain_id, x.users_user_id });
-                    table.ForeignKey(
-                        name: "fk_domain_user_domains_domains_domain_id",
-                        column: x => x.domains_domain_id,
-                        principalTable: "domains",
-                        principalColumn: "domain_id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "fk_domain_user_users_users_user_id",
-                        column: x => x.users_user_id,
-                        principalTable: "users",
-                        principalColumn: "user_id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "address_user",
                 columns: table => new
                 {
@@ -148,17 +124,6 @@ namespace poshtar.Entities.Migrations.Postgres
                 column: "domain_id");
 
             migrationBuilder.CreateIndex(
-                name: "ix_addresses_pattern",
-                table: "addresses",
-                column: "pattern",
-                unique: true);
-
-            migrationBuilder.CreateIndex(
-                name: "ix_domain_user_users_user_id",
-                table: "domain_user",
-                column: "users_user_id");
-
-            migrationBuilder.CreateIndex(
                 name: "ix_domains_name",
                 table: "domains",
                 column: "name");
@@ -172,9 +137,6 @@ namespace poshtar.Entities.Migrations.Postgres
 
             migrationBuilder.DropTable(
                 name: "data_protection_keys");
-
-            migrationBuilder.DropTable(
-                name: "domain_user");
 
             migrationBuilder.DropTable(
                 name: "addresses");

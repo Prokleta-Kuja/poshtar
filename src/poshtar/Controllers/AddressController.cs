@@ -93,22 +93,25 @@ public class AddressesController : ControllerBase
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> CreateAsync(AddressCM model)
     {
-        model.Pattern = model.Pattern.Trim().ToLower();
+        if (model.Type == AddressType.CatchAll)
+            model.Pattern = "*";
+        else
+            model.Pattern = model.Pattern.Trim().ToLower();
 
         if (model.IsInvalid(out var errorModel))
             return BadRequest(errorModel);
 
+        var domain = await _db.Domains.FirstOrDefaultAsync(d => d.DomainId == model.DomainId);
+        if (domain == null)
+            return BadRequest(new ValidationError(nameof(model.DomainId), "Not found"));
+
         var isDuplicate = await _db.Addresses
             .AsNoTracking()
-            .Where(a => a.Pattern == model.Pattern && a.Type == model.Type)
+            .Where(a => a.DomainId == model.DomainId && a.Pattern == model.Pattern && a.Type == model.Type)
             .AnyAsync();
 
         if (isDuplicate)
             return BadRequest(new ValidationError(nameof(model.Pattern), "Already exists"));
-
-        var domain = await _db.Domains.FirstOrDefaultAsync(d => d.DomainId == model.DomainId);
-        if (domain == null)
-            return BadRequest(new ValidationError(nameof(model.DomainId), "Not found"));
 
         var address = new Address
         {
@@ -136,14 +139,17 @@ public class AddressesController : ControllerBase
         if (address == null)
             return NotFound(new PlainError("Not found"));
 
-        model.Pattern = model.Pattern.Trim().ToLower();
+        if (model.Type == AddressType.CatchAll)
+            model.Pattern = "*";
+        else
+            model.Pattern = model.Pattern.Trim().ToLower();
 
         if (model.IsInvalid(out var errorModel))
             return BadRequest(errorModel);
 
         var isDuplicate = await _db.Addresses
             .AsNoTracking()
-            .Where(a => a.AddressId != addressId && a.Pattern == model.Pattern && a.Type == model.Type)
+            .Where(a => a.AddressId != addressId && a.DomainId == model.DomainId && a.Pattern == model.Pattern && a.Type == model.Type)
             .AnyAsync();
 
         if (isDuplicate)

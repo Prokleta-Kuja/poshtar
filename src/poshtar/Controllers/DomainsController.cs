@@ -40,11 +40,6 @@ public class DomainsController : ControllerBase
         else if (req.NotAddressId.HasValue)
             query = query.Where(u => u.Addresses.Any(a => a.AddressId != req.NotAddressId.Value));
 
-        if (req.UserId.HasValue)
-            query = query.Where(d => d.Users.Any(u => u.UserId == req.UserId.Value));
-        else if (req.NotUserId.HasValue)
-            query = query.Where(d => d.Users.Any(u => u.UserId != req.NotUserId.Value));
-
         var count = await query.CountAsync();
 
         if (!string.IsNullOrWhiteSpace(req.SortBy) && Enum.TryParse<DomainsSortBy>(req.SortBy, true, out var sortBy))
@@ -53,7 +48,6 @@ public class DomainsController : ControllerBase
                 DomainsSortBy.Name => query.Order(d => d.Name, req.Ascending),
                 DomainsSortBy.Host => query.Order(d => d.Host, req.Ascending),
                 DomainsSortBy.AddressCount => query.Order(d => d.Addresses.Count(), req.Ascending),
-                DomainsSortBy.UserCount => query.Order(d => d.Users.Count(), req.Ascending),
                 _ => query
             };
 
@@ -64,7 +58,6 @@ public class DomainsController : ControllerBase
                 Id = d.DomainId,
                 Name = d.Name,
                 Host = d.Host,
-                UserCount = d.Users.Count,
                 AddressCount = d.Addresses.Count,
             })
             .ToListAsync();
@@ -186,57 +179,6 @@ public class DomainsController : ControllerBase
 
         return NoContent();
     }
-
-    [HttpPost("{domainId}/users/{userId}", Name = "AddDomainUser")]
-    [ProducesResponseType(StatusCodes.Status204NoContent)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
-    [ProducesResponseType(StatusCodes.Status409Conflict)]
-    public async Task<IActionResult> AddDomainUserAsync(int domainId, int userId)
-    {
-        var domain = await _db.Domains
-            .Include(d => d.Users.Where(u => u.UserId == userId))
-            .Where(d => d.DomainId == domainId)
-            .FirstOrDefaultAsync();
-
-        if (domain == null)
-            return NotFound(new PlainError("Domain not found"));
-
-        if (domain.Users.Count > 0)
-            return Conflict(new PlainError("Domain already contains user"));
-
-        var user = await _db.Users.FirstOrDefaultAsync(u => u.UserId == userId);
-
-        if (user == null)
-            return NotFound(new PlainError("User not found"));
-
-        domain.Users.Add(user);
-        await _db.SaveChangesAsync();
-
-        return NoContent();
-    }
-
-    [HttpDelete("{domainId}/users/{userId}", Name = "RemoveDomainUser")]
-    [ProducesResponseType(StatusCodes.Status204NoContent)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
-    [ProducesResponseType(StatusCodes.Status409Conflict)]
-    public async Task<IActionResult> RemoveDomainUserAsync(int domainId, int userId)
-    {
-        var domain = await _db.Domains
-            .Include(d => d.Users.Where(u => u.UserId == userId))
-            .Where(d => d.DomainId == domainId)
-            .FirstOrDefaultAsync();
-
-        if (domain == null)
-            return NotFound(new PlainError("Domain not found"));
-
-        if (domain.Users.Count > 0)
-            return Conflict(new PlainError("User already removed from domain"));
-
-        domain.Users.RemoveAt(0);
-        await _db.SaveChangesAsync();
-
-        return NoContent();
-    }
 }
 
 public class DomainQuery : FilterQuery
@@ -252,5 +194,4 @@ public enum DomainsSortBy
     Name = 0,
     Host = 1,
     AddressCount = 2,
-    UserCount = 3,
 }

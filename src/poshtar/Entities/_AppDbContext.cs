@@ -8,8 +8,6 @@ using poshtar.Services;
 
 namespace poshtar.Entities;
 
-
-
 public class SqliteDbContext : AppDbContext
 {
     protected override void OnConfiguring(DbContextOptionsBuilder options)
@@ -54,7 +52,6 @@ public partial class AppDbContext : DbContext, IDataProtectionKeyContext
         {
             e.HasKey(e => e.AddressId);
             e.HasOne(e => e.Domain).WithMany(e => e.Addresses).HasForeignKey(e => e.DomainId).IsRequired().OnDelete(DeleteBehavior.Cascade);
-            e.HasIndex(e => e.Pattern).IsUnique();
             e.Property(e => e.Expression).HasComputedColumnSql("CASE type WHEN 0 THEN pattern WHEN 1 THEN pattern || '%' WHEN 2 THEN '%' || pattern ELSE NULL END", true);
         });
 
@@ -67,7 +64,6 @@ public partial class AppDbContext : DbContext, IDataProtectionKeyContext
         builder.Entity<User>(e =>
         {
             e.HasKey(e => e.UserId);
-            e.HasMany(e => e.Domains).WithMany(e => e.Users);
             e.HasMany(e => e.Addresses).WithMany(e => e.Users);
         });
 
@@ -100,32 +96,46 @@ public partial class AppDbContext : DbContext, IDataProtectionKeyContext
         var ica = new Domain
         {
             Name = "ica.hr",
-            Host = "abcd.ica.hr",
+            Host = "relay.ica.hr",
             Port = 587,
             IsSecure = true,
-            Username = "home",
+            Username = "fake",
             Password = serverProtector.Protect("P@ssw0rd"),
         };
-        Domains.Add(ica);
+        var nan = new Domain
+        {
+            Name = "nan.hr",
+            Host = "relay.nan.hr",
+            Port = 587,
+            IsSecure = true,
+            Username = "fake",
+            Password = serverProtector.Protect("P@ssw0rd"),
+        };
+        Domains.Add(nan);
 
-        var master = DovecotHasher.Hash("master");
-        var masterUser = new User { Name = "master", IsMaster = true, Description = "Master user", Salt = master.Salt, Hash = master.Hash, Password = DovecotHasher.Password(master.Salt, master.Hash), };
-        Users.Add(masterUser);
-        ica.Users.Add(masterUser);
+        var admin = DovecotHasher.Hash("admin");
+        var user = DovecotHasher.Hash("user");
 
-        var slave = DovecotHasher.Hash("slave");
-        var slaveUser = new User { Name = "slave", Quota = 1024, Description = "Slave user", Salt = slave.Salt, Hash = slave.Hash, Password = DovecotHasher.Password(slave.Salt, slave.Hash), };
-        Users.Add(slaveUser);
-        ica.Users.Add(slaveUser);
+        var icaAdmin = new User { Name = "icaadmin", IsMaster = true, Description = "ica _admin_ user", Salt = admin.Salt, Hash = admin.Hash, Password = DovecotHasher.Password(admin.Salt, admin.Hash), };
+        var nanAdmin = new User { Name = "nanadmin", IsMaster = true, Description = "nan _admin_ user", Salt = admin.Salt, Hash = admin.Hash, Password = DovecotHasher.Password(admin.Salt, admin.Hash), };
+        var icaUser = new User { Name = "icauser", Quota = 1024 * 1024, Description = "ica regular _user_", Salt = user.Salt, Hash = user.Hash, Password = DovecotHasher.Password(user.Salt, user.Hash), };
+        var nanUser = new User { Name = "nanuser", Quota = 1024 * 1024, Description = "nan regular _user_", Salt = user.Salt, Hash = user.Hash, Password = DovecotHasher.Password(user.Salt, user.Hash), };
+        Users.AddRange(icaAdmin, nanAdmin, icaUser, nanUser);
 
+        var icaMailAdmin = new Address { Pattern = "admin", Description = "admin@ica.hr", Domain = ica, Type = AddressType.Exact };
+        var nanMailAdmin = new Address { Pattern = "admin", Description = "admin@nan.hr", Domain = nan, Type = AddressType.Exact };
+        var icaMailUser = new Address { Pattern = "user", Description = "user@ica.hr", Domain = ica, Type = AddressType.Exact };
+        var nanMailUser = new Address { Pattern = "user", Description = "user@nan.hr", Domain = nan, Type = AddressType.Exact };
+        var icaMailPrefix = new Address { Pattern = "prefix", Description = "prefix@ica.hr", Domain = ica, Type = AddressType.Prefix };
+        var nanMailPrefix = new Address { Pattern = "prefix", Description = "prefix@nan.hr", Domain = nan, Type = AddressType.Prefix };
+        var icaMailSuffix = new Address { Pattern = "suffix", Description = "suffix@ica.hr", Domain = ica, Type = AddressType.Suffix };
+        var nanMailSuffix = new Address { Pattern = "suffix", Description = "suffix@nan.hr", Domain = nan, Type = AddressType.Suffix };
+        Addresses.AddRange(icaMailAdmin, nanMailAdmin, icaMailUser, nanMailUser, icaMailPrefix, nanMailPrefix, icaMailSuffix, nanMailSuffix);
 
-        var mailMaster = new Address { Pattern = "master", Description = "Master main", Domain = ica, Type = AddressType.Exact, };
-        var mailSlave = new Address { Pattern = "slave", Description = "Slave main", Domain = ica, Type = AddressType.Exact, };
-        var mailSales = new Address { Pattern = "slave.", Description = "Slave prefix", Domain = ica, Type = AddressType.Prefix };
-        mailMaster.Users.Add(masterUser);
-        mailSlave.Users.Add(slaveUser);
-        mailSales.Users.Add(slaveUser);
-        Addresses.AddRange(mailMaster, mailSlave, mailSales);
+        icaAdmin.Addresses.Add(icaMailAdmin);
+        nanAdmin.Addresses.Add(nanMailAdmin);
+        icaUser.Addresses.Add(icaMailUser); icaUser.Addresses.Add(icaMailPrefix); icaUser.Addresses.Add(icaMailSuffix);
+        icaUser.Addresses.Add(nanMailUser); icaUser.Addresses.Add(nanMailPrefix); icaUser.Addresses.Add(nanMailSuffix);
 
         await SaveChangesAsync();
     }
