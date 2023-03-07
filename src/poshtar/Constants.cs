@@ -48,6 +48,8 @@ public static class C
         public static string CertDataFor(string file) => Path.Combine(CertData, file);
         public static readonly string ConfigData = $"{Root}/config";
         public static string ConfigDataFor(string file) => Path.Combine(ConfigData, file);
+        public static readonly string LogData = $"{Root}/logs";
+        public static string LogDataFor(string file) => Path.Combine(LogData, file);
         public static readonly string MailData = $"{Root}/mail";
         public static readonly string CertCrt = CertDataFor(CRT_FILE);
         public static readonly string CertKey = CertDataFor(KEY_FILE);

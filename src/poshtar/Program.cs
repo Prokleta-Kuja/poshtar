@@ -1,10 +1,8 @@
-using System.Diagnostics;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Diagnostics;
 using poshtar.Entities;
 using poshtar.Extensions;
 using poshtar.Services;
@@ -110,12 +108,10 @@ public class Program
 
     static async Task Initialize(IServiceProvider provider)
     {
-        if (C.IsDebug)
-        {
-            Directory.CreateDirectory(C.Paths.CertData);
-            Directory.CreateDirectory(C.Paths.ConfigData);
-            Directory.CreateDirectory(C.Paths.MailData);
-        }
+        Directory.CreateDirectory(C.Paths.CertData);
+        Directory.CreateDirectory(C.Paths.ConfigData);
+        Directory.CreateDirectory(C.Paths.MailData);
+        Directory.CreateDirectory(C.Paths.LogData);
 
         if (string.IsNullOrWhiteSpace(C.Hostname))
             throw new Exception("You must specify HOSTNAME environment variable");
@@ -124,10 +120,7 @@ public class Program
             throw new Exception($"Could not load certs from {C.Paths.CertData}");
 
         if (!Directory.Exists(DovecotConfiguration.DovecotRoot))
-        {
-            await BashExec.CreateDovecotLog();
             DovecotConfiguration.Generate();
-        }
 
         if (!Directory.Exists(PostfixConfiguration.PostfixRoot))
             PostfixConfiguration.Generate();
@@ -150,13 +143,13 @@ public class Program
     {
         var dovecot = await BashExec.StartDovecotAsync();
         if (dovecot.exitCode == 0)
-            Log.Information("Dovecot started");
+            Log.Debug("Dovecot started");
         else
             Log.Error("Could not start dovecot: {error}", dovecot.error);
 
         var postfix = await BashExec.StartPostfixAsync();
         if (postfix.exitCode == 0)
-            Log.Information("Postfix started");
+            Log.Debug("Postfix started");
         else
             Log.Error("Could not start postfix: {error}", postfix.error);
     }

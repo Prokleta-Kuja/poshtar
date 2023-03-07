@@ -6,6 +6,7 @@ namespace poshtar.Services;
 
 public static class DovecotConfiguration
 {
+    public static readonly string LogPath = C.Paths.LogDataFor("dovecot.log");
     public static readonly string DovecotRoot = C.Paths.ConfigDataFor("dovecot");
     public static readonly string MainPath = Path.Join(DovecotRoot, "dovecot.conf");
     public static readonly string UsersPath = Path.Join(DovecotRoot, "users.conf");
@@ -103,9 +104,9 @@ namespace {{
   }}
 }}
 
-log_path=/var/log/dovecot.log
-info_log_path=/var/log/dovecot.log
-debug_log_path=/var/log/dovecot.log");
+log_path={LogPath}
+info_log_path={LogPath}
+debug_log_path={LogPath}");
 
         // TODO: insert proper uid gid
         main.AppendLine($@"
@@ -197,6 +198,7 @@ dbpath = {C.Paths.Sqlite}
         }
 
         Directory.CreateDirectory(DovecotRoot);
+        File.Create(LogPath).Dispose();
         GenerateMain();
         GenerateUsers(sqlFilePrefix);
         GeneratePasswords(sqlFilePrefix);

@@ -1,4 +1,3 @@
-using System.Text;
 using MySqlConnector;
 using Npgsql;
 
@@ -6,6 +5,7 @@ namespace poshtar.Services;
 
 public static class PostfixConfiguration
 {
+    public static readonly string LogPath = C.Paths.LogDataFor("postfix.log");
     public static readonly string PostfixRoot = C.Paths.ConfigDataFor("postfix");
     public static string MainPath => Path.Combine(PostfixRoot, "main.cf");
     public static string MasterPath => Path.Combine(PostfixRoot, "master.cf");
@@ -16,7 +16,8 @@ public static class PostfixConfiguration
     public static string RelaysPath => Path.Combine(PostfixRoot, "relays.cf");
     static void GenerateMain(string dbProvider)
     {
-        var main = @$"maillog_file = /var/log/postfix.log
+        var main = @$"maillog_file_prefixes = /
+maillog_file = {LogPath}
 compatibility_level = 3.6
 append_dot_mydomain = no
 readme_directory = no
@@ -216,6 +217,7 @@ query = ";
         }
 
         Directory.CreateDirectory(PostfixRoot);
+        File.Create(LogPath).Dispose();
         GenerateMain(dbProvider);
         GenerateMaster(dbProvider);
         GenerateAddresses(sqlFilePrefix);
