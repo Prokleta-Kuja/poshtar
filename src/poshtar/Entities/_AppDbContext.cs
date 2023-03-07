@@ -135,7 +135,7 @@ public partial class AppDbContext : DbContext, IDataProtectionKeyContext
         icaAdmin.Addresses.Add(icaMailAdmin);
         nanAdmin.Addresses.Add(nanMailAdmin);
         icaUser.Addresses.Add(icaMailUser); icaUser.Addresses.Add(icaMailPrefix); icaUser.Addresses.Add(icaMailSuffix);
-        icaUser.Addresses.Add(nanMailUser); icaUser.Addresses.Add(nanMailPrefix); icaUser.Addresses.Add(nanMailSuffix);
+        nanUser.Addresses.Add(nanMailUser); nanUser.Addresses.Add(nanMailPrefix); nanUser.Addresses.Add(nanMailSuffix);
 
         await SaveChangesAsync();
     }
