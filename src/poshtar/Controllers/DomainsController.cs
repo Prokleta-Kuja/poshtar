@@ -99,16 +99,15 @@ public class DomainsController : ControllerBase
         if (isDuplicate)
             return BadRequest(new ValidationError(nameof(model.Name), "Already exists"));
 
-        var serverProtector = _dpp.CreateProtector(nameof(Domain));
+        // var serverProtector = _dpp.CreateProtector(nameof(Domain));
 
         var domain = new Domain
         {
             Name = model.Name,
             Host = model.Host,
             Port = model.Port,
-            IsSecure = model.IsSecure,
             Username = model.Username,
-            Password = serverProtector.Protect(model.Password),
+            Password = model.Password,
         };
 
         _db.Domains.Add(domain);
@@ -147,12 +146,11 @@ public class DomainsController : ControllerBase
         domain.Name = model.Name;
         domain.Host = model.Host;
         domain.Port = model.Port;
-        domain.IsSecure = model.IsSecure;
         domain.Username = model.Username;
         if (!string.IsNullOrWhiteSpace(model.NewPassword))
         {
-            var serverProtector = _dpp.CreateProtector(nameof(Domain));
-            domain.Password = serverProtector.Protect(model.NewPassword);
+            // var serverProtector = _dpp.CreateProtector(nameof(Domain));
+            domain.Password = model.NewPassword;
         }
         if (model.Disabled.HasValue)
             domain.Disabled = model.Disabled.Value ? domain.Disabled.HasValue ? domain.Disabled : DateTime.UtcNow : null;

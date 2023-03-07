@@ -11,7 +11,6 @@ public class DomainVM
         Name = d.Name;
         Host = d.Host;
         Port = d.Port;
-        IsSecure = d.IsSecure;
         Username = d.Username;
         Disabled = d.Disabled;
     }
@@ -19,7 +18,6 @@ public class DomainVM
     [Required] public string Name { get; set; }
     [Required] public string Host { get; set; }
     [Required] public int Port { get; set; }
-    [Required] public bool IsSecure { get; set; }
     [Required] public string Username { get; set; }
     public DateTime? Disabled { get; set; }
 }

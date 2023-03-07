@@ -1,5 +1,4 @@
 using System.Globalization;
-using System.Net;
 
 namespace poshtar;
 
@@ -9,8 +8,6 @@ public static class C
     public const string CRT_FILE = "cert.crt";
     public const string KEY_FILE = "cert.key";
     public static readonly string Hostname;
-    public static readonly string MasterUser;
-    public static readonly string MasterSecret;
     public static readonly string PostgresConnectionString;
     public static readonly string MysqlConnectionString;
     public static readonly DbContextType DbContextType;
@@ -20,8 +17,6 @@ public static class C
     {
         IsDebug = Environment.GetEnvironmentVariable("DEBUG") == "1";
         Hostname = Environment.GetEnvironmentVariable("HOSTNAME") ?? string.Empty;
-        MasterUser = Environment.GetEnvironmentVariable("MASTER_USER") ?? string.Empty;
-        MasterSecret = Environment.GetEnvironmentVariable("MASTER_SECRET") ?? string.Empty;
         PostgresConnectionString = Environment.GetEnvironmentVariable("POSTGRES") ?? string.Empty;
         MysqlConnectionString = Environment.GetEnvironmentVariable("MYSQL") ?? string.Empty;
         DbContextType = !string.IsNullOrWhiteSpace(PostgresConnectionString) ? DbContextType.PostgreSQL :
@@ -48,7 +43,7 @@ public static class C
     }
     public static class Paths
     {
-        static string Root => IsDebug ? "./data" : string.Empty;
+        static string Root => IsDebug ? Path.Join(Environment.CurrentDirectory, "/data") : string.Empty;
         public static readonly string CertData = $"{Root}/certs";
         public static string CertDataFor(string file) => Path.Combine(CertData, file);
         public static readonly string ConfigData = $"{Root}/config";

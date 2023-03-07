@@ -92,24 +92,22 @@ public partial class AppDbContext : DbContext, IDataProtectionKeyContext
         if (!Debugger.IsAttached)
             return;
 
-        var serverProtector = dpProvider.CreateProtector(nameof(Domain));
+        // var serverProtector = dpProvider.CreateProtector(nameof(Domain));
         var ica = new Domain
         {
             Name = "ica.hr",
             Host = "relay.ica.hr",
             Port = 587,
-            IsSecure = true,
             Username = "fake",
-            Password = serverProtector.Protect("P@ssw0rd"),
+            Password = "P@ssw0rd",
         };
         var nan = new Domain
         {
             Name = "nan.hr",
             Host = "relay.nan.hr",
             Port = 587,
-            IsSecure = true,
             Username = "fake",
-            Password = serverProtector.Protect("P@ssw0rd"),
+            Password = "P@ssw0rd",
         };
         Domains.Add(nan);
 

@@ -66,6 +66,7 @@ public class Program
 
             var app = builder.Build();
             await Initialize(app.Services);
+            await StartServices();
 
             if (app.Environment.IsDevelopment())
             {
@@ -119,14 +120,17 @@ public class Program
         if (string.IsNullOrWhiteSpace(C.Hostname))
             throw new Exception("You must specify HOSTNAME environment variable");
 
-        if (string.IsNullOrWhiteSpace(C.MasterUser) || string.IsNullOrWhiteSpace(C.MasterSecret))
-            throw new Exception("You must specify MASTER_USER & MASTER_SECRET environment variables");
-
         if (!File.Exists(C.Paths.CertCrt) || !File.Exists(C.Paths.CertKey))
             throw new Exception($"Could not load certs from {C.Paths.CertData}");
 
-        // if (!Directory.GetFiles(C.Paths.ConfigData).Any())
-        //     DovecotConfiguration.Initial();
+        if (!Directory.Exists(DovecotConfiguration.DovecotRoot))
+        {
+            await BashExec.CreateDovecotLog();
+            DovecotConfiguration.Generate();
+        }
+
+        if (!Directory.Exists(PostfixConfiguration.PostfixRoot))
+            PostfixConfiguration.Generate();
 
         using var scope = provider.CreateScope();
         using var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
@@ -141,6 +145,20 @@ public class Program
             var dpProvider = scope.ServiceProvider.GetRequiredService<IDataProtectionProvider>();
             await db.InitializeDefaults(dpProvider);
         }
+    }
+    static async Task StartServices()
+    {
+        var dovecot = await BashExec.StartDovecotAsync();
+        if (dovecot.exitCode == 0)
+            Log.Information("Dovecot started");
+        else
+            Log.Error("Could not start dovecot: {error}", dovecot.error);
+
+        var postfix = await BashExec.StartPostfixAsync();
+        if (postfix.exitCode == 0)
+            Log.Information("Postfix started");
+        else
+            Log.Error("Could not start postfix: {error}", postfix.error);
     }
 }
 

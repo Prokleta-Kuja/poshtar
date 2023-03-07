@@ -8,6 +8,7 @@ Master users cant login as themself
 Test SMTP server gracefull shutdown. Should be console logged after docker stop
 Reload certs https://doc.dovecot.org/admin_manual/doveadm_http_api/#doveadm-reload
 API auth
+MySql & Sqlite backend
 
 # Important dovecot conf
 
