@@ -7,7 +7,6 @@ export type DomainVM = {
     name: string;
     host: string;
     port: number;
-    isSecure: boolean;
     username: string;
     disabled?: string | null;
 };

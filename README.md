@@ -1,11 +1,6 @@
 # TODO
 
-Add queues folder to keep mail if delivery fails, also add a job to process them later
-Spam scoring - add it to SessionContext and build it incrementaly then check just before mailbox delivery
 A recurring job to check if there are maildirs for deleted users and/or delete it when deleting users
-A recurring job to delete logs
-Master users cant login as themself
-Test SMTP server gracefull shutdown. Should be console logged after docker stop
 Reload certs https://doc.dovecot.org/admin_manual/doveadm_http_api/#doveadm-reload
 API auth
 MySql & Sqlite backend
@@ -26,23 +21,6 @@ MySql & Sqlite backend
 - https://doc.dovecot.org/settings/core/#core_setting-protocols
 - https://doc.dovecot.org/settings/core/#core_setting-recipient_delimiter
 - https://doc.dovecot.org/settings/core/#core_setting-ssl + odmah ispod za uri do certa
-
-# Installation
-
-Run poshtar first to initialize dovecot configuration.
-Create mailsolution folder, eg. /opt/appdata/poshtar, with subfolders config & mail.
-
-## poshtar container
-
-Bind crt and key files to /certs/cert.crt and /certs/cert.key
-Bind mailsolution/config to /config
-Bind mailsolution/mail to /mail
-
-## dovecot container
-
-Bind crt and key files to /certs/cert.crt and /certs/cert.key
-Bind mailsolution/config to /etc/dovecot
-Bind mailsolution/mail to /mail
 
 # Development
 
@@ -77,6 +55,9 @@ CREATE DATABASE dev_poshtar
     IS_TEMPLATE = False;
 ```
 
-# Other
+## OpenAPI
 
-After changing system user or password via env, dovcot configuration must be reloaded or dovecot restarted.
+```
+cd src/client-app
+npx openapi-typescript-codegen --useOptions --input http://localhost:5000/swagger/v1/swagger.json --output ./src/api
+```

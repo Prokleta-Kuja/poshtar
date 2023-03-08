@@ -17,8 +17,6 @@ export type { DomainLM } from './models/DomainLM';
 export type { DomainLMListResponse } from './models/DomainLMListResponse';
 export type { DomainUM } from './models/DomainUM';
 export type { DomainVM } from './models/DomainVM';
-export type { LogEntryVM } from './models/LogEntryVM';
-export type { LogEntryVMListResponse } from './models/LogEntryVMListResponse';
 export type { PlainError } from './models/PlainError';
 export type { UserCM } from './models/UserCM';
 export type { UserLM } from './models/UserLM';
@@ -29,5 +27,4 @@ export type { ValidationError } from './models/ValidationError';
 
 export { AddressService } from './services/AddressService';
 export { DomainService } from './services/DomainService';
-export { LogEntryService } from './services/LogEntryService';
 export { UserService } from './services/UserService';
