@@ -27,6 +27,8 @@ public class DomainLM
     [Required] public required int Id { get; set; }
     [Required] public required string Name { get; set; }
     [Required] public required string Host { get; set; }
+    [Required] public required int Port { get; set; }
+    public required DateTime? Disabled { get; set; }
     [Required] public required int AddressCount { get; set; }
 }
 
@@ -35,7 +37,6 @@ public class DomainCM
     [Required] public required string Name { get; set; }
     [Required] public required string Host { get; set; }
     [Required] public int Port { get; set; }
-    [Required] public bool IsSecure { get; set; }
     [Required] public required string Username { get; set; }
     [Required] public required string Password { get; set; }
     public bool IsInvalid(out ValidationError errorModel)
@@ -66,7 +67,6 @@ public class DomainUM
     [Required] public required string Name { get; set; }
     [Required] public required string Host { get; set; }
     [Required] public int Port { get; set; }
-    [Required] public bool IsSecure { get; set; }
     [Required] public required string Username { get; set; }
     public string? NewPassword { get; set; }
     public bool? Disabled { get; set; }

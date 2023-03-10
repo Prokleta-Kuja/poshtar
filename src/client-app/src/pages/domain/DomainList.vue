@@ -16,6 +16,13 @@ const refresh = (params?: ITableParams) => {
     DomainService.getDomains({ ...data.params }).then(r => { data.items = r.items; updateParams(data.params, r) });
 };
 
+const disabledText = (dateTime: string | null | undefined) => {
+    if (!dateTime)
+        return '-';
+    var dt = new Date(dateTime);
+    return dt.toLocaleString();
+}
+
 refresh();
 </script>
 <template>
@@ -41,8 +48,9 @@ refresh();
             <thead>
                 <tr>
                     <Header :params="data.params" :on-sort="refresh" column="name" />
-                    <Header :params="data.params" :on-sort="refresh" column="host" unsortable />
-                    <Header :params="data.params" :on-sort="refresh" column="userCount" display="User count" />
+                    <Header :params="data.params" :on-sort="refresh" column="host" display="Upstream host" />
+                    <Header :params="data.params" :on-sort="refresh" column="port" display="Upstream port" />
+                    <Header :params="data.params" :on-sort="refresh" column="disabled" display="Disabled" />
                     <Header :params="data.params" :on-sort="refresh" column="addressCount" display="Address count" />
                 </tr>
             </thead>
@@ -52,7 +60,8 @@ refresh();
                         <RouterLink :to="{ name: 'route.domainEdit', params: { id: item.id } }">{{ item.name }}</RouterLink>
                     </td>
                     <td>{{ item.host }}</td>
-                    <td>{{ item.userCount }}</td>
+                    <td>{{ item.port }}</td>
+                    <td>{{ disabledText(item.disabled) }}</td>
                     <td>{{ item.addressCount }}</td>
                 </tr>
             </tbody>

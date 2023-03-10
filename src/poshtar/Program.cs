@@ -141,6 +141,9 @@ public class Program
     }
     static async Task StartServices()
     {
+        if (C.StartApiOnly)
+            return;
+
         var dovecot = await BashExec.StartDovecotAsync();
         if (dovecot.exitCode == 0)
             Log.Debug("Dovecot started");

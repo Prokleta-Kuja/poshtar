@@ -49,7 +49,9 @@ public class UsersController : ControllerBase
                 UsersSortBy.Name => query.Order(u => u.Name, req.Ascending),
                 UsersSortBy.Description => query.Order(u => u.Description, req.Ascending),
                 UsersSortBy.IsMaster => query.Order(u => u.IsMaster, req.Ascending),
-                UsersSortBy.Quota => query.Order(u => u.Quota, req.Ascending),
+                UsersSortBy.QuotaMegaBytes => query.Order(u => u.Quota == null, req.Ascending).Order(u => u.Quota, req.Ascending),
+                UsersSortBy.AddressCount => query.Order(u => u.Addresses.Count, req.Ascending),
+                UsersSortBy.Disabled => query.Order(u => u.Disabled, req.Ascending),
                 _ => query
             };
 
@@ -198,5 +200,7 @@ public enum UsersSortBy
     Name = 0,
     Description = 1,
     IsMaster = 2,
-    Quota = 3,
+    QuotaMegaBytes = 3,
+    AddressCount = 4,
+    Disabled = 5,
 }

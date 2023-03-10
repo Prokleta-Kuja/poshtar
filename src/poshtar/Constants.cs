@@ -5,6 +5,7 @@ namespace poshtar;
 public static class C
 {
     public static readonly bool IsDebug;
+    public static readonly bool StartApiOnly;
     public const string CRT_FILE = "cert.crt";
     public const string KEY_FILE = "cert.key";
     public static readonly string Hostname;
@@ -16,6 +17,7 @@ public static class C
     static C()
     {
         IsDebug = Environment.GetEnvironmentVariable("DEBUG") == "1";
+        StartApiOnly = Environment.GetEnvironmentVariable("START_API_ONLY") == "1";
         Hostname = Environment.GetEnvironmentVariable("HOSTNAME") ?? string.Empty;
         PostgresConnectionString = Environment.GetEnvironmentVariable("POSTGRES") ?? string.Empty;
         MysqlConnectionString = Environment.GetEnvironmentVariable("MYSQL") ?? string.Empty;

@@ -37,12 +37,15 @@ UserService.getUser({ userId: props.id })
 
 </script>
 <template>
-    <h1 class="display-6">Edit user</h1>
+    <div class="d-flex align-items-center flex-wrap">
+        <h1 class="display-6 me-3">Edit user</h1>
+        <button class="btn btn-sm btn-secondary" @click="$router.back()">Back</button>
+    </div>
     <div class="row">
         <form class="col-md-4" v-if="state.model" @submit.prevent="submit">
             <Text class="mb-3" label="Username" autoFocus v-model="state.model.name" required
                 :error="state.error?.errors?.name" />
-            <Text class="mb-3" label="Description" autoFocus v-model="state.model.description"
+            <Text class="mb-3" label="Description" v-model="state.model.description"
                 :error="state.error?.errors?.description" />
             <Text class="mb-3" label="Replace password" :autoComplete="'off'" :type="'password'"
                 v-model="state.model.newPassword" :error="state.error?.errors?.newPassword" />

@@ -15,7 +15,7 @@ const mapModel = (m: DomainVM) => {
         host: m.host,
         username: m.username,
         port: m.port,
-        isSecure: m.isSecure,
+        disabled: m.disabled ? true : false,
     }
 }
 
@@ -37,7 +37,10 @@ DomainService.getDomain({ domainId: props.id })
 
 </script>
 <template>
-    <h1 class="display-6">Edit domain</h1>
+    <div class="d-flex align-items-center flex-wrap">
+        <h1 class="display-6 me-3">Edit domain</h1>
+        <button class="btn btn-sm btn-secondary" @click="$router.back()">Back</button>
+    </div>
     <div class="row">
         <form class="col-md-4" v-if="state.model" @submit.prevent="submit">
             <Text class="mb-3" label="Domain" :placeholder="'example.com'" autoFocus v-model="state.model.name" required
@@ -46,17 +49,17 @@ DomainService.getDomain({ domainId: props.id })
                 <legend>Outgoing SMTP server</legend>
                 <Text class="mb-3" label="Host" :placeholder="'mail.example.com'" v-model="state.model.host" required
                     :error="state.error?.errors?.host" />
+                <IntegerBox class="mb-3" label="Port" v-model="state.model.port" required
+                    :error="state.error?.errors?.port" />
                 <Text class="mb-3" label="Username" :autoComplete="'off'" v-model="state.model.username" required
                     :error="state.error?.errors?.username" />
                 <Text class="mb-3" label="Replace password" :autoComplete="'off'" :type="'password'"
                     v-model="state.model.newPassword" :error="state.error?.errors?.newPassword" />
-                <IntegerBox class="mb-3" label="Port" v-model="state.model.port" required
-                    :error="state.error?.errors?.port" />
-                <CheckBox class="mb-3" label="Use TLS" v-model="state.model.isSecure"
-                    :error="state.error?.errors?.isSecure" />
-                <SpinButton class="btn-primary" :loading="state.saving" text="Save" loadingText="Saving" isSubmit />
             </fieldset>
+            <CheckBox class="mb-3" label="Disabled" v-model="state.model.disabled" :error="state.error?.errors?.disabled" />
+            <SpinButton class="btn-primary" :loading="state.saving" text="Save" loadingText="Saving" isSubmit />
         </form>
         <p v-else-if="state.error">{{ state.error.message }}</p>
         <p v-else>Loading...</p>
-</div></template>
+    </div>
+</template>

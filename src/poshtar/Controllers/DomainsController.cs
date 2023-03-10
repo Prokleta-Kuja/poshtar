@@ -47,6 +47,8 @@ public class DomainsController : ControllerBase
             {
                 DomainsSortBy.Name => query.Order(d => d.Name, req.Ascending),
                 DomainsSortBy.Host => query.Order(d => d.Host, req.Ascending),
+                DomainsSortBy.Port => query.Order(d => d.Port, req.Ascending),
+                DomainsSortBy.Disabled => query.Order(d => d.Disabled, req.Ascending),
                 DomainsSortBy.AddressCount => query.Order(d => d.Addresses.Count(), req.Ascending),
                 _ => query
             };
@@ -58,6 +60,8 @@ public class DomainsController : ControllerBase
                 Id = d.DomainId,
                 Name = d.Name,
                 Host = d.Host,
+                Port = d.Port,
+                Disabled = d.Disabled,
                 AddressCount = d.Addresses.Count,
             })
             .ToListAsync();
@@ -191,5 +195,7 @@ public enum DomainsSortBy
 {
     Name = 0,
     Host = 1,
-    AddressCount = 2,
+    Port = 2,
+    Disabled = 3,
+    AddressCount = 4,
 }
