@@ -15,6 +15,5 @@ public class User
     public required string Password { get; set; }
     public DateTime? Disabled { get; set; }
 
-    public virtual List<Domain> Domains { get; set; } = new();
     public virtual List<Address> Addresses { get; set; } = new();
 }

@@ -1,50 +1,17 @@
 using System.Text;
+using MySqlConnector;
+using Npgsql;
 
 namespace poshtar.Services;
 
 public static class DovecotConfiguration
 {
-    const string MAIN = "dovecot.conf";
-    const string SQL_USER = "sql-user.conf";
-    const string SQL_PASS = "sql-pass.conf";
-    const string SQL_MASTER = "sql-master.conf";
-    const string SYSTEM = "system.conf";
-    static void GenerateSqlUser()
-    {
-        File.WriteAllText(C.Paths.ConfigDataFor(SQL_USER), @"
-driver = sqlite
-connect = /etc/dovecot/app.db
-user_query = SELECT '*:bytes=' || Quota AS quota_rule FROM users WHERE Name = '%Ln' AND Disabled IS NULL
-iterate_query = SELECT Name AS username FROM Users WHERE Disabled IS NULL");
-    }
-    static void GenerateSqlPass()
-    {
-        File.WriteAllText(C.Paths.ConfigDataFor(SQL_PASS), @"
-driver = sqlite
-connect = /etc/dovecot/app.db
-password_query = SELECT Name AS username, Password AS password, '*:bytes=' || Quota AS quota_rule \
-FROM Users WHERE Name = '%Ln' AND Disabled IS NULL AND IsMaster = 0");
-    }
-    static void GenerateSqlMaster()
-    {
-        File.WriteAllText(C.Paths.ConfigDataFor(SQL_MASTER), @"
-driver = sqlite
-connect = /etc/dovecot/app.db
-password_query = SELECT Name AS username, Password AS password, '*:bytes=' || Quota AS quota_rule \
-FROM Users WHERE Name = '%Ln' AND Disabled IS NULL AND IsMaster = 1");
-    }
-    static void GenerateSystem()
-    {
-        var pair = DovecotHasher.Hash(C.MasterSecret);
-        var pass = DovecotHasher.Password(pair.Salt, pair.Hash);
-        File.WriteAllText(C.Paths.ConfigDataFor(SYSTEM), @$"
-passdb {{
-  driver = static
-  args = user={C.MasterUser} password={pass}
-  master = yes
-  result_success = continue-ok
-}}");
-    }
+    public static readonly string LogPath = C.Paths.LogDataFor("dovecot.log");
+    public static readonly string DovecotRoot = C.Paths.ConfigDataFor("dovecot");
+    public static readonly string MainPath = Path.Join(DovecotRoot, "dovecot.conf");
+    public static readonly string UsersPath = Path.Join(DovecotRoot, "users.conf");
+    public static readonly string PasswordsPath = Path.Join(DovecotRoot, "passes.conf");
+    public static readonly string MastersPath = Path.Join(DovecotRoot, "masters.conf");
     static void GenerateMain()
     {
         var main = new StringBuilder();
@@ -53,11 +20,10 @@ passdb {{
 
         main.AppendLine(@$"
 ssl=required
-ssl_cert = </certs/{C.CRT_FILE}
-ssl_key = </certs/{C.KEY_FILE}
-protocols = imap
-mail_home = /mail/%Ln
-mail_location = maildir:/mail/%Ln
+ssl_cert = <{C.Paths.CertCrt}
+ssl_key = <{C.Paths.CertKey}
+protocols = imap lmtp
+mail_location = maildir:{C.Paths.MailData}/%Ln
 auth_master_user_separator=*
 mail_plugins = $mail_plugins quota
 mailbox_list_index = yes
@@ -74,6 +40,26 @@ plugin {{
   quota = count:User quota
   quota_vsizes = yes
   #quota_rule = *:storage=1G # This will be the default overrriden by SQL.
+}}
+
+protocol lmtp {{
+  #postmaster_address = postmaster@ica.hr   # required
+  #mail_plugins = quota sieve
+}}
+service lmtp {{
+  unix_listener /var/spool/postfix/private/dovecot-lmtp {{
+    mode = 0600
+    user = postfix
+    group = postfix
+  }}
+}}
+auth_mechanisms = plain login
+service auth {{
+  unix_listener /var/spool/postfix/private/auth {{
+    mode = 0660
+    user = postfix
+    group = postfix
+  }}
 }}
 
 namespace {{
@@ -118,9 +104,9 @@ namespace {{
   }}
 }}
 
-log_path=/dev/stdout
-info_log_path=/dev/stdout
-debug_log_path=/dev/stdout");
+log_path={LogPath}
+info_log_path={LogPath}
+debug_log_path={LogPath}");
 
         // TODO: insert proper uid gid
         main.AppendLine($@"
@@ -129,31 +115,93 @@ mail_gid = 1000");
 
         // Permissions
         main.AppendLine($@"
-!include {SYSTEM}
 passdb {{
   driver = sql
-  args = /etc/dovecot/{SQL_MASTER}
+  args = {MastersPath}
   master = yes
   result_success = continue-ok
 }}
 passdb {{
   driver = sql
-  args = /etc/dovecot/{SQL_PASS}
+  args = {PasswordsPath}
 }}
 userdb {{
   override_fields = uid=vmail gid=vmail
   driver = sql
-  args = /etc/dovecot/{SQL_USER}
+  args = {UsersPath}
 }}");
 
-        File.WriteAllText(C.Paths.ConfigDataFor(MAIN), main.ToString());
+        File.WriteAllText(MainPath, main.ToString());
     }
-    public static void Initial()
+    static void GenerateUsers(string sqlFilePrefix)
     {
-        GenerateSqlUser();
-        GenerateSqlPass();
-        GenerateSqlMaster();
-        GenerateSystem();
+        string query = C.DbContextType switch
+        {
+            DbContextType.PostgreSQL => @"iterate_query = SELECT name AS username FROM users WHERE disabled IS NULL
+user_query = SELECT name AS user, '*:bytes=' || quota AS quota_rule FROM users u WHERE disabled IS NULL AND u.name = '%Ln'",
+            DbContextType.SQLite => @"iterate_query = SELECT Name AS username FROM Users WHERE Disabled IS NULL
+user_query = SELECT '*:bytes=' || Quota AS quota_rule FROM users WHERE Name = '%Ln' AND Disabled IS NULL",
+            _ => "Not verified",
+        };
+
+        File.WriteAllText(UsersPath, string.Concat(sqlFilePrefix, query));
+    }
+    static void GeneratePasswords(string sqlFilePrefix)
+    {
+        string query = C.DbContextType switch
+        {
+            DbContextType.PostgreSQL => @"password_query = SELECT Name AS username, password, '*:bytes=' || quota AS quota_rule \
+FROM users WHERE name = '%Ln' AND disabled IS NULL --AND is_master = false",
+            DbContextType.SQLite => @"password_query = SELECT Name AS username, Password AS password, '*:bytes=' || Quota AS quota_rule \
+FROM Users WHERE Name = '%Ln' AND Disabled IS NULL --AND IsMaster = 0",
+            _ => "Not verified",
+        };
+
+        File.WriteAllText(PasswordsPath, string.Concat(sqlFilePrefix, query));
+    }
+    static void GenerateMasters(string sqlFilePrefix)
+    {
+        string query = C.DbContextType switch
+        {
+            DbContextType.PostgreSQL => @"password_query = SELECT Name AS username, password, '*:bytes=' || quota AS quota_rule \
+FROM users WHERE name = '%Ln' AND disabled IS NULL AND is_master = true",
+            DbContextType.SQLite => @"password_query = SELECT Name AS username, Password AS password, '*:bytes=' || Quota AS quota_rule \
+FROM Users WHERE Name = '%Ln' AND Disabled IS NULL AND IsMaster = 1",
+            _ => "Not verified",
+        };
+
+        File.WriteAllText(MastersPath, string.Concat(sqlFilePrefix, query));
+    }
+    public static void Generate()
+    {
+        string? sqlFilePrefix;
+        switch (C.DbContextType)
+        {
+            case DbContextType.PostgreSQL:
+                var postgres = new NpgsqlConnectionStringBuilder(C.PostgresConnectionString);
+                sqlFilePrefix = $@"driver = pgsql
+connect host={postgres.Host} dbname={postgres.Database} user={postgres.Username} password={postgres.Password}
+";
+                break;
+            case DbContextType.MySQL:
+                throw new NotImplementedException();
+                var mysql = new MySqlConnectionStringBuilder(C.MysqlConnectionString);
+                sqlFilePrefix = $@"driver = mysql
+connect host={mysql.Server} dbname={mysql.Database} user={mysql.UserID} password={mysql.Password}
+";
+                break;
+            default:
+                sqlFilePrefix = $@"driver = sqlite
+dbpath = {C.Paths.Sqlite}
+";
+                break;
+        }
+
+        Directory.CreateDirectory(DovecotRoot);
+        File.Create(LogPath).Dispose();
         GenerateMain();
+        GenerateUsers(sqlFilePrefix);
+        GeneratePasswords(sqlFilePrefix);
+        GenerateMasters(sqlFilePrefix);
     }
 }

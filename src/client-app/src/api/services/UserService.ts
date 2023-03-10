@@ -19,8 +19,6 @@ export class UserService {
     public static getUsers({
         addressId,
         notAddressId,
-        domainId,
-        notDomainId,
         size,
         page,
         ascending,
@@ -29,8 +27,6 @@ export class UserService {
     }: {
         addressId?: number,
         notAddressId?: number,
-        domainId?: number,
-        notDomainId?: number,
         size?: number,
         page?: number,
         ascending?: boolean,
@@ -43,8 +39,6 @@ export class UserService {
             query: {
                 'addressId': addressId,
                 'notAddressId': notAddressId,
-                'domainId': domainId,
-                'notDomainId': notDomainId,
                 'size': size,
                 'page': page,
                 'ascending': ascending,

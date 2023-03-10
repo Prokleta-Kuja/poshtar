@@ -14,17 +14,43 @@
 		5000,
 		5001
 	],
+	"appPort": [
+		"0.0.0.0:25:25",
+		"0.0.0.0:465:465",
+		"0.0.0.0:587:587",
+		"0.0.0.0:993:993"
+	],
 	"portsAttributes": {
 		"5001": {
 			"protocol": "https"
+		},
+		"25": {
+			"label": "SMTP",
+			"onAutoForward": "notify",
+			"requireLocalPort": true,
+			"elevateIfNeeded": true
+		},
+		"465": {
+			"label": "Submission implicit",
+			"onAutoForward": "notify",
+			"requireLocalPort": true,
+			"elevateIfNeeded": true
+		},
+		"587": {
+			"label": "Submission explicit",
+			"onAutoForward": "notify",
+			"requireLocalPort": true,
+			"elevateIfNeeded": true
+		},
+		"993": {
+			"label": "IMAP",
+			"onAutoForward": "notify",
+			"requireLocalPort": true,
+			"elevateIfNeeded": true
 		}
 	},
-	"appPort": [
-		"0.0.0.0:25:25",
-		"0.0.0.0:587:587"
-	],
 	// Use 'postCreateCommand' to run commands after the container is created.
-	"postCreateCommand": "dotnet restore src;dotnet tool restore;dotnet dev-certs https -q;",
+	"postCreateCommand": "dotnet restore src;dotnet tool restore;dotnet dev-certs https -q;echo \"alias ll='ls -hal'\" >> ~/.bashrc",
 	"customizations": {
 		"vscode": {
 			"extensions": [
@@ -33,7 +59,8 @@
 				"Vue.vscode-typescript-vue-plugin"
 			]
 		}
-	}
+	},
+	"init": true
 	// Configure tool-specific properties.
 	// "customizations": {},
 	// Uncomment to connect as root instead. More info: https://aka.ms/dev-containers-non-root.

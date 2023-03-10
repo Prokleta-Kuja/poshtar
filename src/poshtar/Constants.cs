@@ -1,5 +1,4 @@
 using System.Globalization;
-using System.Net;
 
 namespace poshtar;
 
@@ -9,16 +8,20 @@ public static class C
     public const string CRT_FILE = "cert.crt";
     public const string KEY_FILE = "cert.key";
     public static readonly string Hostname;
-    public static readonly string MasterUser;
-    public static readonly string MasterSecret;
+    public static readonly string PostgresConnectionString;
+    public static readonly string MysqlConnectionString;
+    public static readonly DbContextType DbContextType;
     public static readonly TimeZoneInfo TZ;
     public static readonly CultureInfo Locale;
     static C()
     {
         IsDebug = Environment.GetEnvironmentVariable("DEBUG") == "1";
         Hostname = Environment.GetEnvironmentVariable("HOSTNAME") ?? string.Empty;
-        MasterUser = Environment.GetEnvironmentVariable("MASTER_USER") ?? string.Empty;
-        MasterSecret = Environment.GetEnvironmentVariable("MASTER_SECRET") ?? string.Empty;
+        PostgresConnectionString = Environment.GetEnvironmentVariable("POSTGRES") ?? string.Empty;
+        MysqlConnectionString = Environment.GetEnvironmentVariable("MYSQL") ?? string.Empty;
+        DbContextType = !string.IsNullOrWhiteSpace(PostgresConnectionString) ? DbContextType.PostgreSQL :
+            !string.IsNullOrWhiteSpace(MysqlConnectionString) ? DbContextType.MySQL :
+            DbContextType.SQLite;
 
         try
         {
@@ -40,28 +43,24 @@ public static class C
     }
     public static class Paths
     {
-        static string Root => IsDebug ? "./data" : string.Empty;
-        public static readonly string MailData = $"{Root}/mail";
-        public static string MailDataFor(string username) => Path.Combine(MailData, username.ToLower());
-        public static readonly string ConfigData = $"{Root}/config";
-        public static string ConfigDataFor(string file) => Path.Combine(ConfigData, file);
+        static string Root => IsDebug ? Path.Join(Environment.CurrentDirectory, "/data") : string.Empty;
         public static readonly string CertData = $"{Root}/certs";
         public static string CertDataFor(string file) => Path.Combine(CertData, file);
-        // Order matters
+        public static readonly string ConfigData = $"{Root}/config";
+        public static string ConfigDataFor(string file) => Path.Combine(ConfigData, file);
+        public static readonly string LogData = $"{Root}/logs";
+        public static string LogDataFor(string file) => Path.Combine(LogData, file);
+        public static readonly string MailData = $"{Root}/mail";
         public static readonly string CertCrt = CertDataFor(CRT_FILE);
         public static readonly string CertKey = CertDataFor(KEY_FILE);
-        public static readonly string AppDb = ConfigDataFor("app.db");
-        public static readonly string AppDbConnectionString = $"Data Source={AppDb}";
+        public static readonly string Sqlite = ConfigDataFor("app.db");
+        public static readonly string AppDbConnectionString = $"Data Source={Sqlite}";
     }
-    public static class Cache
-    {
-        public static string FailedAuthCount(IPEndPoint ip) => $"{nameof(FailedAuthCount)}-{ip.Address}";
-    }
-    public static class Routes
-    {
-        public const string Root = "/";
-        public const string Credentials = "/credentials";
-        public const string Credential = "/credentials/{AliasId:guid}";
-        public static string CredentialFor(Guid aliasId) => $"{Credentials}/{aliasId}";
-    }
+}
+
+public enum DbContextType
+{
+    SQLite,
+    PostgreSQL,
+    MySQL,
 }

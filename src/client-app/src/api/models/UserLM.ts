@@ -10,6 +10,5 @@ export type UserLM = {
     quotaMegaBytes?: number | null;
     disabled?: string | null;
     addressCount: number;
-    domainCount: number;
 };
 

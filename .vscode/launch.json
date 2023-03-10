@@ -17,13 +17,10 @@
             //     "action": "openExternally",
             //     "pattern": "\\bNow listening on:\\s+(https?://\\S+)"
             // },
+            "envFile": "${workspaceFolder}/src/poshtar/.env",
             "env": {
                 "ASPNETCORE_ENVIRONMENT": "Development",
-                "ASPNETCORE_URLS": "http://+:5000;https://+:5001",
-                "DEBUG": "1",
-                "HOSTNAME": "abcd.ica.hr",
-                "MASTER_USER": "kita",
-                "MASTER_SECRET": "pass"
+                "ASPNETCORE_URLS": "http://+:5000;https://+:5001"
             },
             "sourceFileMap": {
                 "/Views": "${workspaceFolder}/Views"
