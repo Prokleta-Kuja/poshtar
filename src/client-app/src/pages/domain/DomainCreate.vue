@@ -26,6 +26,7 @@ const submit = () => {
         <button class="btn btn-sm btn-secondary" @click="$router.back()">Back</button>
     </div>
     <div class="row">
+        <div class="col-md"></div>
         <form class="col-md-4" v-if="state.model" @submit.prevent="submit">
             <Text class="mb-3" label="Domain" autoFocus v-model="state.model.name" required
                 :error="state.error?.errors?.name" />
@@ -39,8 +40,9 @@ const submit = () => {
                 <Text class="mb-3" label="Password" :autoComplete="'off'" :type="'password'" v-model="state.model.password"
                     :error="state.error?.errors?.password" />
             </fieldset>
-            <SpinButton class="btn-primary" :loading="state.saving" text="Save" loadingText="Saving" isSubmit />
+            <SpinButton class="btn-primary" :loading="state.saving" text="Add" loadingText="Adding" isSubmit />
         </form>
         <p v-else-if="state.error">{{ state.error.message }}</p>
+        <div class="col-md"></div>
     </div>
 </template>

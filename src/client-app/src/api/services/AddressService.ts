@@ -18,7 +18,6 @@ export class AddressService {
      */
     public static getAddresses({
         domainId,
-        notDomainId,
         userId,
         notUserId,
         size,
@@ -28,7 +27,6 @@ export class AddressService {
         searchTerm,
     }: {
         domainId?: number,
-        notDomainId?: number,
         userId?: number,
         notUserId?: number,
         size?: number,
@@ -42,7 +40,6 @@ export class AddressService {
             url: '/api/addresses',
             query: {
                 'domainId': domainId,
-                'notDomainId': notDomainId,
                 'userId': userId,
                 'notUserId': notUserId,
                 'size': size,

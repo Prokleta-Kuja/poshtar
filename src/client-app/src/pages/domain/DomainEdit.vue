@@ -1,39 +1,66 @@
 <script setup lang="ts">
 import { reactive } from 'vue';
-import { DomainService, DomainUM, DomainVM, ValidationError } from '../../api';
+import { AddressCM, AddressService, AddressType, DomainService, DomainUM, DomainVM } from '../../api';
 import CheckBox from '../../components/form/CheckBox.vue';
-import IntegerBox from '../../components/form/IntegerBox.vue';
 import SpinButton from '../../components/form/SpinButton.vue';
 import Text from '../../components/form/TextBox.vue';
+import SelectBox from '../../components/form/SelectBox.vue';
+import IntegerBox from '../../components/form/IntegerBox.vue';
+import IModelState from '../../components/form/modelState';
+import AddressList from './AddressList.vue';
 
 const props = defineProps<{ id: number }>()
-const state = reactive<{ saving?: boolean, model?: DomainUM, error?: ValidationError }>({});
+const domain = reactive<IModelState<DomainUM>>({ loading: true });
+const address = reactive<IModelState<AddressCM>>({})
 
-const mapModel = (m: DomainVM) => {
-    state.model = {
+const mapDomainModel = (m: DomainVM) =>
+    domain.model = {
         name: m.name,
         host: m.host,
         username: m.username,
         port: m.port,
         disabled: m.disabled ? true : false,
     }
-}
 
-const submit = () => {
-    if (!state.model)
+const emptyAddress = () => address.model = { domainId: props.id, pattern: '', type: AddressType.Exact }
+
+const addressTypes: { value: number, label: string }[] = [
+    { value: AddressType.Exact, label: 'Exact' },
+    { value: AddressType.Prefix, label: 'Prefix' },
+    { value: AddressType.Suffix, label: 'Suffix' },
+    { value: AddressType.CatchAll, label: 'CatchAll' },
+];
+
+const submitDomain = () => {
+    if (!domain.model)
         return;
 
-    state.saving = true;
-    state.error = undefined;
-    DomainService.updateDomain({ domainId: props.id, requestBody: state.model })
-        .then(mapModel)
-        .catch(r => state.error = r.body)
-        .finally(() => state.saving = false);
+    domain.submitting = true;
+    domain.error = undefined;
+    DomainService.updateDomain({ domainId: props.id, requestBody: domain.model })
+        .then(mapDomainModel)
+        .catch(r => domain.error = r.body)
+        .finally(() => domain.submitting = false);
 };
 
+const submitAddress = () => {
+    if (!address.model)
+        return;
+
+    address.submitting = true;
+    address.error = undefined;
+    AddressService.createAddress({ requestBody: address.model })
+        .then(emptyAddress)
+        .catch(r => address.error = r.body)
+        .finally(() => address.submitting = false);
+}
+
 DomainService.getDomain({ domainId: props.id })
-    .then(mapModel)
-    .catch(r => state.error = r.body);
+    .then(mapDomainModel)
+    .catch(r => domain.error = r.body)
+    .finally(() => domain.loading = false);
+
+emptyAddress();
 
 </script>
 <template>
@@ -42,24 +69,43 @@ DomainService.getDomain({ domainId: props.id })
         <button class="btn btn-sm btn-secondary" @click="$router.back()">Back</button>
     </div>
     <div class="row">
-        <form class="col-md-4" v-if="state.model" @submit.prevent="submit">
-            <Text class="mb-3" label="Domain" :placeholder="'example.com'" autoFocus v-model="state.model.name" required
-                :error="state.error?.errors?.name" />
-            <fieldset>
-                <legend>Outgoing SMTP server</legend>
-                <Text class="mb-3" label="Host" :placeholder="'mail.example.com'" v-model="state.model.host" required
-                    :error="state.error?.errors?.host" />
-                <IntegerBox class="mb-3" label="Port" v-model="state.model.port" required
-                    :error="state.error?.errors?.port" />
-                <Text class="mb-3" label="Username" :autoComplete="'off'" v-model="state.model.username" required
-                    :error="state.error?.errors?.username" />
-                <Text class="mb-3" label="Replace password" :autoComplete="'off'" :type="'password'"
-                    v-model="state.model.newPassword" :error="state.error?.errors?.newPassword" />
-            </fieldset>
-            <CheckBox class="mb-3" label="Disabled" v-model="state.model.disabled" :error="state.error?.errors?.disabled" />
-            <SpinButton class="btn-primary" :loading="state.saving" text="Save" loadingText="Saving" isSubmit />
-        </form>
-        <p v-else-if="state.error">{{ state.error.message }}</p>
-        <p v-else>Loading...</p>
+        <div class="col-md-4">
+            <form v-if="domain.model" @submit.prevent="submitDomain">
+                <Text class="mb-3" label="Domain" autoFocus v-model="domain.model.name" required
+                    :error="domain.error?.errors?.name" />
+                <CheckBox class="mb-3" label="Disabled" v-model="domain.model.disabled"
+                    :error="domain.error?.errors?.disabled" />
+                <fieldset>
+                    <legend>Outgoing SMTP server</legend>
+                    <Text class="mb-3" label="Host" :placeholder="'mail.example.com'" v-model="domain.model.host" required
+                        :error="domain.error?.errors?.host" />
+                    <IntegerBox class="mb-3" label="Port" v-model="domain.model.port" required
+                        :error="domain.error?.errors?.port" />
+                    <Text class="mb-3" label="Username" :autoComplete="'off'" v-model="domain.model.username" required
+                        :error="domain.error?.errors?.username" />
+                    <Text class="mb-3" label="Replace password" :autoComplete="'off'" :type="'password'"
+                        v-model="domain.model.newPassword" :error="domain.error?.errors?.newPassword" />
+                </fieldset>
+                <SpinButton class="btn-primary" :loading="domain.submitting" text="Save" loadingText="Saving" isSubmit />
+            </form>
+            <p v-else-if="domain.error">{{ domain.error.message }}</p>
+            <p v-else>Loading...</p>
+        </div>
+        <div class="col-md"></div>
+        <div class="col-md-4">
+            <form v-if="domain.model && address.model" @submit.prevent="submitAddress">
+                <fieldset>
+                    <legend>New domain address</legend>
+                    <SelectBox class="mb-3" label="Type" v-model="address.model.type" :error="address.error?.errors?.type"
+                        :options="addressTypes" required />
+                    <Text v-if="address.model.type !== AddressType.CatchAll" class="mb-3" label="Pattern"
+                        v-model="address.model.pattern" required :error="address.error?.errors?.pattern" />
+                    <Text class="mb-3" label="Description" v-model="address.model.description"
+                        :error="address.error?.errors?.description" />
+                </fieldset>
+                <SpinButton class="btn-primary" :loading="address.submitting" text="Add" loadingText="Adding" isSubmit />
+            </form>
+        </div>
     </div>
+    <AddressList :id="props.id" />
 </template>

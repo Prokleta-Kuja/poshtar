@@ -35,8 +35,6 @@ public class AddressesController : ControllerBase
 
         if (req.DomainId.HasValue)
             query = query.Where(a => a.DomainId == req.DomainId.Value);
-        else if (req.NotDomainId.HasValue)
-            query = query.Where(a => a.DomainId != req.NotDomainId.Value);
 
         if (req.UserId.HasValue)
             query = query.Where(a => a.Users.Any(u => u.UserId == req.UserId.Value));
@@ -243,7 +241,6 @@ public class AddressesController : ControllerBase
 public class AddressQuery : FilterQuery
 {
     public int? DomainId { get; set; }
-    public int? NotDomainId { get; set; }
     public int? UserId { get; set; }
     public int? NotUserId { get; set; }
 }
