@@ -37,7 +37,6 @@ const disabledText = (dateTime: string | null | undefined) => {
 refresh();
 </script>
 <template>
-    <h3 class="display-9 mt-3">Domain addresses</h3>
     <div class="d-flex flex-wrap">
         <Sizes class="me-3 mb-2" style="max-width:8rem" :params="data.params" :on-change="refresh" />
         <Search autoFocus class="me-3 mb-2" style="max-width:16rem" placeholder="Pattern" v-model="data.params.searchTerm"
@@ -57,7 +56,8 @@ refresh();
             <tbody>
                 <tr v-for="item in data.items" :key="item.id">
                     <td>
-                        <RouterLink :to="{ name: 'route.domainEdit', params: { id: item.id } }"> TODO LINK {{ item.pattern
+                        <RouterLink :to="{ name: 'route.domainDetails', params: { id: item.id } }"> TODO LINK {{
+                            item.pattern
                         }}</RouterLink>
                     </td>
                     <td>{{ typeText(item.type) }}</td>

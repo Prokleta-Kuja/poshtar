@@ -3,6 +3,7 @@ import { reactive } from "vue";
 import { DomainLM, DomainService } from "../../api";
 import Search from '../../components/form/Search.vue'
 import { Header, Pages, Sizes, ITableParams, initParams, updateParams } from "../../components/table"
+import AddDomain from "./AddDomain.vue";
 
 interface IDomainParams extends ITableParams {
     searchTerm?: string;
@@ -28,15 +29,7 @@ refresh();
 <template>
     <div class="d-flex align-items-center flex-wrap">
         <h1 class="display-6 me-3">Domains</h1>
-        <RouterLink :to="{ name: 'route.domainCreate', params: { id: 'new' } }" type="button"
-            class="btn btn-sm btn-success">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-plus-lg"
-                viewBox="0 0 16 16">
-                <path fill-rule="evenodd"
-                    d="M8 2a.5.5 0 0 1 .5.5v5h5a.5.5 0 0 1 0 1h-5v5a.5.5 0 0 1-1 0v-5h-5a.5.5 0 0 1 0-1h5v-5A.5.5 0 0 1 8 2Z" />
-            </svg>
-            Add
-        </RouterLink>
+        <AddDomain />
     </div>
     <div class="d-flex flex-wrap">
         <Sizes class="me-3 mb-2" style="max-width:8rem" :params="data.params" :on-change="refresh" />
@@ -57,7 +50,8 @@ refresh();
             <tbody>
                 <tr v-for="item in data.items" :key="item.id">
                     <td>
-                        <RouterLink :to="{ name: 'route.domainEdit', params: { id: item.id } }">{{ item.name }}</RouterLink>
+                        <RouterLink :to="{ name: 'route.domainDetails', params: { id: item.id } }">{{ item.name }}
+                        </RouterLink>
                     </td>
                     <td>{{ item.host }}</td>
                     <td>{{ item.port }}</td>

@@ -1,9 +1,7 @@
-import Create from "./DomainCreate.vue";
-import Edit from "./DomainEdit.vue";
-import List from "./DomainList.vue";
+import DomainDetails from "./_DomainDetails.vue";
+import Domains from "./_Domains.vue";
 
 export default {
-  Create,
-  Edit,
-  List,
+  DomainDetails,
+  Domains,
 };

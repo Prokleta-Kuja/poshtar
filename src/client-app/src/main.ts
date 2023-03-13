@@ -28,19 +28,14 @@ const router = createRouter({
     },
     {
       path: "/domains",
-      name: "route.domainList",
-      component: Domain.List,
+      name: "route.domains",
+      component: Domain.Domains,
     },
     {
       path: "/domains/:id(\\d+)",
-      name: "route.domainEdit",
-      component: Domain.Edit,
+      name: "route.domainDetails",
+      component: Domain.DomainDetails,
       props: parseId,
-    },
-    {
-      path: "/domains/:id",
-      name: "route.domainCreate",
-      component: Domain.Create,
     },
     {
       path: "/users",

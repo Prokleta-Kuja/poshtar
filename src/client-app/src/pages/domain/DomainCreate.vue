@@ -38,7 +38,7 @@ const submit = () => {
                 <Text class="mb-3" label="Username" v-model="state.model.username" required
                     :error="state.error?.errors?.username" />
                 <Text class="mb-3" label="Password" :autoComplete="'off'" :type="'password'" v-model="state.model.password"
-                    :error="state.error?.errors?.password" />
+                    required :error="state.error?.errors?.password" />
             </fieldset>
             <SpinButton class="btn-primary" :loading="state.saving" text="Add" loadingText="Adding" isSubmit />
         </form>

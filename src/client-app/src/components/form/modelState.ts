@@ -3,6 +3,6 @@ import { ValidationError } from "../../api";
 export default interface IModelState<T> {
   loading?: boolean;
   submitting?: boolean;
-  model?: T;
+  model: T;
   error?: ValidationError;
 }
