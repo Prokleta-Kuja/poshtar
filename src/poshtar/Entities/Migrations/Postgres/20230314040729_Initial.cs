@@ -35,7 +35,6 @@ namespace poshtar.Entities.Migrations.Postgres
                     name = table.Column<string>(type: "text", nullable: false),
                     host = table.Column<string>(type: "text", nullable: false),
                     port = table.Column<int>(type: "integer", nullable: false),
-                    is_secure = table.Column<bool>(type: "boolean", nullable: false),
                     username = table.Column<string>(type: "text", nullable: false),
                     password = table.Column<string>(type: "text", nullable: false),
                     disabled = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)

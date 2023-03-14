@@ -33,7 +33,6 @@ namespace poshtar.Entities.Migrations.Sqlite
                     name = table.Column<string>(type: "TEXT", nullable: false),
                     host = table.Column<string>(type: "TEXT", nullable: false),
                     port = table.Column<int>(type: "INTEGER", nullable: false),
-                    is_secure = table.Column<bool>(type: "INTEGER", nullable: false),
                     username = table.Column<string>(type: "TEXT", nullable: false),
                     password = table.Column<string>(type: "TEXT", nullable: false),
                     disabled = table.Column<long>(type: "INTEGER", nullable: true)

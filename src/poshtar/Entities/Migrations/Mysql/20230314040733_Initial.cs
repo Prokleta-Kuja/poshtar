@@ -43,7 +43,6 @@ namespace poshtar.Entities.Migrations.Mysql
                     host = table.Column<string>(type: "longtext", nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     port = table.Column<int>(type: "int", nullable: false),
-                    is_secure = table.Column<bool>(type: "tinyint(1)", nullable: false),
                     username = table.Column<string>(type: "longtext", nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     password = table.Column<string>(type: "longtext", nullable: false)

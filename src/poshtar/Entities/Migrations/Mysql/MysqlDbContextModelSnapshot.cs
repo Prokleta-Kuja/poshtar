@@ -118,10 +118,6 @@ namespace poshtar.Entities.Migrations.Mysql
                         .HasColumnType("longtext")
                         .HasColumnName("host");
 
-                    b.Property<bool>("IsSecure")
-                        .HasColumnType("tinyint(1)")
-                        .HasColumnName("is_secure");
-
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("varchar(255)")

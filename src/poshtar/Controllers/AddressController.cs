@@ -119,6 +119,7 @@ public class AddressesController : ControllerBase
         };
 
         _db.Addresses.Add(address);
+        // domain.Addresses.Add(address);
         await _db.SaveChangesAsync();
 
         return Ok(new AddressVM(address));

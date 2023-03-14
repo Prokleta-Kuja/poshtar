@@ -7,7 +7,7 @@ import SelectBox from '../../components/form/SelectBox.vue';
 import SpinButton from '../../components/form/SpinButton.vue';
 import Text from '../../components/form/TextBox.vue';
 
-const props = defineProps<{ domainId: number }>()
+const props = defineProps<{ domainId: number, onAdded?: () => void }>()
 const blank = (): AddressCM => ({ domainId: props.domainId, pattern: '', type: AddressType.Exact })
 const shown = ref(false)
 const address = reactive<IModelState<AddressCM>>({ model: blank() })
@@ -26,7 +26,12 @@ const submit = () => {
     address.submitting = true;
     address.error = undefined;
     AddressService.createAddress({ requestBody: address.model })
-        .then(blank)
+        .then(r => {
+            address.model = blank();
+            if (props.onAdded)
+                props.onAdded();
+            shown.value = false;
+        })
         .catch(r => address.error = r.body)
         .finally(() => address.submitting = false);
 }
@@ -49,10 +54,10 @@ const submit = () => {
                     v-model="address.model.pattern" required :error="address.error?.errors?.pattern" />
                 <Text class="mb-3" label="Description" v-model="address.model.description"
                     :error="address.error?.errors?.description" />
-                <p v-if="address.error" class="text-danger">{{ address.error.message }}</p>
             </form>
         </template>
         <template #footer>
+            <p v-if="address.error" class="text-danger">{{ address.error.message }}</p>
             <button class="btn btn-outline-danger" @click="toggle">Cancel</button>
             <SpinButton class="btn-primary" :loading="address.submitting" text="Add" loadingText="Adding" @click="submit" />
         </template>

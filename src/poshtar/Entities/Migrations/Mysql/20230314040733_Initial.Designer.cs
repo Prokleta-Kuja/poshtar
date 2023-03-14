@@ -11,7 +11,7 @@ using poshtar.Entities;
 namespace poshtar.Entities.Migrations.Mysql
 {
     [DbContext(typeof(MysqlDbContext))]
-    [Migration("20230303095824_Initial")]
+    [Migration("20230314040733_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -120,10 +120,6 @@ namespace poshtar.Entities.Migrations.Mysql
                         .IsRequired()
                         .HasColumnType("longtext")
                         .HasColumnName("host");
-
-                    b.Property<bool>("IsSecure")
-                        .HasColumnType("tinyint(1)")
-                        .HasColumnName("is_secure");
 
                     b.Property<string>("Name")
                         .IsRequired()

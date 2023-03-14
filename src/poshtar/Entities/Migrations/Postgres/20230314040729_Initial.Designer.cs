@@ -12,7 +12,7 @@ using poshtar.Entities;
 namespace poshtar.Entities.Migrations.Postgres
 {
     [DbContext(typeof(PostgresDbContext))]
-    [Migration("20230303095821_Initial")]
+    [Migration("20230314040729_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -129,10 +129,6 @@ namespace poshtar.Entities.Migrations.Postgres
                         .IsRequired()
                         .HasColumnType("text")
                         .HasColumnName("host");
-
-                    b.Property<bool>("IsSecure")
-                        .HasColumnType("boolean")
-                        .HasColumnName("is_secure");
 
                     b.Property<string>("Name")
                         .IsRequired()

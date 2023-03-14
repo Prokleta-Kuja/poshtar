@@ -18,7 +18,7 @@ const submit = () => {
     domain.submitting = true;
     domain.error = undefined;
     DomainService.createDomain({ requestBody: domain.model })
-        .then(r => router.push({ name: 'route.domainEdit', params: { id: r.id } }))
+        .then(r => router.push({ name: 'route.domainDetails', params: { id: r.id } }))
         .catch(r => domain.error = r.body)
         .finally(() => domain.submitting = false);
 };
@@ -48,10 +48,10 @@ const submit = () => {
                     <Text class="mb-3" label="Password" :autoComplete="'off'" :type="'password'"
                         v-model="domain.model.password" required :error="domain.error?.errors?.password" />
                 </fieldset>
-                <p v-if="domain.error" class="text-danger">{{ domain.error.message }}</p>
             </form>
         </template>
         <template #footer>
+            <p v-if="domain.error" class="text-danger">{{ domain.error.message }}</p>
             <button class="btn btn-outline-danger" @click="toggle">Cancel</button>
             <SpinButton class="btn-primary" :loading="domain.submitting" text="Add" loadingText="Adding" @click="submit" />
         </template>

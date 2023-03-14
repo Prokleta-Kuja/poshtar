@@ -12,9 +12,11 @@ import AddAddress from './AddAddress.vue';
 
 const props = defineProps<{ id: number }>()
 const modal = ref(false)
+const lastChange = ref(new Date)
 const domain = reactive<IModelState<DomainUM>>({ loading: true, model: undefined! });
 
 const toggle = () => modal.value = !modal.value
+const updateLastChange = () => lastChange.value = new Date;
 const mapDomainModel = (m: DomainVM) =>
     domain.model = {
         name: m.name,
@@ -56,7 +58,7 @@ DomainService.getDomain({ domainId: props.id })
                 </svg>
                 Domain
             </button>
-            <AddAddress :domain-id="props.id" />
+            <AddAddress :domain-id="props.id" @added="updateLastChange" />
         </template>
     </div>
     <Modal v-if="domain.model" title="Edit domain" :shown="modal" :onClose="toggle">
@@ -85,5 +87,5 @@ DomainService.getDomain({ domainId: props.id })
             <SpinButton class="btn-primary" :loading="domain.submitting" text="Save" loadingText="Saving" @click="submit" />
         </template>
     </Modal>
-    <AddressList :id="props.id" />
+    <AddressList :id="props.id" :last-change="lastChange" />
 </template>

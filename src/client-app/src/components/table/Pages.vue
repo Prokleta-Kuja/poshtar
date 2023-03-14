@@ -28,7 +28,8 @@ const change = (page: number) => {
 </script>
 <template>
     <div class="d-flex justify-content-between align-items-center flex-wrap-reverse">
-        <div>Showing {{ counter.startItem }} to {{ counter.endItem }} of {{ counter.totalItems }} entries.</div>
+        <div v-if="props.params.total === 0">No results</div>
+        <div v-else>Showing {{ counter.startItem }} to {{ counter.endItem }} of {{ counter.totalItems }} entries.</div>
         <nav>
             <ul class="pagination mb-0">
                 <li class="page-item" :class="{ disabled: props.params.page === 1, pointer: props.params.page !== 1 }"

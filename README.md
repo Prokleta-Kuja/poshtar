@@ -4,7 +4,6 @@ A recurring job to check if there are maildirs for deleted users and/or delete i
 Reload certs https://doc.dovecot.org/admin_manual/doveadm_http_api/#doveadm-reload
 API auth
 MySql & Sqlite backend
-Showing 1 to 0 of 0 entries.
 
 # Important dovecot conf
 

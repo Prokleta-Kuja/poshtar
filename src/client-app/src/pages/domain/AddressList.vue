@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { reactive } from "vue";
+import { reactive, watch } from "vue";
 import { AddressLM, AddressService, AddressType } from "../../api";
 import Search from '../../components/form/Search.vue'
 import { Header, Pages, Sizes, ITableParams, initParams, updateParams } from "../../components/table"
@@ -8,7 +8,7 @@ interface IAddressParams extends ITableParams {
     searchTerm?: string;
 }
 
-const props = defineProps<{ id: number }>()
+const props = defineProps<{ id: number, lastChange?: Date }>()
 const data = reactive<{ params: IAddressParams, items: AddressLM[] }>({ params: initParams(), items: [] });
 const refresh = (params?: ITableParams) => {
     if (params)
@@ -17,6 +17,8 @@ const refresh = (params?: ITableParams) => {
     AddressService.getAddresses({ ...data.params, domainId: props.id })
         .then(r => { data.items = r.items; updateParams(data.params, r) });
 };
+
+watch(() => props.lastChange, () => refresh());
 
 const typeText = (type: AddressType) => {
     switch (type) {

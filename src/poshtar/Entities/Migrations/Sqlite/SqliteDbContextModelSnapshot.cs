@@ -116,10 +116,6 @@ namespace poshtar.Entities.Migrations.Sqlite
                         .HasColumnType("TEXT")
                         .HasColumnName("host");
 
-                    b.Property<bool>("IsSecure")
-                        .HasColumnType("INTEGER")
-                        .HasColumnName("is_secure");
-
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("TEXT")

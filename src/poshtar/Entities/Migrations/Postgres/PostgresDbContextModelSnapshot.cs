@@ -127,10 +127,6 @@ namespace poshtar.Entities.Migrations.Postgres
                         .HasColumnType("text")
                         .HasColumnName("host");
 
-                    b.Property<bool>("IsSecure")
-                        .HasColumnType("boolean")
-                        .HasColumnName("is_secure");
-
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("text")
