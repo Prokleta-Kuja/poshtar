@@ -4,6 +4,9 @@ A recurring job to check if there are maildirs for deleted users and/or delete i
 Reload certs https://doc.dovecot.org/admin_manual/doveadm_http_api/#doveadm-reload
 API auth
 MySql & Sqlite backend
+shutdown services https://stackoverflow.com/questions/35257287/kestrel-shutdown-function-in-startup-cs-in-asp-net-core
+disable built-in api model validation
+password checking and generation https://api.pwnedpasswords.com/ https://haveibeenpwned.com/API/v2
 
 # Important dovecot conf
 

@@ -34,7 +34,7 @@
               <RouterLink class="nav-link py-2 px-0 px-lg-2" :to="{ name: 'route.domains' }">Domains</RouterLink>
             </li>
             <li class="nav-item col-6 col-lg-auto">
-              <RouterLink class="nav-link py-2 px-0 px-lg-2" :to="{ name: 'route.userList' }">Users</RouterLink>
+              <RouterLink class="nav-link py-2 px-0 px-lg-2" :to="{ name: 'route.users' }">Users</RouterLink>
             </li>
           </ul>
         </div>

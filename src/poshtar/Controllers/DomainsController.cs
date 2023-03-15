@@ -10,7 +10,7 @@ namespace poshtar.Controllers;
 // [Authorize]
 [ApiController]
 [Route("api/domains")]
-[Tags(nameof(Entities.Domain))]
+[Tags(nameof(Domain))]
 [Produces("application/json")]
 [ProducesErrorResponseType(typeof(PlainError))]
 public class DomainsController : ControllerBase

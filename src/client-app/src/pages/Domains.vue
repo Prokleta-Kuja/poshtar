@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { reactive } from "vue";
-import { DomainLM, DomainService } from "../../api";
-import Search from '../../components/form/Search.vue'
-import { Header, Pages, Sizes, ITableParams, initParams, updateParams } from "../../components/table"
-import AddDomain from "./AddDomain.vue";
+import { DomainLM, DomainService } from "../api";
+import Search from '../components/form/Search.vue'
+import { Header, Pages, Sizes, ITableParams, initParams, updateParams } from "../components/table"
+import AddDomain from "../modals/AddDomain.vue";
 
 interface IDomainParams extends ITableParams {
     searchTerm?: string;

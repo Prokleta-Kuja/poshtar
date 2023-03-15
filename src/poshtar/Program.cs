@@ -53,12 +53,16 @@ public class Program
                 options.UseAllOfToExtendReferenceSchemas();
             });
 
-            builder.Services.AddControllers().AddJsonOptions(o =>
-            {
-                o.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingDefault | JsonIgnoreCondition.WhenWritingNull;
-                o.JsonSerializerOptions.DictionaryKeyPolicy = JsonNamingPolicy.CamelCase;
-                o.JsonSerializerOptions.WriteIndented = true;
-            });
+            builder.Services.AddControllers(options =>
+                {
+                    options.Filters.Add<ExceptionFilter>();
+                })
+                .AddJsonOptions(o =>
+                {
+                    o.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingDefault | JsonIgnoreCondition.WhenWritingNull;
+                    o.JsonSerializerOptions.DictionaryKeyPolicy = JsonNamingPolicy.CamelCase;
+                    o.JsonSerializerOptions.WriteIndented = true;
+                });
             // In production, the React files will be served from this directory
             builder.Services.AddSpaStaticFiles(c => { c.RootPath = "spa"; });
 

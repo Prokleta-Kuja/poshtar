@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import { reactive } from "vue";
-import { UserLM, UserService } from "../../api";
-import Search from '../../components/form/Search.vue'
-import { Header, Pages, Sizes, ITableParams, initParams, updateParams } from "../../components/table"
+import { UserLM, UserService } from "../api";
+import Search from '../components/form/Search.vue'
+import { Header, Pages, Sizes, ITableParams, initParams, updateParams } from "../components/table"
+import AddUser from "../modals/AddUser.vue";
 
 interface IUserParams extends ITableParams {
     searchTerm?: string;
@@ -28,14 +29,7 @@ refresh();
 <template>
     <div class="d-flex align-items-center flex-wrap">
         <h1 class="display-6 me-3">Users</h1>
-        <RouterLink :to="{ name: 'route.userCreate', params: { id: 'new' } }" type="button" class="btn btn-sm btn-success">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-plus-lg"
-                viewBox="0 0 16 16">
-                <path fill-rule="evenodd"
-                    d="M8 2a.5.5 0 0 1 .5.5v5h5a.5.5 0 0 1 0 1h-5v5a.5.5 0 0 1-1 0v-5h-5a.5.5 0 0 1 0-1h5v-5A.5.5 0 0 1 8 2Z" />
-            </svg>
-            Add
-        </RouterLink>
+        <AddUser />
     </div>
     <div class="d-flex flex-wrap">
         <Sizes class="me-3 mb-2" style="max-width:8rem" :params="data.params" :on-change="refresh" />
@@ -57,7 +51,8 @@ refresh();
             <tbody>
                 <tr v-for="item in data.items" :key="item.id">
                     <td>
-                        <RouterLink :to="{ name: 'route.userEdit', params: { id: item.id } }">{{ item.name }}</RouterLink>
+                        <RouterLink :to="{ name: 'route.userDetails', params: { id: item.id } }">{{ item.name }}
+                        </RouterLink>
                     </td>
                     <td>{{ item.description }}</td>
                     <td>

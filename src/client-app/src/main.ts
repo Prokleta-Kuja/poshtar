@@ -8,8 +8,10 @@ import "~bootstrap";
 import "./styles.scss";
 import App from "./App.vue";
 import Index from "./pages/Index.vue";
-import Domain from "./pages/domain";
-import User from "./pages/user";
+import Domains from "./pages/Domains.vue";
+import DomainDetails from "./pages/DomainDetails.vue";
+import Users from "./pages/Users.vue";
+import UserDetails from "./pages/UserDetails.vue";
 
 const parseId = (route: RouteLocationNormalized) => {
   let parsed = parseInt(route.params.id.toString());
@@ -29,29 +31,24 @@ const router = createRouter({
     {
       path: "/domains",
       name: "route.domains",
-      component: Domain.Domains,
+      component: Domains,
     },
     {
       path: "/domains/:id(\\d+)",
       name: "route.domainDetails",
-      component: Domain.DomainDetails,
+      component: DomainDetails,
       props: parseId,
     },
     {
       path: "/users",
-      name: "route.userList",
-      component: User.List,
+      name: "route.users",
+      component: Users,
     },
     {
       path: "/users/:id(\\d+)",
-      name: "route.userEdit",
-      component: User.Edit,
+      name: "route.userDetails",
+      component: UserDetails,
       props: parseId,
-    },
-    {
-      path: "/users/:id",
-      name: "route.userCreate",
-      component: User.Create,
     },
     { path: "/:pathMatch(.*)*", name: "NotFound", component: Index }, // NotFound
   ],

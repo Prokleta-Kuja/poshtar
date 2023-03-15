@@ -9,7 +9,7 @@ namespace poshtar.Controllers;
 // [Authorize]
 [ApiController]
 [Route("api/addresses")]
-[Tags(nameof(Entities.Address))]
+[Tags(nameof(Address))]
 [Produces("application/json")]
 [ProducesErrorResponseType(typeof(PlainError))]
 public class AddressesController : ControllerBase
@@ -39,7 +39,7 @@ public class AddressesController : ControllerBase
         if (req.UserId.HasValue)
             query = query.Where(a => a.Users.Any(u => u.UserId == req.UserId.Value));
         else if (req.NotUserId.HasValue)
-            query = query.Where(a => a.Users.Any(u => u.UserId != req.NotUserId.Value));
+            query = query.Where(a => !a.Users.Any(u => u.UserId == req.NotUserId.Value));
 
         var count = await query.CountAsync();
 
@@ -118,8 +118,7 @@ public class AddressesController : ControllerBase
             Type = model.Type,
         };
 
-        _db.Addresses.Add(address);
-        // domain.Addresses.Add(address);
+        domain.Addresses.Add(address);
         await _db.SaveChangesAsync();
 
         return Ok(new AddressVM(address));
@@ -194,8 +193,8 @@ public class AddressesController : ControllerBase
     public async Task<IActionResult> AddAddressUserAsync(int addressId, int userId)
     {
         var address = await _db.Addresses
-            .Include(d => d.Users.Where(u => u.UserId == userId))
-            .Where(d => d.DomainId == addressId)
+            .Include(a => a.Users.Where(u => u.UserId == userId))
+            .Where(a => a.AddressId == addressId)
             .FirstOrDefaultAsync();
 
         if (address == null)
@@ -222,14 +221,14 @@ public class AddressesController : ControllerBase
     public async Task<IActionResult> RemoveAddressUserAsync(int addressId, int userId)
     {
         var address = await _db.Addresses
-            .Include(d => d.Users.Where(u => u.UserId == userId))
-            .Where(d => d.DomainId == addressId)
+            .Include(a => a.Users.Where(u => u.UserId == userId))
+            .Where(a => a.AddressId == addressId)
             .FirstOrDefaultAsync();
 
         if (address == null)
             return NotFound(new PlainError("Address not found"));
 
-        if (address.Users.Count > 0)
+        if (address.Users.Count == 0)
             return Conflict(new PlainError("User already removed from address"));
 
         address.Users.RemoveAt(0);
