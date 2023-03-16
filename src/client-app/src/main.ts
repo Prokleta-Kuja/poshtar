@@ -8,6 +8,7 @@ import "~bootstrap";
 import "./styles.scss";
 import App from "./App.vue";
 import Index from "./pages/Index.vue";
+import Login from "./pages/Login.vue";
 import Domains from "./pages/Domains.vue";
 import DomainDetails from "./pages/DomainDetails.vue";
 import Users from "./pages/Users.vue";
@@ -27,6 +28,11 @@ const router = createRouter({
       path: "/",
       name: "route.root",
       component: Index,
+    },
+    {
+      path: "/login",
+      name: "route.login",
+      component: Login,
     },
     {
       path: "/domains",

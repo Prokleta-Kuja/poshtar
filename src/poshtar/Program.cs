@@ -1,5 +1,6 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.EntityFrameworkCore;
@@ -53,6 +54,14 @@ public class Program
                 options.UseAllOfToExtendReferenceSchemas();
             });
 
+            builder.Services
+                .AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+                .AddCookie(opt =>
+                {
+                    opt.Events.OnRedirectToAccessDenied = ctx => { ctx.Response.StatusCode = StatusCodes.Status403Forbidden; return Task.CompletedTask; };
+                    opt.Events.OnRedirectToLogin = ctx => { ctx.Response.StatusCode = StatusCodes.Status401Unauthorized; return Task.CompletedTask; };
+                });
+
             builder.Services.AddControllers(options =>
                 {
                     options.Filters.Add<ExceptionFilter>();
@@ -80,10 +89,10 @@ public class Program
 
             app.UseSpaStaticFiles();
             app.UseHttpsRedirection();
-            // app.UseAuthentication();
-            // app.UseAuthorization();
+            app.UseAuthentication();
+            app.UseAuthorization();
 
-            app.MapControllers();
+            app.MapControllers().RequireAuthorization();
 
             app.MapWhen(x => !x.Request.Path.Value!.StartsWith("/api/"), builder =>
             {

@@ -1,4 +1,3 @@
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using poshtar.Entities;
@@ -6,7 +5,6 @@ using poshtar.Models;
 
 namespace poshtar.Controllers;
 
-// [Authorize]
 [ApiController]
 [Route("api/addresses")]
 [Tags(nameof(Address))]

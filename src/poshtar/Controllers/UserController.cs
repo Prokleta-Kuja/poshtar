@@ -1,4 +1,3 @@
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -8,7 +7,6 @@ using poshtar.Services;
 
 namespace poshtar.Controllers;
 
-// [Authorize]
 [ApiController]
 [Route("api/users")]
 [Tags(nameof(Entities.User))]
@@ -106,7 +104,6 @@ public class UsersController : ControllerBase
         if (isDuplicate)
             return BadRequest(new ValidationError(nameof(model.Name), "Already exists"));
 
-        var serverProtector = _dpp.CreateProtector(nameof(User));
         var result = DovecotHasher.Hash(model.Password);
         var user = new User
         {

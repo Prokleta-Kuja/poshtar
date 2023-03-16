@@ -1,4 +1,3 @@
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -7,7 +6,6 @@ using poshtar.Models;
 
 namespace poshtar.Controllers;
 
-// [Authorize]
 [ApiController]
 [Route("api/domains")]
 [Tags(nameof(Domain))]
