@@ -19,10 +19,11 @@ jobs:
           registry: ghcr.io
           username: ${{ github.REPOSITORY_OWNER }}
           password: ${{ secrets.GITHUB_TOKEN }}
-      - name: downcase REPO
+      - name: Generate env variables
         run: |
           echo "REPO=${GITHUB_REPOSITORY,,}" >> ${GITHUB_ENV}
           echo "DATE=$(date +'%Y-%m-%d')" >> ${GITHUB_ENV}
+          echo "VERSION=$(date +'%Y.%m.%d')-${GITHUB_RUN_NUMBER}" >> ${GITHUB_ENV}
       - name: Build and push
         uses: docker/build-push-action@v4
         with:
@@ -30,7 +31,7 @@ jobs:
           file: Dockerfile
           push: true
           build-args: |
-            Version="$(date +'%Y.%m.%d')-${{ github.RUN_NUMBER }}"
+            Version=${{ env.VERSION }}
           tags: |
             ghcr.io/${{ env.REPO }}:latest
             ghcr.io/${{ env.REPO }}:${{ env.DATE }}
