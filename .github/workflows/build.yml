@@ -28,6 +28,6 @@ jobs:
           build-args: |
             Version=$(date +'%Y.%m.%d')-${{ github.RUN_NUMBER }}
           tags: |
-            ghcr.io/${{ github.GITHUB_REPOSITORY }}:latest
-            ghcr.io/${{ github.GITHUB_REPOSITORY }}:$(date +'%Y-%m-%d')
-            ghcr.io/${{ github.GITHUB_REPOSITORY }}:${{ github.RUN_NUMBER }}
+            ghcr.io/${{ github.REPOSITORY }}:latest
+            ghcr.io/${{ github.REPOSITORY }}:$(date +'%Y-%m-%d')
+            ghcr.io/${{ github.REPOSITORY }}:${{ github.RUN_NUMBER }}
