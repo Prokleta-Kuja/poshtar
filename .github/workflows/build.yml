@@ -32,5 +32,5 @@ jobs:
             Version="$(date +'%Y.%m.%d')-${{ github.RUN_NUMBER }}"
           tags: |
             ghcr.io/${{ env.REPO }}:latest
-            ghcr.io/${{ env.REPO }}:${{ (date +'%Y-%m-%d') }}
+            ghcr.io/${{ env.REPO }}:$(date +'%Y-%m-%d')
             ghcr.io/${{ env.REPO }}:${{ github.RUN_NUMBER }}
