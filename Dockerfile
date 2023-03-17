@@ -7,11 +7,14 @@ RUN dotnet restore
 COPY ./src/poshtar .
 
 ARG Version=0.0.0
-RUN dotnet publish /p:Version=$Version -c Release -o out --no-restore
+RUN dotnet publish /p:Version=$Version -c Release -o /out --no-restore && rm -r *
+
+COPY ./src/client-app/ ./
+RUN npm ci && npm exec --vue-tsc && npm exec -- vite build --outDir /out/client-app
 
 FROM mcr.microsoft.com/dotnet/aspnet:7.0 AS runtime
 WORKDIR /app
-COPY --from=build /app/out ./
+COPY --from=build /out ./
 
 ENV LC_ALL C
 
