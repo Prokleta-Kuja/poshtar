@@ -4,6 +4,6 @@
 
 export type AuthStatusModel = {
     authenticated: boolean;
-    username: string;
+    username?: string | null;
 };
 

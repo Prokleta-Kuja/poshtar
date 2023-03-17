@@ -5,7 +5,7 @@ import { AuthService, AuthStatusModel } from "../api";
 export const useAuth = defineStore("auth", () => {
   const initialized = ref(false);
   const isAuthenticated = ref(false);
-  const username = ref("");
+  const username = ref<string | undefined | null>(undefined);
 
   const setLoginInfo = (info: AuthStatusModel) => {
     isAuthenticated.value = info.authenticated;

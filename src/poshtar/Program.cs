@@ -74,7 +74,7 @@ public class Program
                     o.JsonSerializerOptions.WriteIndented = true;
                 });
             // In production, the React files will be served from this directory
-            builder.Services.AddSpaStaticFiles(c => { c.RootPath = "spa"; });
+            builder.Services.AddSpaStaticFiles(c => { c.RootPath = "client-app"; });
 
             var app = builder.Build();
             await Initialize(app.Services);
@@ -99,7 +99,7 @@ public class Program
             {
                 builder.UseSpa(spa =>
                 {
-                    spa.Options.SourcePath = "../client-app"; // ???
+                    spa.Options.SourcePath = "../client-app";
                     if (app.Environment.IsDevelopment())
                         spa.UseProxyToSpaDevelopmentServer("http://localhost:3000");
                 });

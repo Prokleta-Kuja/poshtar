@@ -11,5 +11,5 @@ public class LoginModel
 public class AuthStatusModel
 {
     [Required] public required bool Authenticated { get; set; }
-    [Required] public string? Username { get; set; }
+    public string? Username { get; set; }
 }
