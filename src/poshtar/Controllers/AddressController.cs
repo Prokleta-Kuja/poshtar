@@ -74,6 +74,7 @@ public class AddressesController : ControllerBase
     public async Task<IActionResult> GetOneAsnyc(int addressId)
     {
         var address = await _db.Addresses
+           .AsNoTracking()
            .Where(a => a.AddressId == addressId)
            .Select(a => new AddressVM(a))
            .FirstOrDefaultAsync();
@@ -151,7 +152,9 @@ public class AddressesController : ControllerBase
         if (isDuplicate)
             return BadRequest(new ValidationError(nameof(model.Pattern), "Already exists"));
 
-        var domain = await _db.Domains.FirstOrDefaultAsync(d => d.DomainId == model.DomainId);
+        var domain = await _db.Domains
+            .AsNoTracking()
+            .FirstOrDefaultAsync(d => d.DomainId == model.DomainId);
         if (domain == null)
             return BadRequest(new ValidationError(nameof(model.DomainId), "Not found"));
 

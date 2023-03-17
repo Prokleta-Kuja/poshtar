@@ -42,7 +42,7 @@ public class AuthController : ControllerBase
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> AutoLoginAsync()
     {
-        var hasMasters = await _db.Users.AnyAsync(u => u.IsMaster);
+        var hasMasters = await _db.Users.AsNoTracking().AnyAsync(u => u.IsMaster);
         if (hasMasters)
             return BadRequest(new PlainError("There are master users in database, autologin disabled."));
 
@@ -60,7 +60,9 @@ public class AuthController : ControllerBase
     public async Task<IActionResult> LoginAsync(LoginModel model)
     {
         model.Username = model.Username.ToLower();
-        var user = await _db.Users.SingleOrDefaultAsync(u => u.Name == model.Username && u.IsMaster == true && u.Disabled == null);
+        var user = await _db.Users
+            .AsNoTracking()
+            .SingleOrDefaultAsync(u => u.Name == model.Username && u.IsMaster == true && u.Disabled == null);
         if (user == null || !DovecotHasher.Verify(user.Salt, user.Hash, model.Password))
             return BadRequest(new PlainError("Invalid username or password"));
 

@@ -76,6 +76,7 @@ public class UsersController : ControllerBase
     public async Task<IActionResult> GetOneAsnyc(int userId)
     {
         var user = await _db.Users
+           .AsNoTracking()
            .Where(u => u.UserId == userId)
            .Select(u => new UserVM(u))
            .FirstOrDefaultAsync();

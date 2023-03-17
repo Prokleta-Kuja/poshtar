@@ -15,13 +15,11 @@ public class DomainsController : ControllerBase
 {
     readonly ILogger<DomainsController> _logger;
     readonly AppDbContext _db;
-    readonly IDataProtectionProvider _dpp;
 
-    public DomainsController(ILogger<DomainsController> logger, AppDbContext db, IDataProtectionProvider dpp)
+    public DomainsController(ILogger<DomainsController> logger, AppDbContext db)
     {
         _logger = logger;
         _db = db;
-        _dpp = dpp;
     }
 
     [HttpGet(Name = "GetDomains")]
@@ -72,6 +70,7 @@ public class DomainsController : ControllerBase
     public async Task<IActionResult> GetOneAsnyc(int domainId)
     {
         var domain = await _db.Domains
+           .AsNoTracking()
            .Where(d => d.DomainId == domainId)
            .Select(d => new DomainVM(d))
            .FirstOrDefaultAsync();
