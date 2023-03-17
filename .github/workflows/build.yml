@@ -26,7 +26,7 @@ jobs:
           file: Dockerfile
           push: true
           build-args: |
-            Version=$(date +'%Y.%m.%d')-${{ github.RUN_NUMBER }}
+            Version="$(date +'%Y.%m.%d')-${{ github.RUN_NUMBER }}"
           tags: |
             ghcr.io/${{ github.REPOSITORY }}:latest
             ghcr.io/${{ github.REPOSITORY }}:$(date +'%Y-%m-%d')
