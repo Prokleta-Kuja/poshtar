@@ -9,10 +9,13 @@ import "./styles.scss";
 import App from "./App.vue";
 import Index from "./pages/Index.vue";
 import Login from "./pages/Login.vue";
+import Logout from "./pages/Logout.vue";
 import Domains from "./pages/Domains.vue";
 import DomainDetails from "./pages/DomainDetails.vue";
 import Users from "./pages/Users.vue";
 import UserDetails from "./pages/UserDetails.vue";
+import { createPinia } from "pinia";
+import { useAuth } from "./stores/auth.store";
 
 const parseId = (route: RouteLocationNormalized) => {
   let parsed = parseInt(route.params.id.toString());
@@ -20,6 +23,7 @@ const parseId = (route: RouteLocationNormalized) => {
 
   return { ...route.params, id: parsed };
 };
+const pinia = createPinia();
 const router = createRouter({
   linkActiveClass: "active",
   history: createWebHistory(),
@@ -33,6 +37,11 @@ const router = createRouter({
       path: "/login",
       name: "route.login",
       component: Login,
+    },
+    {
+      path: "/logout",
+      name: "route.logout",
+      component: Logout,
     },
     {
       path: "/domains",
@@ -60,4 +69,16 @@ const router = createRouter({
   ],
 });
 
-createApp(App).use(router).mount("#app");
+const publicPages = ["/login", "/logout"];
+router.beforeEach(async (to, from) => {
+  const auth = useAuth();
+  const authRequired = !publicPages.includes(to.path);
+
+  // Must wait for auth to intialize before making a decision
+  while (!auth.initialized) await new Promise((f) => setTimeout(f, 500));
+
+  if (!auth.isAuthenticated && authRequired) return { name: "route.login" };
+});
+
+const app = createApp(App);
+app.use(router).use(pinia).mount("#app");

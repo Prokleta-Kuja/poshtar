@@ -49,7 +49,7 @@ const submit = () => {
         <template #body>
             <form @submit.prevent="submit">
                 <SelectBox class="mb-3" label="Type" v-model="address.model.type" :error="address.error?.errors?.type"
-                    :options="addressTypes" required />
+                    :options="addressTypes" required autoFocus />
                 <Text v-if="address.model.type !== AddressType.CatchAll" class="mb-3" label="Pattern"
                     v-model="address.model.pattern" required :error="address.error?.errors?.pattern" />
                 <Text class="mb-3" label="Description" v-model="address.model.description"

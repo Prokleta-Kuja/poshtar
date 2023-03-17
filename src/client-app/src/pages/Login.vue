@@ -5,7 +5,9 @@ import { AuthService, LoginModel } from '../api';
 import IModelState from '../components/form/modelState';
 import TextBox from '../components/form/TextBox.vue';
 import SpinButton from '../components/form/SpinButton.vue';
+import { useAuth } from '../stores/auth.store';
 
+const auth = useAuth();
 const router = useRouter()
 const loading = ref(true);
 const autologin = ref(false);
@@ -15,12 +17,18 @@ const goToRoot = () => router.replace({ name: 'route.root' })
 const login = () => {
     state.submitting = true;
     AuthService.login({ requestBody: state.model })
-        .then(goToRoot)
+        .then(r => { auth.setLoginInfo(r), goToRoot(); })
         .catch(r => state.error = r.body)
         .finally(() => state.submitting = false)
 }
 
-AuthService.autoLogin().then(() => autologin.value = true).finally(() => loading.value = false)
+if (!auth.isAuthenticated)
+    AuthService.autoLogin()
+        .then(() => autologin.value = true)
+        .catch(() => { })
+        .finally(() => loading.value = false)
+else
+    goToRoot()
 </script>
 <template>
     <div class="row vh-100 g-0">
@@ -49,14 +57,14 @@ AuthService.autoLogin().then(() => autologin.value = true).finally(() => loading
                             <h3 class="text-1000">Sign In</h3>
                             <p class="text-700">Self-hosted email server</p>
                         </div>
-                        <form>
+                        <form @submit.prevent="login">
                             <TextBox class="mb-3" label="Username" autoComplete="username" v-model="state.model.username"
                                 required autoFocus />
                             <TextBox class="mb-3" label="Password" type="password" autoComplete="password"
                                 v-model="state.model.password" required />
                             <p v-if="state.error" class="text-danger">{{ state.error.message }}</p>
                             <SpinButton class="btn-primary w-100 mb-3" :loading="state.submitting" text="Sign in"
-                                loadingText="Signing in" @click="login" />
+                                loadingText="Signing in" isSubmit />
                         </form>
                     </template>
                 </div>

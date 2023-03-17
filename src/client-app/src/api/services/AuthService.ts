@@ -59,17 +59,10 @@ export class AuthService {
      * @returns void
      * @throws ApiError
      */
-    public static logout({
-        addressId,
-    }: {
-        addressId?: number,
-    }): CancelablePromise<void> {
+    public static logout(): CancelablePromise<void> {
         return __request(OpenAPI, {
             method: 'DELETE',
             url: '/api/auth',
-            query: {
-                'addressId': addressId,
-            },
             errors: {
                 404: `Not Found`,
             },

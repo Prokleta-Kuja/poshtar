@@ -18,8 +18,6 @@ namespace poshtar.Controllers;
 [ProducesErrorResponseType(typeof(PlainError))]
 public class AuthController : ControllerBase
 {
-    static bool FirstRun;
-    static bool HasMasterUsers;
     readonly ILogger<AuthController> _logger;
     readonly AppDbContext _db;
 
@@ -34,9 +32,9 @@ public class AuthController : ControllerBase
     public IActionResult Status()
     {
         if (HttpContext.User.Identity?.IsAuthenticated ?? false)
-            return Ok(new AuthStatusModel { Authenticated = false });
-        else
             return Ok(new AuthStatusModel { Authenticated = true, Username = HttpContext.User.Identity!.Name });
+        else
+            return Ok(new AuthStatusModel { Authenticated = false });
     }
 
     [HttpPatch(Name = "AutoLogin")]
@@ -44,13 +42,8 @@ public class AuthController : ControllerBase
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> AutoLoginAsync()
     {
-        if (FirstRun)
-        {
-            FirstRun = false;
-            HasMasterUsers = await _db.Users.AnyAsync(u => u.IsMaster);
-        }
-
-        if (HasMasterUsers)
+        var hasMasters = await _db.Users.AnyAsync(u => u.IsMaster);
+        if (hasMasters)
             return BadRequest(new PlainError("There are master users in database, autologin disabled."));
 
         var claims = new List<Claim> { new(ClaimTypes.Name, "temporary admin"), new(ClaimTypes.Role, "master") };
@@ -85,9 +78,10 @@ public class AuthController : ControllerBase
     [HttpDelete(Name = "Logout")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> LogoutAsync(int addressId)
+    public async Task<IActionResult> LogoutAsync()
     {
-        await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+        if (HttpContext.User.Identity?.IsAuthenticated ?? false)
+            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
         return NoContent();
     }
 }

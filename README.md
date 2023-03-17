@@ -7,6 +7,7 @@ MySql & Sqlite backend
 shutdown services https://stackoverflow.com/questions/35257287/kestrel-shutdown-function-in-startup-cs-in-asp-net-core
 disable built-in api model validation
 password checking and generation https://api.pwnedpasswords.com/ https://haveibeenpwned.com/API/v2
+pooling for auth expiration in auth store
 
 # Important dovecot conf
 
