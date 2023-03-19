@@ -18,7 +18,7 @@ COPY --from=node-build /out ./client-app
 
 ENV LC_ALL C
 
-RUN set -eux; \
+RUN set -eux; DEBIAN_FRONTEND=noninteractive; \
     apt-get update && apt-get install -y --no-install-recommends \
     ca-certificates \
     ssl-cert \
@@ -35,12 +35,17 @@ RUN set -eux; \
     dovecot-sieve \
     dovecot-sqlite \
     ; \
-	rm -rf /var/lib/apt/lists/*
+    groupadd -g 1000 vmail && \
+    useradd -u 1000 -g 1000 vmail --shell /usr/sbin/nologin && \
+    passwd -l vmail && \
+    ; \
+    update-rc.d postfix disable && update-rc.d dovecot disable && \
+    rm -rf /var/lib/apt/lists /etc/dovecot /etc/postfix
 
 ENV ASPNETCORE_URLS=http://*:50505 \
     LOCALE=en-US \
     TZ=America/Chicago
 
-EXPOSE 50505
 VOLUME ["/data/certs", "/data/config", "/data/logs", "/data/mail"]
+EXPOSE 25/TCP 587/TCP 993/TCP 50505/TCP
 ENTRYPOINT ["dotnet", "poshtar.dll"]

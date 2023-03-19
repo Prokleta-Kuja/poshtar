@@ -8,6 +8,8 @@ public static class C
     public static readonly bool StartApiOnly;
     public const string CRT_FILE = "cert.crt";
     public const string KEY_FILE = "cert.key";
+    public static readonly int Uid;
+    public static readonly int Gid;
     public static readonly string Hostname;
     public static readonly string PostgresConnectionString;
     public static readonly string MysqlConnectionString;
@@ -18,6 +20,8 @@ public static class C
     {
         IsDebug = Environment.GetEnvironmentVariable("DEBUG") == "1";
         StartApiOnly = Environment.GetEnvironmentVariable("START_API_ONLY") == "1";
+        Uid = int.TryParse(Environment.GetEnvironmentVariable("UID"), out var uid) ? uid : 1000;
+        Gid = int.TryParse(Environment.GetEnvironmentVariable("GID"), out var gid) ? gid : 1000;
         Hostname = Environment.GetEnvironmentVariable("HOSTNAME") ?? string.Empty;
         PostgresConnectionString = Environment.GetEnvironmentVariable("POSTGRES") ?? string.Empty;
         MysqlConnectionString = Environment.GetEnvironmentVariable("MYSQL") ?? string.Empty;

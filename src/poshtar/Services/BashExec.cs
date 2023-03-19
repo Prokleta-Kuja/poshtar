@@ -46,6 +46,8 @@ public static class BashExec
         => await RunAsync($"dovecot stop");
     public static async Task<(int exitCode, string error, string output)> StatusDovecotAsync()
          => await RunAsync($"service dovecot status");
+    public static async Task<(int exitCode, string error, string output)> ChangeDovecotUidGid()
+         => await RunAsync($"usermod -u {C.Uid} vmail && groupmod -g {C.Gid} vmail");
 
     // Postfix
     public static async Task<(int exitCode, string error, string output)> StartPostfixAsync()

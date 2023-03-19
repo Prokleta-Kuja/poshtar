@@ -158,6 +158,12 @@ public class Program
         if (C.StartApiOnly)
             return;
 
+        var idChange = await BashExec.ChangeDovecotUidGid();
+        if (idChange.exitCode == 0)
+            Log.Debug("Changed dovecot permissions");
+        else
+            Log.Error("Could not change dovecot permissions: {error}", idChange.error);
+
         var dovecot = await BashExec.StartDovecotAsync();
         if (dovecot.exitCode == 0)
             Log.Debug("Dovecot started");

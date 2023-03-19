@@ -108,10 +108,9 @@ log_path={LogPath}
 info_log_path={LogPath}
 debug_log_path={LogPath}");
 
-        // TODO: insert proper uid gid
         main.AppendLine($@"
-mail_uid = 1000
-mail_gid = 1000");
+mail_uid = {C.Uid}
+mail_gid = {C.Gid}");
 
         // Permissions
         main.AppendLine($@"
@@ -126,7 +125,6 @@ passdb {{
   args = {PasswordsPath}
 }}
 userdb {{
-  override_fields = uid=vmail gid=vmail
   driver = sql
   args = {UsersPath}
 }}");
