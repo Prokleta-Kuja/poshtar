@@ -42,5 +42,5 @@ ENV ASPNETCORE_URLS=http://*:50505 \
     TZ=America/Chicago
 
 EXPOSE 50505
-VOLUME ["/data"]
+VOLUME ["/data/certs", "/data/config", "/data/logs", "/data/mail"]
 ENTRYPOINT ["dotnet", "poshtar.dll"]

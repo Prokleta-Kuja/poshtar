@@ -45,7 +45,7 @@ public static class C
     }
     public static class Paths
     {
-        static string Root => IsDebug ? Path.Join(Environment.CurrentDirectory, "/data") : string.Empty;
+        static string Root => IsDebug ? Path.Join(Environment.CurrentDirectory, "/data") : "/data";
         public static readonly string CertData = $"{Root}/certs";
         public static string CertDataFor(string file) => Path.Combine(CertData, file);
         public static readonly string ConfigData = $"{Root}/config";
