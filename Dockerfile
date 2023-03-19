@@ -37,7 +37,7 @@ RUN set -eux; \
     ; \
     groupadd -g 1000 vmail && \
     useradd -u 1000 -g 1000 vmail --shell /usr/sbin/nologin && \
-    passwd -l vmail && \
+    passwd -l vmail \
     ; \
     update-rc.d postfix disable && update-rc.d dovecot disable && \
     rm -rf /var/lib/apt/lists /etc/dovecot /etc/postfix
