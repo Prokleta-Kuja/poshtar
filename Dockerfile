@@ -40,7 +40,7 @@ RUN set -eux; \
     passwd -l vmail \
     ; \
     update-rc.d postfix disable && update-rc.d dovecot disable && \
-    rm -rf /var/lib/apt/lists /etc/dovecot /etc/postfix
+    rm -rf /var/lib/apt/lists /etc/dovecot
 
 ENV ASPNETCORE_URLS=http://*:50505 \
     LOCALE=en-US \
