@@ -8,6 +8,8 @@ shutdown services https://stackoverflow.com/questions/35257287/kestrel-shutdown-
 disable built-in api model validation
 password checking and generation https://api.pwnedpasswords.com/ https://haveibeenpwned.com/API/v2
 pooling for auth expiration in auth store
+Autologin button not working
+Catchall addresses cannot be added without pattern
 
 # Important dovecot conf
 

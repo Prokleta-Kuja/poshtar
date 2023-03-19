@@ -50,7 +50,7 @@ else
                         <p>You have been autologined with temporary admin user since there are no master users in database.
                         </p>
                         <p>Please add a master user, sign out and then sign in with non-temporary user.</p>
-                        <button class="btn btn-primary w-100 mb-3" @click="goToRoot">Acknowledge</button>
+                        <button class="btn btn-primary w-100 mb-3" @click="goToRoot()">Acknowledge</button>
                     </template>
                     <template v-else>
                         <div class="text-center mb-7">

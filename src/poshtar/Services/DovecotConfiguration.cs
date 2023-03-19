@@ -180,14 +180,14 @@ FROM Users WHERE Name = '%Ln' AND Disabled IS NULL AND IsMaster = 1",
             case DbContextType.PostgreSQL:
                 var postgres = new NpgsqlConnectionStringBuilder(C.PostgresConnectionString);
                 sqlFilePrefix = $@"driver = pgsql
-connect host={postgres.Host} dbname={postgres.Database} user={postgres.Username} password={postgres.Password}
+connect = host={postgres.Host} dbname={postgres.Database} user={postgres.Username} password={postgres.Password}
 ";
                 break;
             case DbContextType.MySQL:
                 throw new NotImplementedException();
                 var mysql = new MySqlConnectionStringBuilder(C.MysqlConnectionString);
                 sqlFilePrefix = $@"driver = mysql
-connect host={mysql.Server} dbname={mysql.Database} user={mysql.UserID} password={mysql.Password}
+connect = host={mysql.Server} dbname={mysql.Database} user={mysql.UserID} password={mysql.Password}
 ";
                 break;
             default:
