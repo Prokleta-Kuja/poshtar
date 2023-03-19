@@ -17,8 +17,8 @@ COPY --from=dotnet-build /out ./
 COPY --from=node-build /out ./client-app
 
 ENV LC_ALL C
-
-RUN set -eux; DEBIAN_FRONTEND=noninteractive; \
+ARG DEBIAN_FRONTEND=noninteractive
+RUN set -eux; \
     apt-get update && apt-get install -y --no-install-recommends \
     ca-certificates \
     ssl-cert \
