@@ -34,6 +34,7 @@ RUN set -eux; \
     dovecot-pgsql \
     dovecot-sieve \
     dovecot-sqlite \
+    libsasl2-modules \
     ; \
     groupadd -g 1000 vmail && \
     useradd -u 1000 -g 1000 vmail --shell /usr/sbin/nologin && \
