@@ -10,7 +10,6 @@ import { useAuth } from '../stores/auth.store';
 const auth = useAuth();
 const router = useRouter()
 const loading = ref(true);
-const autologin = ref(false);
 const state = reactive<IModelState<LoginModel>>({ model: { username: '', password: '' } });
 
 const goToRoot = () => router.replace({ name: 'route.root' })
@@ -24,7 +23,7 @@ const login = () => {
 
 if (!auth.isAuthenticated)
     AuthService.autoLogin()
-        .then(() => autologin.value = true)
+        .then(r => { auth.setLoginInfo(r), goToRoot(); })
         .catch(() => { })
         .finally(() => loading.value = false)
 else
@@ -45,12 +44,6 @@ else
                         <div class="text-center mt-5">
                             <div class="spinner-border" role="status"></div>
                         </div>
-                    </template>
-                    <template v-else-if="autologin">
-                        <p>You have been autologined with temporary admin user since there are no master users in database.
-                        </p>
-                        <p>Please add a master user, sign out and then sign in with non-temporary user.</p>
-                        <button class="btn btn-primary w-100 mb-3" @click="goToRoot()">Acknowledge</button>
                     </template>
                     <template v-else>
                         <div class="text-center mb-7">

@@ -48,7 +48,7 @@ public class AuthController : ControllerBase
 
         var claims = new List<Claim> { new(ClaimTypes.Name, "temporary admin"), new(ClaimTypes.Role, "master") };
         var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
-        var authProperties = new AuthenticationProperties { AllowRefresh = false, ExpiresUtc = DateTime.UtcNow.AddMinutes(10) };
+        var authProperties = new AuthenticationProperties { AllowRefresh = false, ExpiresUtc = DateTime.UtcNow.AddMinutes(10), IsPersistent = true };
         await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(claimsIdentity), authProperties);
 
         return Ok(new AuthStatusModel { Authenticated = true, Username = "temporary admin" });
@@ -71,7 +71,7 @@ public class AuthController : ControllerBase
             claims.Add(new Claim(ClaimTypes.Role, "master"));
 
         var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
-        var authProperties = new AuthenticationProperties { AllowRefresh = false, ExpiresUtc = DateTime.UtcNow.AddHours(1) };
+        var authProperties = new AuthenticationProperties { AllowRefresh = false, ExpiresUtc = DateTime.UtcNow.AddHours(1), IsPersistent = true };
         await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(claimsIdentity), authProperties);
 
         return Ok(new AuthStatusModel { Authenticated = true, Username = user.Name });

@@ -8,7 +8,10 @@ const auth = useAuth()
 const router = useRouter()
 const loading = ref(true)
 const goToLogin = () => router.replace({ name: 'route.login' })
-AuthService.logout().then(() => auth.clearLoginInfo()).finally(() => loading.value = false)
+if (auth.isAuthenticated)
+    AuthService.logout().then(() => auth.clearLoginInfo())
+else
+    loading.value = false
 
 </script>
 <template>
