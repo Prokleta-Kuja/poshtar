@@ -136,9 +136,6 @@ public class Program
         if (!Directory.Exists(DovecotConfiguration.DovecotRoot))
             DovecotConfiguration.Generate();
 
-        if (!Directory.Exists(PostfixConfiguration.PostfixRoot))
-            PostfixConfiguration.Generate();
-
         using var scope = provider.CreateScope();
         using var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
         if (db.Database.GetMigrations().Any())
@@ -169,12 +166,6 @@ public class Program
             Log.Debug("Dovecot started");
         else
             Log.Error("Could not start dovecot: {error}", dovecot.error);
-
-        var postfix = await BashExec.StartPostfixAsync();
-        if (postfix.exitCode == 0)
-            Log.Debug("Postfix started");
-        else
-            Log.Error("Could not start postfix: {error}", postfix.error);
     }
 }
 

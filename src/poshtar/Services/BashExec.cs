@@ -48,14 +48,4 @@ public static class BashExec
          => await RunAsync($"service dovecot status");
     public static async Task<(int exitCode, string error, string output)> ChangeDovecotUidGid()
          => await RunAsync($"usermod -u {C.Uid} vmail && groupmod -g {C.Gid} vmail");
-
-    // Postfix
-    public static async Task<(int exitCode, string error, string output)> StartPostfixAsync()
-        => await RunAsync($"postfix -c {PostfixConfiguration.PostfixRoot} start");
-    public static async Task<(int exitCode, string error, string output)> RestartPostfixAsync()
-        => await RunAsync($"postfix -c {PostfixConfiguration.PostfixRoot} reload");
-    public static async Task<(int exitCode, string error, string output)> StopPostfixAsync()
-        => await RunAsync($"postfix stop");
-    public static async Task<(int exitCode, string error, string output)> StatusPostfixAsync()
-        => await RunAsync($"service postfix status");
 }

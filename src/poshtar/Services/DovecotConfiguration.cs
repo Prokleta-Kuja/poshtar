@@ -22,7 +22,7 @@ public static class DovecotConfiguration
 ssl=required
 ssl_cert = <{C.Paths.CertCrt}
 ssl_key = <{C.Paths.CertKey}
-protocols = imap lmtp
+protocols = imap
 mail_location = maildir:{C.Paths.MailData}/%Ln
 auth_master_user_separator=*
 mail_plugins = $mail_plugins quota
@@ -42,25 +42,7 @@ plugin {{
   #quota_rule = *:storage=1G # This will be the default overrriden by SQL.
 }}
 
-protocol lmtp {{
-  #postmaster_address = postmaster@ica.hr   # required
-  #mail_plugins = quota sieve
-}}
-service lmtp {{
-  unix_listener /var/spool/postfix/private/dovecot-lmtp {{
-    mode = 0600
-    user = postfix
-    group = postfix
-  }}
-}}
 auth_mechanisms = plain login
-service auth {{
-  unix_listener /var/spool/postfix/private/auth {{
-    mode = 0660
-    user = postfix
-    group = postfix
-  }}
-}}
 
 namespace {{
   inbox = yes
