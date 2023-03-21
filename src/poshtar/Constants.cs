@@ -1,4 +1,5 @@
 using System.Globalization;
+using System.Net;
 
 namespace poshtar;
 
@@ -46,6 +47,10 @@ public static class C
         {
             Locale = CultureInfo.InvariantCulture;
         }
+    }
+    public static class CacheKeys
+    {
+        public static string FailedAuthCountFor(IPEndPoint ip) => $"IpFailedAuthCount-{ip.Address}";
     }
     public static class Paths
     {

@@ -34,6 +34,7 @@ public partial class AppDbContext : DbContext, IDataProtectionKeyContext
     public DbSet<Address> Addresses => Set<Address>();
     public DbSet<Domain> Domains => Set<Domain>();
     public DbSet<User> Users => Set<User>();
+    public DbSet<LogEntry> Logs => Set<LogEntry>();
 
     protected void AdditionalConfiguration(DbContextOptionsBuilder options)
     {
