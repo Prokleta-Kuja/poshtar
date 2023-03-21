@@ -136,9 +136,9 @@ userdb {{
         string query = C.DbContextType switch
         {
             DbContextType.PostgreSQL => @"iterate_query = SELECT name AS username FROM users WHERE disabled IS NULL
-user_query = SELECT name AS user, '*:bytes=' || quota AS quota_rule FROM users u WHERE disabled IS NULL AND u.name = '%Ln'",
+user_query = SELECT name AS user, '*:bytes=' || quota AS quota_rule FROM users u WHERE disabled IS NULL AND u.name = '%Lu'",
             DbContextType.SQLite => @"iterate_query = SELECT Name AS username FROM Users WHERE Disabled IS NULL
-user_query = SELECT '*:bytes=' || Quota AS quota_rule FROM users WHERE Name = '%Ln' AND Disabled IS NULL",
+user_query = SELECT '*:bytes=' || Quota AS quota_rule FROM users WHERE Name = '%Lu' AND Disabled IS NULL",
             _ => "Not verified",
         };
 
@@ -149,9 +149,9 @@ user_query = SELECT '*:bytes=' || Quota AS quota_rule FROM users WHERE Name = '%
         string query = C.DbContextType switch
         {
             DbContextType.PostgreSQL => @"password_query = SELECT Name AS username, password, '*:bytes=' || quota AS quota_rule \
-FROM users WHERE name = '%Ln' AND disabled IS NULL --AND is_master = false",
+FROM users WHERE name = '%Lu' AND disabled IS NULL --AND is_master = false",
             DbContextType.SQLite => @"password_query = SELECT Name AS username, Password AS password, '*:bytes=' || Quota AS quota_rule \
-FROM Users WHERE Name = '%Ln' AND Disabled IS NULL --AND IsMaster = 0",
+FROM Users WHERE Name = '%Lu' AND Disabled IS NULL --AND IsMaster = 0",
             _ => "Not verified",
         };
 
@@ -162,9 +162,9 @@ FROM Users WHERE Name = '%Ln' AND Disabled IS NULL --AND IsMaster = 0",
         string query = C.DbContextType switch
         {
             DbContextType.PostgreSQL => @"password_query = SELECT Name AS username, password, '*:bytes=' || quota AS quota_rule \
-FROM users WHERE name = '%Ln' AND disabled IS NULL AND is_master = true",
+FROM users WHERE name = '%Lu' AND disabled IS NULL AND is_master = true",
             DbContextType.SQLite => @"password_query = SELECT Name AS username, Password AS password, '*:bytes=' || Quota AS quota_rule \
-FROM Users WHERE Name = '%Ln' AND Disabled IS NULL AND IsMaster = 1",
+FROM Users WHERE Name = '%Lu' AND Disabled IS NULL AND IsMaster = 1",
             _ => "Not verified",
         };
 
