@@ -51,7 +51,6 @@ public class SecurableDuplexPipe
         };
 
         await stream.AuthenticateAsServerAsync(opt, cancellationToken).ConfigureAwait(false);
-        //await stream.AuthenticateAsServerAsync(certificate, false, protocols, true).ConfigureAwait(false);
 
         _stream = stream;
 

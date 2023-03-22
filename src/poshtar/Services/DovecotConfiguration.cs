@@ -119,12 +119,14 @@ userdb {{
         {
             DbContextType.PostgreSQL => @"iterate_query = SELECT name AS username FROM users WHERE disabled IS NULL
 user_query = SELECT name AS user, '*:bytes=' || quota AS quota_rule FROM users u WHERE disabled IS NULL AND u.name = '%Lu'",
+            DbContextType.MySQL => @"iterate_query = SELECT name AS username FROM users WHERE disabled IS NULL
+user_query = SELECT name AS user, '*:bytes=' || quota AS quota_rule FROM users u WHERE disabled IS NULL AND u.name = '%Lu'",
             DbContextType.SQLite => @"iterate_query = SELECT Name AS username FROM Users WHERE Disabled IS NULL
 user_query = SELECT '*:bytes=' || Quota AS quota_rule FROM users WHERE Name = '%Lu' AND Disabled IS NULL",
             _ => "Not verified",
         };
 
-        File.WriteAllText(UsersPath, string.Concat(sqlFilePrefix, query));
+        File.WriteAllText(UsersPath, string.Concat(sqlFilePrefix, query, '\n'));
     }
     static void GeneratePasswords(string sqlFilePrefix)
     {
@@ -132,12 +134,14 @@ user_query = SELECT '*:bytes=' || Quota AS quota_rule FROM users WHERE Name = '%
         {
             DbContextType.PostgreSQL => @"password_query = SELECT Name AS username, password, '*:bytes=' || quota AS quota_rule \
 FROM users WHERE name = '%Lu' AND disabled IS NULL --AND is_master = false",
+            DbContextType.MySQL => @"password_query = SELECT Name AS username, password, '*:bytes=' || quota AS quota_rule \
+FROM users WHERE name = '%Lu' AND disabled IS NULL --AND is_master = false",
             DbContextType.SQLite => @"password_query = SELECT Name AS username, Password AS password, '*:bytes=' || Quota AS quota_rule \
 FROM Users WHERE Name = '%Lu' AND Disabled IS NULL --AND IsMaster = 0",
             _ => "Not verified",
         };
 
-        File.WriteAllText(PasswordsPath, string.Concat(sqlFilePrefix, query));
+        File.WriteAllText(PasswordsPath, string.Concat(sqlFilePrefix, query, '\n'));
     }
     static void GenerateMasters(string sqlFilePrefix)
     {
@@ -145,12 +149,14 @@ FROM Users WHERE Name = '%Lu' AND Disabled IS NULL --AND IsMaster = 0",
         {
             DbContextType.PostgreSQL => @"password_query = SELECT Name AS username, password, '*:bytes=' || quota AS quota_rule \
 FROM users WHERE name = '%Lu' AND disabled IS NULL AND is_master = true",
+            DbContextType.MySQL => @"password_query = SELECT Name AS username, password, '*:bytes=' || Quota AS quota_rule \
+FROM Users WHERE Name = '%Lu' AND Disabled IS NULL AND IsMaster = 1",
             DbContextType.SQLite => @"password_query = SELECT Name AS username, Password AS password, '*:bytes=' || Quota AS quota_rule \
 FROM Users WHERE Name = '%Lu' AND Disabled IS NULL AND IsMaster = 1",
             _ => "Not verified",
         };
 
-        File.WriteAllText(MastersPath, string.Concat(sqlFilePrefix, query));
+        File.WriteAllText(MastersPath, string.Concat(sqlFilePrefix, query, '\n'));
     }
     public static void Generate()
     {
@@ -164,7 +170,6 @@ connect = host={postgres.Host} dbname={postgres.Database} user={postgres.Usernam
 ";
                 break;
             case DbContextType.MySQL:
-                throw new NotImplementedException();
                 var mysql = new MySqlConnectionStringBuilder(C.MysqlConnectionString);
                 sqlFilePrefix = $@"driver = mysql
 connect = host={mysql.Server} dbname={mysql.Database} user={mysql.UserID} password={mysql.Password}

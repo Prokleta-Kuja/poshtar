@@ -28,12 +28,10 @@ class Session
     internal async Task RunAsync(CancellationToken cancellationToken)
     {
         if (cancellationToken.IsCancellationRequested)
-        {
             return;
-        }
 
         await OutputGreetingAsync(cancellationToken).ConfigureAwait(false);
-
+        // TODO: RBL check
         await ExecuteAsync(_context, cancellationToken).ConfigureAwait(false);
     }
 
@@ -166,7 +164,7 @@ class Session
     /// <returns>A task which performs the operation.</returns>
     ValueTask<FlushResult> OutputGreetingAsync(CancellationToken cancellationToken)
     {
-        _context.Pipe?.Output.WriteLine($"220 {_context.ServerOptions.ServerName} v1.1 ESMTP ready");
+        _context.Pipe?.Output.WriteLine($"220 {C.Hostname} ESMTP {_context.ContextId}");
 
         return _context.Pipe!.Output.FlushAsync(cancellationToken);
     }

@@ -28,9 +28,7 @@ public class EhloCommand : Command
         var output = new[] { GetGreeting(context) }.Union(GetExtensions(context)).ToArray();
 
         for (var i = 0; i < output.Length - 1; i++)
-        {
             context.Pipe.Output.WriteLine($"250-{output[i]}");
-        }
 
         context.Pipe.Output.WriteLine($"250 {output[^1]}");
 
@@ -46,7 +44,10 @@ public class EhloCommand : Command
     /// <returns>The greeting text to display to the remote host.</returns>
     protected virtual string GetGreeting(SessionContext context)
     {
-        return $"{context.ServerOptions.ServerName} Hello {DomainOrAddress}, haven't we met before?";
+        if (context.IsSubmissionPort)
+            return $"{context.ServerOptions.ServerName} Hello {DomainOrAddress}, what do you want to send today?";
+        else
+            return $"{context.ServerOptions.ServerName} Hello {DomainOrAddress}, got any emails for me?";
     }
 
     /// <summary>
@@ -59,29 +60,13 @@ public class EhloCommand : Command
         yield return "PIPELINING";
         yield return "8BITMIME";
         yield return "SMTPUTF8";
+        yield return "STARTTLS";
 
-        if (context.Pipe?.IsSecure == false && context.EndpointDefinition.ServerCertificate != null)
-        {
-            yield return "STARTTLS";
-        }
-
-        if (context.ServerOptions.MaxMessageSize > 0)
-        {
+        if (C.MaxMessageSize > 0)
             yield return $"SIZE {context.ServerOptions.MaxMessageSize}";
-        }
 
-        if (IsPlainLoginAllowed(context))
-        {
+        if (context.IsSubmissionPort)
             yield return "AUTH PLAIN LOGIN";
-        }
-
-        static bool IsPlainLoginAllowed(SessionContext context)
-        {
-            if (context.Pipe == null)
-                return false;
-
-            return context.Pipe.IsSecure || context.EndpointDefinition.AllowUnsecureAuthentication;
-        }
     }
 
     /// <summary>

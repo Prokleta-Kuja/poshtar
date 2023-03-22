@@ -1,3 +1,5 @@
+using System.Security.Authentication;
+
 namespace poshtar.Smtp.Commands;
 
 public class StartTlsCommand : Command
@@ -22,7 +24,7 @@ public class StartTlsCommand : Command
             await context.Pipe.Output.WriteReplyAsync(Response.ServiceReady, cancellationToken).ConfigureAwait(false);
 
         var certificate = context.EndpointDefinition.ServerCertificate;
-        var protocols = context.EndpointDefinition.SupportedSslProtocols;
+        var protocols = SslProtocols.Tls13 | SslProtocols.Tls12;
 
         if (context.Pipe != null)
             await context.Pipe.UpgradeAsync(certificate, protocols, cancellationToken).ConfigureAwait(false);

@@ -18,9 +18,10 @@ public class NoopCommand : Command
     /// if the current state is to be maintained.</returns>
     internal override async Task<bool> ExecuteAsync(SessionContext context, CancellationToken cancellationToken)
     {
-        if (context.Pipe != null)
-            await context.Pipe.Output.WriteReplyAsync(Response.Ok, cancellationToken).ConfigureAwait(false);
+        if (context.Pipe == null)
+            return false;
 
+        await context.Pipe.Output.WriteReplyAsync(Response.Ok, cancellationToken).ConfigureAwait(false);
         return true;
     }
 }

@@ -12,6 +12,7 @@ public static class C
     public static readonly int Uid;
     public static readonly int Gid;
     public static readonly string Hostname;
+    public static readonly int MaxMessageSize;
     public static readonly string PostgresConnectionString;
     public static readonly string MysqlConnectionString;
     public static readonly DbContextType DbContextType;
@@ -24,6 +25,7 @@ public static class C
         Uid = int.TryParse(Environment.GetEnvironmentVariable("UID"), out var uid) ? uid : 1000;
         Gid = int.TryParse(Environment.GetEnvironmentVariable("GID"), out var gid) ? gid : 1000;
         Hostname = Environment.GetEnvironmentVariable("HOSTNAME") ?? string.Empty;
+        MaxMessageSize = int.TryParse(Environment.GetEnvironmentVariable("MAX_MESSAGE_SIZE_MB"), out var maxMessageSize) ? maxMessageSize * 1024 * 1024 : 0;
         PostgresConnectionString = Environment.GetEnvironmentVariable("POSTGRES") ?? string.Empty;
         MysqlConnectionString = Environment.GetEnvironmentVariable("MYSQL") ?? string.Empty;
         DbContextType = !string.IsNullOrWhiteSpace(PostgresConnectionString) ? DbContextType.PostgreSQL :

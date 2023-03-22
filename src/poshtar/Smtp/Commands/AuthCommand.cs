@@ -1,6 +1,8 @@
 using System.IO.Pipelines;
 using System.Text;
 using System.Text.RegularExpressions;
+using Microsoft.EntityFrameworkCore;
+using poshtar.Services;
 
 namespace poshtar.Smtp.Commands;
 
@@ -9,7 +11,10 @@ public enum AuthenticationMethod { Login, Plain }
 public class AuthCommand : Command
 {
     public const string Command = "AUTH";
-
+    const string BASE64_USERNAME = "VXNlcm5hbWU6"; // 'Username' encoded in base64
+    const string BASE64_PASSWORD = "UGFzc3dvcmQ6"; // 'Password' encoded in base64
+    const string FAIL_NOT_PARSABLE = "Invalid authentication attempt";
+    const string FAIL_INVALID_PARAMS = "Authentication failed, invalid username and/or password provided";
     string? _user;
     string? _password;
 
@@ -27,57 +32,75 @@ public class AuthCommand : Command
     /// <summary>
     /// Execute the command.
     /// </summary>
-    /// <param name="context">The execution context to operate on.</param>
+    /// <param name="ctx">The execution context to operate on.</param>
     /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>Returns true if the command executed successfully such that the transition to the next state should occur, false 
     /// if the current state is to be maintained.</returns>
-    internal override async Task<bool> ExecuteAsync(SessionContext context, CancellationToken cancellationToken)
+    internal override async Task<bool> ExecuteAsync(SessionContext ctx, CancellationToken cancellationToken)
     {
+        if (!ctx.IsSubmissionPort)
+        {
+            ctx.Log("Authentication not allowed");
+            return false;
+        }
+        if (ctx.RemoteEndpoint == null || ctx.Pipe == null)
+            return false;
+        if (!ctx.Pipe.IsSecure)
+        {
+            ctx.Log("Unsecure authentication not allowed");
+            return false;
+        }
+
         switch (Method)
         {
-            case AuthenticationMethod.Plain:
-                if (await TryPlainAsync(context, cancellationToken).ConfigureAwait(false) == false)
-                {
-                    if (context.Pipe != null)
-                        await context.Pipe.Output.WriteReplyAsync(Response.AuthenticationFailed, cancellationToken).ConfigureAwait(false);
-                    return false;
-                }
+            case AuthenticationMethod.Plain: // both login and password in the same Base64-encoded string
+                if (await TryPlainAsync(ctx, cancellationToken).ConfigureAwait(false) == false)
+                    return await FailResponse(ctx.Pipe, FAIL_NOT_PARSABLE, cancellationToken).ConfigureAwait(false);
                 break;
 
-            case AuthenticationMethod.Login:
-                if (await TryLoginAsync(context, cancellationToken).ConfigureAwait(false) == false)
-                {
-                    if (context.Pipe != null)
-                        await context.Pipe.Output.WriteReplyAsync(Response.AuthenticationFailed, cancellationToken).ConfigureAwait(false);
-                    return false;
-                }
+            case AuthenticationMethod.Login: // login and password separately
+                if (await TryLoginAsync(ctx, cancellationToken).ConfigureAwait(false) == false)
+                    return await FailResponse(ctx.Pipe, FAIL_NOT_PARSABLE, cancellationToken).ConfigureAwait(false);
                 break;
         }
 
-        if (!context.EndpointDefinition.AuthenticationRequired)
+        if (string.IsNullOrWhiteSpace(_user) || string.IsNullOrWhiteSpace(_password))
         {
-            context.Log("Endpoint not configured for authentication");
-            return false;
+            ctx.Log("Auth failed, no username or password provided");
+            return await FailResponse(ctx.Pipe, FAIL_INVALID_PARAMS, cancellationToken).ConfigureAwait(false);
         }
 
-        if (await context.AuthenticateAsync(_user, _password, cancellationToken).ConfigureAwait(false) == false)
+        var userLower = _user.ToLower();
+        var dbUser = await ctx.Db.Users
+            .AsNoTracking()
+            .FirstOrDefaultAsync(u => u.Name.Equals(userLower) && !u.Disabled.HasValue, cancellationToken).ConfigureAwait(false);
+        if (dbUser == null)
         {
-            var remaining = context.ServerOptions.MaxAuthenticationAttempts - ++context.AuthenticationAttempts;
-            var response = new Response(ReplyCode.AuthenticationFailed, $"authentication failed, {remaining} attempt(s) remaining.");
-
-            if (context.Pipe != null)
-                await context.Pipe.Output.WriteReplyAsync(response, cancellationToken).ConfigureAwait(false);
-
-            if (remaining <= 0)
-                throw new ResponseException(Response.ServiceClosingTransmissionChannel, true);
-
-            return false;
+            ctx.Log($"Authentication failed, invalid user", new { _user });
+            return await FailResponse(ctx.Pipe, FAIL_INVALID_PARAMS, cancellationToken).ConfigureAwait(false);
         }
 
-        if (context.Pipe != null)
-            await context.Pipe.Output.WriteReplyAsync(Response.AuthenticationSuccessful, cancellationToken).ConfigureAwait(false);
+        if (!DovecotHasher.Verify(dbUser.Salt, dbUser.Hash, _password))
+        {
+            ctx.Log($"Authentication failed, invalid password", new { _user });
+            return await FailResponse(ctx.Pipe, FAIL_INVALID_PARAMS, cancellationToken).ConfigureAwait(false);
+        }
 
+        ctx.User = dbUser;
+        ctx.Log($"Authenticated", new { _user });
+        await ctx.Pipe.Output.WriteReplyAsync(Response.AuthenticationSuccessful, cancellationToken).ConfigureAwait(false);
         return true;
+    }
+
+    static async Task<bool> FailResponse(SecurableDuplexPipe pipe, string message, CancellationToken cancellationToken)
+    {
+        var response = new Response(ReplyCode.AuthenticationFailed, message);
+        await pipe.Output.WriteReplyAsync(response, cancellationToken).ConfigureAwait(false);
+
+        // if (should close connection)
+        //     throw new ResponseException(Response.ServiceClosingTransmissionChannel, true);
+
+        return false;
     }
 
     /// <summary>
@@ -114,11 +137,8 @@ public class AuthCommand : Command
     bool TryExtractFromBase64(string base64)
     {
         var match = Regex.Match(Encoding.UTF8.GetString(Convert.FromBase64String(base64)), "\x0000(?<user>.*)\x0000(?<password>.*)");
-
-        if (match.Success == false)
-        {
+        if (!match.Success)
             return false;
-        }
 
         _user = match.Groups["user"].Value;
         _password = match.Groups["password"].Value;
@@ -134,22 +154,22 @@ public class AuthCommand : Command
     /// <returns>true if the LOGIN login sequence worked, false if not.</returns>
     async Task<bool> TryLoginAsync(SessionContext context, CancellationToken cancellationToken)
     {
-        if (string.IsNullOrWhiteSpace(Parameter) == false)
-        {
+        if (!string.IsNullOrWhiteSpace(Parameter))
             _user = Encoding.UTF8.GetString(Convert.FromBase64String(Parameter));
-        }
         else
         {
             if (context.Pipe != null)
-                await context.Pipe.Output.WriteReplyAsync(new(ReplyCode.ContinueWithAuth, "VXNlcm5hbWU6"), cancellationToken).ConfigureAwait(false);
-            if (context.Pipe != null)
+            {
+                await context.Pipe.Output.WriteReplyAsync(new(ReplyCode.ContinueWithAuth, BASE64_USERNAME), cancellationToken).ConfigureAwait(false);
                 _user = await ReadBase64EncodedLineAsync(context.Pipe.Input, cancellationToken).ConfigureAwait(false);
+            }
         }
-        // TODO: WTF is this hardcoded shit
+
         if (context.Pipe != null)
-            await context.Pipe.Output.WriteReplyAsync(new(ReplyCode.ContinueWithAuth, "UGFzc3dvcmQ6"), cancellationToken).ConfigureAwait(false);
-        if (context.Pipe != null)
+        {
+            await context.Pipe.Output.WriteReplyAsync(new(ReplyCode.ContinueWithAuth, BASE64_PASSWORD), cancellationToken).ConfigureAwait(false);
             _password = await ReadBase64EncodedLineAsync(context.Pipe.Input, cancellationToken).ConfigureAwait(false);
+        }
 
         return true;
     }
@@ -163,7 +183,6 @@ public class AuthCommand : Command
     static async Task<string> ReadBase64EncodedLineAsync(PipeReader reader, CancellationToken cancellationToken)
     {
         var text = await reader.ReadLineAsync(cancellationToken);
-
         return text == null ? string.Empty : Encoding.UTF8.GetString(Convert.FromBase64String(text));
     }
 

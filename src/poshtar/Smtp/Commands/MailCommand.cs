@@ -1,3 +1,5 @@
+using Microsoft.EntityFrameworkCore;
+
 namespace poshtar.Smtp.Commands;
 public enum MailboxFilterResult { Yes = 0, NoTemporarily = 1, NoPermanently = 2, SizeLimitExceeded = 3 }
 public class MailCommand : Command
@@ -18,54 +20,102 @@ public class MailCommand : Command
     /// <summary>
     /// Execute the command.
     /// </summary>
-    /// <param name="context">The execution context to operate on.</param>
+    /// <param name="ctx">The execution context to operate on.</param>
     /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>Returns true if the command executed successfully such that the transition to the next state should occurr, false 
     /// if the current state is to be maintained.</returns>
-    internal override async Task<bool> ExecuteAsync(SessionContext context, CancellationToken cancellationToken)
+    internal override async Task<bool> ExecuteAsync(SessionContext ctx, CancellationToken cancellationToken)
     {
-        if (context.EndpointDefinition.AuthenticationRequired && context.IsAuthenticated == false)
+        if (ctx.Pipe == null)
+            return false;
+
+        if (ctx.EndpointDefinition.AuthenticationRequired && ctx.IsAuthenticated == false)
         {
-            if (context.Pipe != null)
-                await context.Pipe.Output.WriteReplyAsync(Response.AuthenticationRequired, cancellationToken).ConfigureAwait(false);
+            await ctx.Pipe.Output.WriteReplyAsync(Response.AuthenticationRequired, cancellationToken).ConfigureAwait(false);
             return false;
         }
 
-        context.Transaction.Reset();
-        context.Transaction.Parameters = Parameters;
+        ctx.Transaction.Reset();
+        ctx.Transaction.Parameters = Parameters;
 
         // check if a size has been defined
         var size = GetMessageSize();
 
         // check against the server supplied maximum
-        if (context.ServerOptions.MaxMessageSize > 0 && size > context.ServerOptions.MaxMessageSize)
+        if (C.MaxMessageSize > 0 && size > C.MaxMessageSize)
         {
-            if (context.Pipe != null)
-                await context.Pipe.Output.WriteReplyAsync(Response.SizeLimitExceeded, cancellationToken).ConfigureAwait(false);
+            await ctx.Pipe.Output.WriteReplyAsync(Response.SizeLimitExceeded, cancellationToken).ConfigureAwait(false);
             return false;
         }
-        if (context.Pipe != null)
-            switch (await context.CanAcceptFromAsync(Address, size, cancellationToken).ConfigureAwait(false))
+
+        ctx.Transaction.From = Address;
+        if (ctx.IsSubmissionPort)
+        {
+            if (ctx.User == null)
             {
-                case MailboxFilterResult.Yes:
-                    context.Transaction.From = Address;
-                    await context.Pipe.Output.WriteReplyAsync(Response.Ok, cancellationToken).ConfigureAwait(false);
-                    return true;
+                ctx.Log("Cannot send without authentication", Address);
+                await ctx.Pipe.Output.WriteReplyAsync(Response.MailboxNameNotAllowed, cancellationToken).ConfigureAwait(false);
+                return false;
+            }
+            /*"SELECT u.name FROM addresses a 
+                JOIN domains d USING(domain_id) 
+                JOIN address_user au ON au.addresses_address_id = a.address_id 
+                JOIN users u ON u.user_id = au.users_user_id 
+                    WHERE d.disabled IS NULL 
+                        AND a.disabled IS NULL 
+                        AND u.disabled IS NULL 
+                        AND d.name = '%d' 
+                        AND ('%u' LIKE a.expression OR a.expression IS NULL)"*/
 
-                case MailboxFilterResult.NoTemporarily:
-                    await context.Pipe.Output.WriteReplyAsync(Response.MailboxUnavailable, cancellationToken).ConfigureAwait(false);
-                    return false;
-
-                case MailboxFilterResult.NoPermanently:
-                    await context.Pipe.Output.WriteReplyAsync(Response.MailboxNameNotAllowed, cancellationToken).ConfigureAwait(false);
-                    return false;
-
-                case MailboxFilterResult.SizeLimitExceeded:
-                    await context.Pipe.Output.WriteReplyAsync(Response.SizeLimitExceeded, cancellationToken).ConfigureAwait(false);
-                    return false;
+            System.Diagnostics.Debugger.Break();
+            var canSend = await ctx.Db.Addresses
+                .AsNoTracking()
+                .Where(a => !a.Disabled.HasValue && (a.Expression == null || EF.Functions.Like(Address.User, a.Expression)))
+                .Where(a => a.Users.Where(u => !u.Disabled.HasValue).Contains(ctx.User))
+                .Where(a => a.Domain!.Name.Equals(Address.Host.ToLower()) && !a.Domain.Disabled.HasValue)
+                .AnyAsync(cancellationToken).ConfigureAwait(false);
+            // var domain = await ctx.Db.Domains
+            //     .AsNoTracking()
+            //     .Where(d => d.Name.Equals(Address.Host.ToLower()) && !d.Disabled.HasValue)
+            //     .Include(d => d.Addresses.Where(a => a.Users.Contains(ctx.User) && !a.Disabled.HasValue))
+            //     .SingleOrDefaultAsync(cancellationToken).ConfigureAwait(false);
+            if (!canSend)
+            {
+                ctx.Log("Sending as address not allowed", Address);
+                await ctx.Pipe.Output.WriteReplyAsync(Response.MailboxNameNotAllowed, cancellationToken).ConfigureAwait(false);
+                return false;
             }
 
-        throw new ResponseException(Response.TransactionFailed);
+            // TODO: does user has enough space to accept message?
+        }
+        else
+        {
+            // TODO: check SPF
+        }
+
+        await ctx.Pipe.Output.WriteReplyAsync(Response.Ok, cancellationToken).ConfigureAwait(false);
+        return true;
+        // switch (await context.CanAcceptFromAsync(Address, size, cancellationToken).ConfigureAwait(false))
+        // {
+        //     case MailboxFilterResult.Yes:
+        //         context.Transaction.From = Address;
+        //         await context.Pipe.Output.WriteReplyAsync(Response.Ok, cancellationToken).ConfigureAwait(false);
+        //         return true;
+
+        //     case MailboxFilterResult.NoTemporarily:
+        //         await context.Pipe.Output.WriteReplyAsync(Response.MailboxUnavailable, cancellationToken).ConfigureAwait(false);
+        //         return false;
+
+        //     case MailboxFilterResult.NoPermanently:
+        //         await context.Pipe.Output.WriteReplyAsync(Response.MailboxNameNotAllowed, cancellationToken).ConfigureAwait(false);
+        //         return false;
+
+        //     case MailboxFilterResult.SizeLimitExceeded:
+        //         await context.Pipe.Output.WriteReplyAsync(Response.SizeLimitExceeded, cancellationToken).ConfigureAwait(false);
+        //         return false;
+        // }
+
+        //throw new ResponseException(Response.TransactionFailed);
     }
 
     /// <summary>
@@ -75,9 +125,7 @@ public class MailCommand : Command
     int GetMessageSize()
     {
         if (Parameters.TryGetValue("SIZE", out var value) == false)
-        {
             return 0;
-        }
 
         return int.TryParse(value, out var size) == false ? 0 : size;
     }

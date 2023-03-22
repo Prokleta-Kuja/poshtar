@@ -36,7 +36,10 @@ public class HeloCommand : Command
     /// <returns>The greeting text to display to the remote host.</returns>
     protected virtual string GetGreeting(SessionContext context)
     {
-        return $"{context.ServerOptions.ServerName} Hello {DomainOrAddress}, haven't we met before?";
+        if (context.IsSubmissionPort)
+            return $"{context.ServerOptions.ServerName} Hello {DomainOrAddress}, what do you want to send today?";
+        else
+            return $"{context.ServerOptions.ServerName} Hello {DomainOrAddress}, got any emails for me?";
     }
 
     /// <summary>
