@@ -18,6 +18,7 @@ public class QuitCommand : Command
     /// if the current state is to be maintained.</returns>
     internal override async Task<bool> ExecuteAsync(SessionContext context, CancellationToken cancellationToken)
     {
+        // TODO: Sending quit is a very small indicator not to be spam
         context.IsQuitRequested = true;
 
         if (context.Pipe != null)

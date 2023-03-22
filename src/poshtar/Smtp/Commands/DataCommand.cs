@@ -21,7 +21,7 @@ public class DataCommand : Command
         if (context.Pipe == null)
             return false;
 
-        if (context.Transaction.To.Count == 0)
+        if (context.Transaction.To.Count == 0 && context.Transaction.ToUsers.Count == 0)
         {
             await context.Pipe.Output.WriteReplyAsync(Response.NoValidRecipientsGiven, cancellationToken).ConfigureAwait(false);
             return false;

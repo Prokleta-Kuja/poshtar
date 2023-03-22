@@ -57,28 +57,14 @@ public class MailCommand : Command
                 await ctx.Pipe.Output.WriteReplyAsync(Response.MailboxNameNotAllowed, cancellationToken).ConfigureAwait(false);
                 return false;
             }
-            /*"SELECT u.name FROM addresses a 
-                JOIN domains d USING(domain_id) 
-                JOIN address_user au ON au.addresses_address_id = a.address_id 
-                JOIN users u ON u.user_id = au.users_user_id 
-                    WHERE d.disabled IS NULL 
-                        AND a.disabled IS NULL 
-                        AND u.disabled IS NULL 
-                        AND d.name = '%d' 
-                        AND ('%u' LIKE a.expression OR a.expression IS NULL)"*/
 
-            System.Diagnostics.Debugger.Break();
             var canSend = await ctx.Db.Addresses
                 .AsNoTracking()
                 .Where(a => !a.Disabled.HasValue && (a.Expression == null || EF.Functions.Like(Address.User, a.Expression)))
                 .Where(a => a.Users.Where(u => !u.Disabled.HasValue).Contains(ctx.User))
                 .Where(a => a.Domain!.Name.Equals(Address.Host.ToLower()) && !a.Domain.Disabled.HasValue)
                 .AnyAsync(cancellationToken).ConfigureAwait(false);
-            // var domain = await ctx.Db.Domains
-            //     .AsNoTracking()
-            //     .Where(d => d.Name.Equals(Address.Host.ToLower()) && !d.Disabled.HasValue)
-            //     .Include(d => d.Addresses.Where(a => a.Users.Contains(ctx.User) && !a.Disabled.HasValue))
-            //     .SingleOrDefaultAsync(cancellationToken).ConfigureAwait(false);
+
             if (!canSend)
             {
                 ctx.Log("Sending as address not allowed", Address);
@@ -95,27 +81,6 @@ public class MailCommand : Command
 
         await ctx.Pipe.Output.WriteReplyAsync(Response.Ok, cancellationToken).ConfigureAwait(false);
         return true;
-        // switch (await context.CanAcceptFromAsync(Address, size, cancellationToken).ConfigureAwait(false))
-        // {
-        //     case MailboxFilterResult.Yes:
-        //         context.Transaction.From = Address;
-        //         await context.Pipe.Output.WriteReplyAsync(Response.Ok, cancellationToken).ConfigureAwait(false);
-        //         return true;
-
-        //     case MailboxFilterResult.NoTemporarily:
-        //         await context.Pipe.Output.WriteReplyAsync(Response.MailboxUnavailable, cancellationToken).ConfigureAwait(false);
-        //         return false;
-
-        //     case MailboxFilterResult.NoPermanently:
-        //         await context.Pipe.Output.WriteReplyAsync(Response.MailboxNameNotAllowed, cancellationToken).ConfigureAwait(false);
-        //         return false;
-
-        //     case MailboxFilterResult.SizeLimitExceeded:
-        //         await context.Pipe.Output.WriteReplyAsync(Response.SizeLimitExceeded, cancellationToken).ConfigureAwait(false);
-        //         return false;
-        // }
-
-        //throw new ResponseException(Response.TransactionFailed);
     }
 
     /// <summary>

@@ -1,3 +1,5 @@
+using Microsoft.EntityFrameworkCore;
+
 namespace poshtar.Smtp.Commands;
 
 public sealed class RcptCommand : Command
@@ -25,36 +27,30 @@ public sealed class RcptCommand : Command
         if (ctx.Pipe == null || ctx.Transaction.From == null)
             throw new NotSupportedException("The Acceptance state is not supported.");
 
-        if (ctx.IsSubmissionPort)
-        {
-            // check if internal rcpt and remember userids
-            // else accept everything
-        }
+        var internalUsers = await ctx.Db.Users
+            .AsNoTracking()
+            .Where(u => !u.Disabled.HasValue)
+            .Where(u => u.Addresses.Any(a =>
+                !a.Disabled.HasValue &&
+                !a.Domain!.Disabled.HasValue &&
+                a.Domain.Name.Equals(Address.Host.ToLower()) &&
+                (a.Expression == null || EF.Functions.Like(Address.User, a.Expression))
+                ))
+             .ToListAsync(cancellationToken).ConfigureAwait(false);
+
+        if (internalUsers.Count > 0)
+            foreach (var internalUser in internalUsers)
+                ctx.Transaction.ToUsers.TryAdd(internalUser.UserId, internalUser.Name);
+        else if (ctx.IsSubmissionPort)
+            ctx.Transaction.To.Add(Address);
         else
         {
-            // accept only internal rcpt and remember userids
+            await ctx.Pipe.Output.WriteReplyAsync(Response.MailboxNameNotAllowed, cancellationToken).ConfigureAwait(false);
+            return false;
         }
 
-        ctx.Transaction.To.Add(Address);
         await ctx.Pipe.Output.WriteReplyAsync(Response.Ok, cancellationToken).ConfigureAwait(false);
         return true;
-        //     switch (await context.CanDeliverToAsync(Address, context.Transaction.From, cancellationToken).ConfigureAwait(false))
-        //     {
-        //         case MailboxFilterResult.Yes:
-        //             context.Transaction.To.Add(Address);
-        //             await context.Pipe.Output.WriteReplyAsync(Response.Ok, cancellationToken).ConfigureAwait(false);
-        //             return true;
-
-        //         case MailboxFilterResult.NoTemporarily:
-        //             await context.Pipe.Output.WriteReplyAsync(Response.MailboxUnavailable, cancellationToken).ConfigureAwait(false);
-        //             return false;
-
-        //         case MailboxFilterResult.NoPermanently:
-        //             await context.Pipe.Output.WriteReplyAsync(Response.MailboxNameNotAllowed, cancellationToken).ConfigureAwait(false);
-        //             return false;
-        //     }
-
-        // throw new NotSupportedException("The Acceptance state is not supported.");
     }
 
     /// <summary>

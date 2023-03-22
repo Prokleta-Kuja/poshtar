@@ -11,6 +11,7 @@ public class MessageTransaction
     {
         From = null;
         To = new();
+        ToUsers = new();
         Parameters = new ReadOnlyDictionary<string, string>(new Dictionary<string, string>());
     }
 
@@ -23,6 +24,7 @@ public class MessageTransaction
     /// Gets or sets the collection of mailboxes that the message is to be delivered to.
     /// </summary>
     public List<EmailAddress> To { get; set; } = new();
+    public Dictionary<int, string> ToUsers { get; set; } = new();
 
     /// <summary>
     /// The list of parameters that were supplied by the client.
