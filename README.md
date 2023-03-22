@@ -9,6 +9,7 @@ disable built-in api model validation
 password checking and generation https://api.pwnedpasswords.com/ https://haveibeenpwned.com/API/v2
 pooling for auth expiration in auth store
 Catchall addresses cannot be added without pattern
+Cannot edit address description
 
 # Important dovecot conf
 

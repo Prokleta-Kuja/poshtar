@@ -42,6 +42,7 @@ refresh();
                 <tr>
                     <Header :params="data.params" :on-sort="refresh" column="name" />
                     <Header :params="data.params" :on-sort="refresh" column="host" display="Upstream host" />
+                    <Header :params="data.params" :on-sort="refresh" column="username" display="Upstream user" />
                     <Header :params="data.params" :on-sort="refresh" column="port" display="Upstream port" />
                     <Header :params="data.params" :on-sort="refresh" column="disabled" display="Disabled" />
                     <Header :params="data.params" :on-sort="refresh" column="addressCount" display="Address count" />
@@ -54,6 +55,7 @@ refresh();
                         </RouterLink>
                     </td>
                     <td>{{ item.host }}</td>
+                    <td>{{ item.username }}</td>
                     <td>{{ item.port }}</td>
                     <td>{{ disabledText(item.disabled) }}</td>
                     <td>{{ item.addressCount }}</td>
