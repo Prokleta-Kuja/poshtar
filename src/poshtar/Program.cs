@@ -32,6 +32,7 @@ public class Program
         {
             var builder = WebApplication.CreateBuilder(args);
             builder.Host.UseSerilog();
+            builder.Services.AddSmtp();
             builder.Services.Configure<ForwardedHeadersOptions>(options => options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto);
             builder.Services.AddDataProtection().PersistKeysToDbContext<AppDbContext>();
             switch (C.DbContextType)
@@ -78,7 +79,8 @@ public class Program
 
             var app = builder.Build();
             await Initialize(app.Services);
-            await StartServices();
+            await StartServices(); // TODO: make hosted service
+            app.UseSmtp();
 
             if (app.Environment.IsDevelopment())
             {

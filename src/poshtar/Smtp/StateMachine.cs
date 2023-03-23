@@ -51,9 +51,7 @@ public class State : IEnumerable
 
     // this is just here for the collection initializer syntax to work
     IEnumerator IEnumerable.GetEnumerator() => throw new NotImplementedException();
-
     internal StateId StateId { get; }
-
     internal IDictionary<string, StateTransition> Transitions { get; } = new Dictionary<string, StateTransition>(StringComparer.OrdinalIgnoreCase);
 }
 

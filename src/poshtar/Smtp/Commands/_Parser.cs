@@ -67,12 +67,9 @@ public sealed class Parser
         errorResponse = null;
 
         if (TryMakeHeloLiteral(ref reader) == false)
-        {
             return false;
-        }
 
         reader.Skip(TokenKind.Space);
-
         if (reader.TryMake(TryMakeDomain, out var domain))
         {
             var domainOrAddress = StringUtil.Create(domain);
@@ -134,12 +131,9 @@ public sealed class Parser
         errorResponse = null;
 
         if (TryMakeEhloLiteral(ref reader) == false)
-        {
             return false;
-        }
 
         reader.Skip(TokenKind.Space);
-
         if (reader.TryMake(TryMakeDomain, out var domain))
         {
             var domainOrAddress = StringUtil.Create(domain);
@@ -201,12 +195,9 @@ public sealed class Parser
         errorResponse = null;
 
         if (TryMakeMail(ref reader) == false)
-        {
             return false;
-        }
 
         reader.Skip(TokenKind.Space);
-
         if (TryMakeFrom(ref reader) == false || reader.Take().Kind != TokenKind.Colon)
         {
             errorResponse = new Response(ReplyCode.SyntaxError, "missing the FROM:");
@@ -215,7 +206,6 @@ public sealed class Parser
 
         // according to the spec, whitespace isnt allowed here but most servers send it
         reader.Skip(TokenKind.Space);
-
         if (reader.TryMake(TryMakeReversePath, out EmailAddress? mailbox) == false)
         {
             errorResponse = new Response(ReplyCode.SyntaxError);
@@ -226,9 +216,7 @@ public sealed class Parser
 
         // match the optional (ESMTP) parameters
         if (reader.TryMake(TryMakeMailParameters, out IReadOnlyDictionary<string, string>? parameters) == false)
-        {
             parameters = new Dictionary<string, string>();
-        }
 
         command = _smtpCommandFactory.CreateMail(mailbox!, parameters!);
         return true;
@@ -289,16 +277,11 @@ public sealed class Parser
         errorResponse = null;
 
         if (TryMakeRcptLiteral(ref reader) == false)
-        {
             return false;
-        }
 
         reader.Skip(TokenKind.Space);
-
         if (TryMakeToLiteral(ref reader) == false)
-        {
             return false;
-        }
 
         if (reader.Take().Kind != TokenKind.Colon)
         {
@@ -308,7 +291,6 @@ public sealed class Parser
 
         // according to the spec, whitespace isnt allowed here anyway
         reader.Skip(TokenKind.Space);
-
         if (TryMakePath(ref reader, out var mailbox) == false)
         {
             errorResponse = Response.SyntaxError;
@@ -374,12 +356,9 @@ public sealed class Parser
         errorResponse = null;
 
         if (reader.TryMake(TryMakeDataLiteral) == false)
-        {
             return false;
-        }
 
         reader.Skip(TokenKind.Space);
-
         if (reader.TryMake(TryMakeEnd) == false)
         {
             errorResponse = Response.SyntaxError;
@@ -424,9 +403,7 @@ public sealed class Parser
         errorResponse = null;
 
         if (reader.TryMake(TryMakeQuitLiteral) == false)
-        {
             return false;
-        }
 
         if (TryMakeEnd(ref reader) == false)
         {
@@ -472,9 +449,7 @@ public sealed class Parser
         errorResponse = null;
 
         if (reader.TryMake(TryMakeNoopLiteral) == false)
-        {
             return false;
-        }
 
         if (TryMakeEnd(ref reader) == false)
         {
@@ -520,12 +495,9 @@ public sealed class Parser
         errorResponse = null;
 
         if (reader.TryMake(TryMakeRsetLiteral) == false)
-        {
             return false;
-        }
 
         reader.Skip(TokenKind.Space);
-
         if (TryMakeEnd(ref reader) == false)
         {
             errorResponse = Response.SyntaxError;
@@ -570,12 +542,9 @@ public sealed class Parser
         errorResponse = null;
 
         if (reader.TryMake(TryMakeStartTlsLiteral) == false)
-        {
             return false;
-        }
 
         reader.Skip(TokenKind.Space);
-
         if (TryMakeEnd(ref reader) == false)
         {
             errorResponse = Response.SyntaxError;
@@ -624,16 +593,12 @@ public sealed class Parser
         errorResponse = null;
 
         if (reader.TryMake(TryMakeAuthLiteral) == false)
-        {
             return false;
-        }
 
         reader.Skip(TokenKind.Space);
 
         if (TryMakeAuthenticationMethod(ref reader, out var authenticationMethod) == false)
-        {
             return false;
-        }
 
         reader.Take();
 
@@ -798,7 +763,6 @@ public sealed class Parser
     public bool TryMakeEnd(ref TokenReader reader)
     {
         reader.Skip(TokenKind.Space);
-
         return reader.Take() == default;
     }
 
@@ -812,9 +776,7 @@ public sealed class Parser
     public bool TryMakeReversePath(ref TokenReader reader, out EmailAddress? mailbox)
     {
         if (reader.TryMake(TryMakePath, out mailbox))
-        {
             return true;
-        }
 
         if (TryMakeEmptyPath(ref reader))
         {
@@ -834,13 +796,10 @@ public sealed class Parser
     public bool TryMakeEmptyPath(ref TokenReader reader)
     {
         if (reader.Take().Kind != TokenKind.LessThan)
-        {
             return false;
-        }
 
         // not valid according to the spec but some senders do it
         reader.Skip(TokenKind.Space);
-
         return reader.Take().Kind == TokenKind.GreaterThan;
     }
 
@@ -856,9 +815,7 @@ public sealed class Parser
         mailbox = null;
 
         if (reader.Take().Kind != TokenKind.LessThan)
-        {
             return false;
-        }
 
         // Note, the at-domain-list must be matched, but also must be ignored
         // http://tools.ietf.org/html/rfc5321#appendix-C
@@ -866,15 +823,11 @@ public sealed class Parser
         {
             // if the @domain list was matched then it needs to be followed by a colon
             if (reader.Take().Kind != TokenKind.Colon)
-            {
                 return false;
-            }
         }
 
         if (TryMakeMailbox(ref reader, out mailbox) == false)
-        {
             return false;
-        }
 
         return reader.Take().Kind == TokenKind.GreaterThan;
     }
@@ -888,18 +841,14 @@ public sealed class Parser
     public bool TryMakeAtDomainList(ref TokenReader reader)
     {
         if (TryMakeAtDomain(ref reader) == false)
-        {
             return false;
-        }
 
         while (reader.Peek().Kind == TokenKind.Comma)
         {
             reader.Take();
 
             if (TryMakeAtDomain(ref reader) == false)
-            {
                 return false;
-            }
         }
 
         return true;
@@ -914,9 +863,7 @@ public sealed class Parser
     public bool TryMakeAtDomain(ref TokenReader reader)
     {
         if (reader.Take().Kind != TokenKind.At)
-        {
             return false;
-        }
 
         return TryMakeDomain(ref reader);
     }
@@ -933,14 +880,10 @@ public sealed class Parser
         mailbox = null;
 
         if (reader.TryMake(TryMakeLocalPart, out var localpart) == false)
-        {
             return false;
-        }
 
         if (reader.Take().Kind != TokenKind.At)
-        {
             return false;
-        }
 
         if (reader.TryMake(TryMakeDomain, out var domain))
         {
@@ -980,18 +923,13 @@ public sealed class Parser
     public bool TryMakeDomain(ref TokenReader reader)
     {
         if (TryMakeSubdomain(ref reader) == false)
-        {
             return false;
-        }
 
         while (reader.Peek().Kind == TokenKind.Period)
         {
             reader.Take();
-
             if (TryMakeSubdomain(ref reader) == false)
-            {
                 return false;
-            }
         }
 
         return true;
@@ -1006,13 +944,10 @@ public sealed class Parser
     public bool TryMakeSubdomain(ref TokenReader reader)
     {
         if (TryMakeTextOrNumber(ref reader) == false)
-        {
             return false;
-        }
 
         // this is optional
         reader.TryMake(TryMakeTextOrNumberOrHyphenString);
-
         return true;
     }
 
@@ -1025,16 +960,12 @@ public sealed class Parser
     public bool TryMakeAddressLiteral(ref TokenReader reader)
     {
         if (reader.Take().Kind != TokenKind.LeftBracket)
-        {
             return false;
-        }
 
         reader.Skip(TokenKind.Space);
 
         if (reader.TryMake(TryMakeIPv4AddressLiteral) == false && reader.TryMake(TryMakeIPv6AddressLiteral) == false)
-        {
             return false;
-        }
 
         reader.Skip(TokenKind.Space);
 
@@ -1050,21 +981,15 @@ public sealed class Parser
     public bool TryMakeIPv4AddressLiteral(ref TokenReader reader)
     {
         if (reader.TryMake(TryMakeSnum) == false)
-        {
             return false;
-        }
 
         for (var i = 0; i < 3; i++)
         {
             if (reader.Take().Kind != TokenKind.Period)
-            {
                 return false;
-            }
 
             if (reader.TryMake(TryMakeSnum) == false)
-            {
                 return false;
-            }
         }
 
         return true;
@@ -1079,9 +1004,7 @@ public sealed class Parser
     public bool TryMakeSnum(ref TokenReader reader)
     {
         if (reader.TryMake(TryMakeNumber, out var number) == false)
-        {
             return false;
-        }
 
         return int.TryParse(StringUtil.Create(number), out var snum) && snum >= 0 && snum <= 255;
     }
@@ -1095,9 +1018,7 @@ public sealed class Parser
     public bool TryMakeWnum(ref TokenReader reader)
     {
         if (reader.TryMake(TryMakeNumber, out var number) == false)
-        {
             return false;
-        }
 
         return int.TryParse(StringUtil.Create(number), out var wnum) && wnum >= 0 && wnum <= 65535;
     }
@@ -1111,14 +1032,10 @@ public sealed class Parser
     public bool TryMakeIPv6AddressLiteral(ref TokenReader reader)
     {
         if (TryMakeIPv6(ref reader) == false)
-        {
             return false;
-        }
 
         if (reader.Take().Kind != TokenKind.Colon)
-        {
             return false;
-        }
 
         return TryMakeIPv6Address(ref reader);
     }
@@ -1131,16 +1048,11 @@ public sealed class Parser
     public bool TryMakeIPv6(ref TokenReader reader)
     {
         if (TryMakeIPv(ref reader) == false)
-        {
             return false;
-        }
 
         var token = reader.Take();
-
         if (token.Kind != TokenKind.Number || token.Text.Length > 1)
-        {
             return false;
-        }
 
         return token.Text[0] == '6';
     }
@@ -1194,9 +1106,7 @@ public sealed class Parser
     {
         // "::" 5( h16 ":" ) ls32
         if (reader.Take().Kind != TokenKind.Colon || reader.Take().Kind != TokenKind.Colon)
-        {
             return false;
-        }
 
         return TryMakeIPv6HexPostamble(ref reader, 5);
     }
@@ -1205,9 +1115,7 @@ public sealed class Parser
     {
         // [ h16 ] "::" 4( h16 ":" ) ls32
         if (TryMakeIPv6HexPreamble(ref reader, 1) == false)
-        {
             return false;
-        }
 
         return TryMakeIPv6HexPostamble(ref reader, 4);
     }
@@ -1216,9 +1124,7 @@ public sealed class Parser
     {
         // [ *1( h16 ":" ) h16 ] "::" 3( h16 ":" ) ls32
         if (TryMakeIPv6HexPreamble(ref reader, 2) == false)
-        {
             return false;
-        }
 
         return TryMakeIPv6HexPostamble(ref reader, 3);
     }
@@ -1227,9 +1133,7 @@ public sealed class Parser
     {
         // [ *2( h16 ":" ) h16 ] "::" 2( h16 ":" ) ls32
         if (TryMakeIPv6HexPreamble(ref reader, 3) == false)
-        {
             return false;
-        }
 
         return TryMakeIPv6HexPostamble(ref reader, 2);
     }
@@ -1238,9 +1142,7 @@ public sealed class Parser
     {
         // [ *3( h16 ":" ) h16 ] "::" h16 ":" ls32
         if (TryMakeIPv6HexPreamble(ref reader, 4) == false)
-        {
             return false;
-        }
 
         return TryMakeIPv6HexPostamble(ref reader, 1);
     }
@@ -1249,9 +1151,7 @@ public sealed class Parser
     {
         // [ *4( h16 ":" ) h16 ] "::" ls32
         if (TryMakeIPv6HexPreamble(ref reader, 5) == false)
-        {
             return false;
-        }
 
         return TryMakeIPv6Ls32(ref reader);
     }
@@ -1260,9 +1160,7 @@ public sealed class Parser
     {
         // [ *5( h16 ":" ) h16 ] "::" h16
         if (TryMakeIPv6HexPreamble(ref reader, 6) == false)
-        {
             return false;
-        }
 
         return TryMake16BitHex(ref reader);
     }
@@ -1278,22 +1176,14 @@ public sealed class Parser
         for (var i = 0; i < maximum; i++)
         {
             if (reader.TryMake(TryMakeTerminal))
-            {
                 return true;
-            }
 
             if (i > 0)
-            {
                 if (reader.Take().Kind != TokenKind.Colon)
-                {
                     return false;
-                }
-            }
 
             if (TryMake16BitHex(ref reader) == false)
-            {
                 return false;
-            }
         }
 
         return reader.TryMake(TryMakeTerminal);
@@ -1309,14 +1199,10 @@ public sealed class Parser
         while (count-- > 0)
         {
             if (TryMake16BitHex(ref reader) == false)
-            {
                 return false;
-            }
 
             if (reader.Take().Kind != TokenKind.Colon)
-            {
                 return false;
-            }
         }
 
         return TryMakeIPv6Ls32(ref reader);
@@ -1325,19 +1211,13 @@ public sealed class Parser
     bool TryMakeIPv6Ls32(ref TokenReader reader)
     {
         if (reader.TryMake(TryMakeIPv4AddressLiteral))
-        {
             return true;
-        }
 
         if (TryMake16BitHex(ref reader) == false)
-        {
             return false;
-        }
 
         if (reader.Take().Kind != TokenKind.Colon)
-        {
             return false;
-        }
 
         return TryMake16BitHex(ref reader);
     }
@@ -1355,12 +1235,9 @@ public sealed class Parser
         while ((token.Kind == TokenKind.Text || token.Kind == TokenKind.Number) && hexLength < 4)
         {
             if (token.Kind == TokenKind.Text && IsHex(ref token) == false)
-            {
                 return false;
-            }
 
             hexLength += reader.Take().Text.Length;
-
             token = reader.Peek();
         }
 
@@ -1369,7 +1246,6 @@ public sealed class Parser
         static bool IsHex(ref Token token)
         {
             var span = token.Text;
-
             return span.IsHex();
         }
     }
@@ -1404,14 +1280,10 @@ public sealed class Parser
         var token = reader.Peek();
 
         if (token.Kind == TokenKind.Text)
-        {
             return TryMakeText(ref reader);
-        }
 
         if (token.Kind == TokenKind.Number)
-        {
             return TryMakeNumber(ref reader);
-        }
 
         return false;
     }
@@ -1425,9 +1297,7 @@ public sealed class Parser
     public bool TryMakeLocalPart(ref TokenReader reader)
     {
         if (reader.TryMake(TryMakeDotString))
-        {
             return true;
-        }
 
         return TryMakeQuotedString(ref reader);
     }
@@ -1441,18 +1311,13 @@ public sealed class Parser
     public bool TryMakeDotString(ref TokenReader reader)
     {
         if (TryMakeAtom(ref reader) == false)
-        {
             return false;
-        }
 
         while (reader.Peek().Kind == TokenKind.Period)
         {
             reader.Take();
-
             if (TryMakeAtom(ref reader) == false)
-            {
                 return false;
-            }
         }
 
         return true;
@@ -1467,16 +1332,12 @@ public sealed class Parser
     public bool TryMakeQuotedString(ref TokenReader reader)
     {
         if (reader.Take().Kind != TokenKind.Quote)
-        {
             return false;
-        }
 
         while (reader.Peek().Kind != TokenKind.Quote)
         {
             if (TryMakeQContentSmtp(ref reader) == false)
-            {
                 return false;
-            }
         }
 
         return reader.Take().Kind == TokenKind.Quote;
@@ -1491,9 +1352,7 @@ public sealed class Parser
     public bool TryMakeQContentSmtp(ref TokenReader reader)
     {
         if (reader.TryMake(TryMakeQTextSmtp))
-        {
             return true;
-        }
 
         return TryMakeQuotedPairSmtp(ref reader);
     }
@@ -1507,9 +1366,7 @@ public sealed class Parser
     public bool TryMakeQTextSmtp(ref TokenReader reader)
     {
         if (reader.Peek().Kind == TokenKind.None)
-        {
             return false;
-        }
 
         switch (reader.Peek().Kind)
         {
@@ -1571,12 +1428,9 @@ public sealed class Parser
     public bool TryMakeQuotedPairSmtp(ref TokenReader reader)
     {
         if (reader.Take().Kind != TokenKind.Backslash)
-        {
             return false;
-        }
 
         var token = reader.Take();
-
         return token.Text.Length > 0 && token.Text[0] >= 32 && token.Text[0] <= 126;
     }
 
@@ -1591,9 +1445,7 @@ public sealed class Parser
         var count = 0;
 
         while (reader.TryMake(TryMakeAtext))
-        {
             count++;
-        }
 
         return count >= 1;
     }
@@ -1695,19 +1547,13 @@ public sealed class Parser
         value = default;
 
         if (reader.TryMake(TryMakeEsmtpKeyword, out keyword) == false)
-        {
             return false;
-        }
 
         if (reader.Peek().Kind == TokenKind.None || reader.Peek().Kind == TokenKind.Space)
-        {
             return true;
-        }
 
         if (reader.Take().Kind != TokenKind.Equal)
-        {
             return false;
-        }
 
         return reader.TryMake(TryMakeEsmtpValue, out value);
     }
@@ -1722,9 +1568,7 @@ public sealed class Parser
     {
         var token = reader.Take();
         if (token.Kind != TokenKind.Text && token.Kind != TokenKind.Number)
-        {
             return false;
-        }
 
         token = reader.Peek();
         while (token.Kind == TokenKind.Text || token.Kind == TokenKind.Number || token.Kind == TokenKind.Hyphen)
@@ -1746,15 +1590,12 @@ public sealed class Parser
     {
         var token = reader.Take();
         if (token.Kind == TokenKind.None || IsValid(ref token) == false)
-        {
             return false;
-        }
 
         token = reader.Peek();
         while (token.Kind != TokenKind.None && IsValid(ref token))
         {
             reader.Take();
-
             token = reader.Peek();
         }
 
@@ -1763,13 +1604,10 @@ public sealed class Parser
         static bool IsValid(ref Token token)
         {
             var span = token.Text;
-
             for (var i = 0; i < span.Length; i++)
             {
                 if ((span[i] < 33 || span[i] > 60) && (span[i] < 62 || span[i] > 127))
-                {
                     return false;
-                }
             }
 
             return true;
@@ -1785,19 +1623,13 @@ public sealed class Parser
     public bool TryMakeBase64(ref TokenReader reader)
     {
         if (TryMakeBase64Text(ref reader) == false)
-        {
             return false;
-        }
 
         if (reader.Peek().Kind == TokenKind.Equal)
-        {
             reader.Take();
-        }
 
         if (reader.Peek().Kind == TokenKind.Equal)
-        {
             reader.Take();
-        }
 
         return true;
     }
@@ -1811,11 +1643,8 @@ public sealed class Parser
     public bool TryMakeBase64Text(ref TokenReader reader)
     {
         var count = 0;
-
         while (reader.TryMake(TryMakeBase64Chars))
-        {
             count++;
-        }
 
         return count > 0;
     }

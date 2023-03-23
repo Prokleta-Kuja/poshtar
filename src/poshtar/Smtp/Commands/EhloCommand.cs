@@ -45,9 +45,9 @@ public class EhloCommand : Command
     protected virtual string GetGreeting(SessionContext context)
     {
         if (context.IsSubmissionPort)
-            return $"{context.ServerOptions.ServerName} Hello {DomainOrAddress}, what do you want to send today?";
+            return $"{C.Hostname} Hello {DomainOrAddress}, what do you want to send today?";
         else
-            return $"{context.ServerOptions.ServerName} Hello {DomainOrAddress}, got any emails for me?";
+            return $"{C.Hostname} Hello {DomainOrAddress}, got any emails for me?";
     }
 
     /// <summary>
@@ -63,7 +63,7 @@ public class EhloCommand : Command
         yield return "STARTTLS";
 
         if (C.MaxMessageSize > 0)
-            yield return $"SIZE {context.ServerOptions.MaxMessageSize}";
+            yield return $"SIZE {C.MaxMessageSize}";
 
         if (context.IsSubmissionPort)
             yield return "AUTH PLAIN LOGIN";

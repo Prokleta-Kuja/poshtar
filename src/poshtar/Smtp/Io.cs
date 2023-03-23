@@ -64,16 +64,16 @@ public class SecurableDuplexPipe
     /// <param name="disposing">true to release both managed and unmanaged resources; false to release only unmanaged resources.</param>
     void Dispose(bool disposing)
     {
-        if (_disposed == false)
-        {
-            if (disposing)
-            {
-                _disposeAction();
-                _stream = null;
-            }
+        if (_disposed)
+            return;
 
-            _disposed = true;
+        if (disposing)
+        {
+            _disposeAction();
+            _stream = null;
         }
+
+        _disposed = true;
     }
 
     /// <summary>
@@ -125,7 +125,6 @@ public class ByteArraySegmentList
     internal void Append(byte[] buffer)
     {
         var sequence = new ReadOnlySequence<byte>(buffer);
-
         Append(ref sequence);
     }
 
@@ -134,17 +133,13 @@ public class ByteArraySegmentList
         var position = sequence.GetPosition(0);
 
         while (sequence.TryGet(ref position, out var memory))
-        {
             if (Start == null)
             {
                 Start = new ByteArraySegment(memory);
                 End = Start;
             }
             else
-            {
                 End = End.Append(memory);
-            }
-        }
     }
 
     internal ReadOnlySequence<byte> Build()
@@ -174,9 +169,7 @@ public static class IoExtensions
     static async ValueTask ReadUntilAsync(PipeReader reader, byte[] sequence, Func<ReadOnlySequence<byte>, Task> func, CancellationToken cancellationToken)
     {
         if (reader == null)
-        {
             throw new ArgumentNullException(nameof(reader));
-        }
 
         var read = await reader.ReadAsync(cancellationToken);
         var head = read.Buffer.Start;
@@ -198,7 +191,6 @@ public static class IoExtensions
             }
 
             reader.AdvanceTo(read.Buffer.Start, read.Buffer.End);
-
             read = await reader.ReadAsync(cancellationToken);
         }
     }
@@ -213,9 +205,7 @@ public static class IoExtensions
     internal static ValueTask ReadLineAsync(this PipeReader reader, Func<ReadOnlySequence<byte>, Task> func, CancellationToken cancellationToken = default)
     {
         if (reader == null)
-        {
             throw new ArgumentNullException(nameof(reader));
-        }
 
         return ReadUntilAsync(reader, CRLF, func, cancellationToken);
     }
@@ -229,9 +219,7 @@ public static class IoExtensions
     internal static ValueTask<string> ReadLineAsync(this PipeReader reader, CancellationToken cancellationToken = default)
     {
         if (reader == null)
-        {
             throw new ArgumentNullException(nameof(reader));
-        }
 
         return reader.ReadLineAsync(Encoding.ASCII, cancellationToken);
     }
@@ -246,17 +234,13 @@ public static class IoExtensions
     internal static async ValueTask<string> ReadLineAsync(this PipeReader reader, Encoding encoding, CancellationToken cancellationToken = default)
     {
         if (reader == null)
-        {
             throw new ArgumentNullException(nameof(reader));
-        }
 
         var text = string.Empty;
-
         await reader.ReadLineAsync(
             buffer =>
             {
                 text = StringUtil.Create(buffer, encoding);
-
                 return Task.CompletedTask;
             },
             cancellationToken);
@@ -274,9 +258,7 @@ public static class IoExtensions
     internal static async ValueTask ReadDotBlockAsync(this PipeReader reader, Func<ReadOnlySequence<byte>, Task> func, CancellationToken cancellationToken = default)
     {
         if (reader == null)
-        {
             throw new ArgumentNullException(nameof(reader));
-        }
 
         await ReadUntilAsync(
             reader,
@@ -299,9 +281,7 @@ public static class IoExtensions
             while (buffer.TryFind(DotBlockStuffing, ref head, out var tail))
             {
                 var slice = buffer.Slice(start, buffer.GetPosition(3, head));
-
                 segments.Append(ref slice);
-
                 start = tail;
                 head = tail;
             }
@@ -321,9 +301,7 @@ public static class IoExtensions
     internal static void WriteLine(this PipeWriter writer, string text)
     {
         if (writer == null)
-        {
             throw new ArgumentNullException(nameof(writer));
-        }
 
         WriteLine(writer, Encoding.ASCII, text);
     }
@@ -337,9 +315,7 @@ public static class IoExtensions
     static unsafe void WriteLine(this PipeWriter writer, Encoding encoding, string text)
     {
         if (writer == null)
-        {
             throw new ArgumentNullException(nameof(writer));
-        }
 
         fixed (char* ptr = text)
         {
@@ -367,12 +343,9 @@ public static class IoExtensions
     public static ValueTask<FlushResult> WriteReplyAsync(this PipeWriter writer, Response response, CancellationToken cancellationToken)
     {
         if (writer == null)
-        {
             throw new ArgumentNullException(nameof(writer));
-        }
 
         writer.WriteLine($"{(int)response.ReplyCode} {response.Message}");
-
         return writer.FlushAsync(cancellationToken);
     }
 
@@ -391,14 +364,10 @@ public static class IoExtensions
 
         // move to the first span
         var position = head;
-
         if (TryMoveNext(ref source, ref position, out var span) == false)
-        {
             return false;
-        }
 
         var index = span.IndexOf(sequence);
-
         if (index != -1)
         {
             head = source.GetPosition(index, head);
@@ -407,11 +376,8 @@ public static class IoExtensions
             return true;
         }
 
-        if (source.IsSingleSegment)
-        {
-            // nothing else can be done here
+        if (source.IsSingleSegment) // nothing else can be done here            
             return false;
-        }
 
         while (true)
         {
@@ -455,7 +421,6 @@ public static class IoExtensions
         if (TryMatchEnd(ref previous, ref partial, out index))
         {
             partial = sequence[index..];
-
             if (next.StartsWith(partial))
             {
                 // adjust the index to the position it was found in the previous span
@@ -470,7 +435,6 @@ public static class IoExtensions
     static bool TryMatchEnd(ref ReadOnlySpan<byte> span, ref ReadOnlySpan<byte> sequence, out int index)
     {
         var partial = sequence;
-
         while (partial.Length > 0)
         {
             if (span.EndsWith(partial))
@@ -506,7 +470,6 @@ public static class IoExtensions
         if (buffer.IsSingleSegment)
         {
             var span = buffer.First.Span;
-
             return CaseInsensitiveStringEquals(ref span, ref text, 0);
         }
 
@@ -516,11 +479,8 @@ public static class IoExtensions
         while (buffer.TryGet(ref position, out var memory, advance: true))
         {
             var span = memory.Span;
-
             if (CaseInsensitiveStringEquals(ref span, ref text, i) == false)
-            {
                 return false;
-            }
 
             i += span.Length;
         }
@@ -531,18 +491,13 @@ public static class IoExtensions
     static bool CaseInsensitiveStringEquals(ref ReadOnlySpan<byte> span, ref Span<char> text, int offset)
     {
         if (text.Length - offset != span.Length)
-        {
             return false;
-        }
 
         for (var i = 0; i < span.Length; i++)
         {
             var ch = (char)span[i];
-
             if (char.ToUpper(ch) != char.ToUpper(text[i + offset]))
-            {
                 return false;
-            }
         }
 
         return true;
@@ -551,12 +506,8 @@ public static class IoExtensions
     internal static bool IsHex(this ref ReadOnlySpan<byte> buffer)
     {
         for (var i = 0; i < buffer.Length; i++)
-        {
             if ((buffer[i] < 'a' || buffer[i] > 'f') && (buffer[i] < 'A' || buffer[i] > 'F'))
-            {
                 return false;
-            }
-        }
 
         return true;
     }

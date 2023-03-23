@@ -15,14 +15,11 @@ public static class StringUtil
     internal static unsafe string? Create(ReadOnlySequence<byte> sequence, Encoding encoding)
     {
         if (sequence.Length == 0)
-        {
             return null;
-        }
 
         if (sequence.IsSingleSegment)
         {
             var span = sequence.First.Span;
-
             fixed (byte* ptr = span)
             {
                 return encoding.GetString(ptr, span.Length);
@@ -39,9 +36,7 @@ public static class StringUtil
             {
                 var span = memory.Span;
                 for (var j = 0; j < span.Length; i++, j++)
-                {
                     buffer[i] = span[j];
-                }
             }
 
             fixed (byte* ptr = buffer)
@@ -295,7 +290,6 @@ public readonly ref struct Token
     public string ToText()
     {
         var text = Text;
-
         return StringUtil.Create(ref text);
     }
 
@@ -459,22 +453,19 @@ public ref struct TokenReader
     /// <returns>true if the match could be made, false if not.</returns>
     public bool TryMake<TOut1, TOut2>(TryMakeDelegate<TOut1, TOut2> @delegate, out TOut1 value1, out TOut2 value2)
     {
-        if (_buffer.IsSingleSegment)
+        if (!_buffer.IsSingleSegment)
+            throw new NotImplementedException();
+
+        var index = _spanIndex;
+        if (@delegate(ref this, out value1, out value2) == false)
         {
-            var index = _spanIndex;
+            _spanIndex = index;
+            _hasPeeked = false;
 
-            if (@delegate(ref this, out value1, out value2) == false)
-            {
-                _spanIndex = index;
-                _hasPeeked = false;
-
-                return false;
-            }
-
-            return true;
+            return false;
         }
 
-        throw new NotImplementedException();
+        return true;
     }
 
     /// <summary>
@@ -507,9 +498,7 @@ public ref struct TokenReader
         }
 
         var token = ReadToken();
-
         _spanIndex += token.Text.Length;
-
         return token;
     }
 
@@ -520,9 +509,7 @@ public ref struct TokenReader
     public void Skip(TokenKind kind)
     {
         while (Peek().Kind == kind)
-        {
             Take();
-        }
     }
 
     /// <summary>
@@ -532,9 +519,7 @@ public ref struct TokenReader
     public void Skip(Func<TokenKind, bool> predicate)
     {
         while (predicate(Peek().Kind))
-        {
             Take();
-        }
     }
 
     /// <summary>
@@ -544,9 +529,7 @@ public ref struct TokenReader
     Token ReadToken()
     {
         if (_spanIndex >= _span.Length && MoveToNextSpan() == false)
-        {
             return default;
-        }
 
         switch (_span[_spanIndex])
         {
@@ -617,9 +600,7 @@ public ref struct TokenReader
             _spanIndex = 0;
 
             if (_span.Length > 0)
-            {
                 return true;
-            }
         }
 
         return false;
@@ -633,11 +614,8 @@ public ref struct TokenReader
     ReadOnlySpan<byte> ReadWhile(Func<byte, bool> predicate)
     {
         var count = 0;
-
         while (_spanIndex + count < _span.Length && predicate(_span[_spanIndex + count]))
-        {
             count++;
-        }
 
         return _span.Slice(_spanIndex, count);
     }

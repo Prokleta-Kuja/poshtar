@@ -37,9 +37,9 @@ public class HeloCommand : Command
     protected virtual string GetGreeting(SessionContext context)
     {
         if (context.IsSubmissionPort)
-            return $"{context.ServerOptions.ServerName} Hello {DomainOrAddress}, what do you want to send today?";
+            return $"{C.Hostname} Hello {DomainOrAddress}, what do you want to send today?";
         else
-            return $"{context.ServerOptions.ServerName} Hello {DomainOrAddress}, got any emails for me?";
+            return $"{C.Hostname} Hello {DomainOrAddress}, got any emails for me?";
     }
 
     /// <summary>

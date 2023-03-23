@@ -5,6 +5,8 @@ namespace poshtar.Smtp;
 
 class Session
 {
+    const int MAX_RETRY_COUNT = 5;
+    static readonly TimeSpan s_commandTimeOut = TimeSpan.FromMinutes(5);
     readonly StateMachine _stateMachine;
     readonly SessionContext _context;
     readonly CommandFactory _commandFactory;
@@ -43,7 +45,7 @@ class Session
     /// <returns>A task which asynchronously performs the execution.</returns>
     async Task ExecuteAsync(SessionContext context, CancellationToken cancellationToken)
     {
-        var retries = _context.ServerOptions.MaxRetryCount;
+        var retries = MAX_RETRY_COUNT;
 
         while (retries-- > 0 && context.IsQuitRequested == false && cancellationToken.IsCancellationRequested == false)
         {
@@ -52,21 +54,15 @@ class Session
                 var command = await ReadCommandAsync(context, cancellationToken).ConfigureAwait(false);
 
                 if (command == null)
-                {
                     return;
-                }
 
                 if (_stateMachine.TryAccept(command, out var errorResponse) == false)
-                {
                     throw new ResponseException(errorResponse!);
-                }
 
                 if (await ExecuteAsync(command, context, cancellationToken).ConfigureAwait(false))
-                {
                     _stateMachine.Transition(context);
-                }
 
-                retries = _context.ServerOptions.MaxRetryCount;
+                retries = MAX_RETRY_COUNT;
             }
             catch (ResponseException responseException) when (responseException.IsQuitRequested)
             {
@@ -92,8 +88,7 @@ class Session
 
     async ValueTask<Command> ReadCommandAsync(SessionContext context, CancellationToken cancellationToken)
     {
-        var timeout = new CancellationTokenSource(context.ServerOptions.CommandWaitTimeout);
-
+        var timeout = new CancellationTokenSource(s_commandTimeOut);
         var cancellationTokenSource = CancellationTokenSource.CreateLinkedTokenSource(timeout.Token, cancellationToken);
 
         try
@@ -105,11 +100,8 @@ class Session
                     buffer =>
                     {
                         var parser = new Parser(_commandFactory);
-
                         if (parser.TryMake(ref buffer, out command, out var errorResponse) == false)
-                        {
                             throw new ResponseException(errorResponse!);
-                        }
 
                         return Task.CompletedTask;
                     },
@@ -120,9 +112,7 @@ class Session
         catch (OperationCanceledException)
         {
             if (timeout.IsCancellationRequested)
-            {
                 throw new ResponseException(new Response(ReplyCode.ServiceClosingTransmissionChannel, "Timeout whilst waiting for input."), true);
-            }
 
             throw new ResponseException(new Response(ReplyCode.ServiceClosingTransmissionChannel, "The session has be cancelled."), true);
         }
@@ -165,7 +155,6 @@ class Session
     ValueTask<FlushResult> OutputGreetingAsync(CancellationToken cancellationToken)
     {
         _context.Pipe?.Output.WriteLine($"220 {C.Hostname} ESMTP {_context.ContextId}");
-
         return _context.Pipe!.Output.FlushAsync(cancellationToken);
     }
 }

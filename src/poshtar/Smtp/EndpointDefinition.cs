@@ -11,7 +11,7 @@ public class EndpointDefinition
         Endpoint = new IPEndPoint(IPAddress.Any, port);
         ServerCertificate = cert;
         ReadTimeout = TimeSpan.FromMinutes(2);
-        SupportedSslProtocols = SslProtocols.Tls12;
+        SupportedSslProtocols = SslProtocols.Tls13 | SslProtocols.Tls12;
     }
     /// <summary>
     /// The IP endpoint to listen on.

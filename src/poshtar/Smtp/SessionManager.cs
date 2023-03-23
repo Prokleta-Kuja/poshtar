@@ -11,7 +11,6 @@ public class SessionManager
         Add(handle);
 
         handle.CompletionTask = RunAsync(handle, cancellationToken);
-
         handle.CompletionTask.ContinueWith(task =>
             {
                 Remove(handle);
@@ -23,21 +22,14 @@ public class SessionManager
         try
         {
             await UpgradeAsync(handle, cancellationToken);
-
             cancellationToken.ThrowIfCancellationRequested();
-
             await handle.Session.RunAsync(cancellationToken);
         }
-        catch (OperationCanceledException)
-        {
-        }
-        catch (Exception)
-        {
-        }
+        catch (OperationCanceledException) { }
+        catch (Exception) { }
         finally
         {
             await handle.SessionContext.Pipe!.Input.CompleteAsync();
-
             handle.SessionContext.Dispose();
         }
     }
@@ -45,17 +37,13 @@ public class SessionManager
     static async Task UpgradeAsync(SessionHandle handle, CancellationToken cancellationToken)
     {
         var endpoint = handle.SessionContext.EndpointDefinition;
-
         if (endpoint.IsSecure && endpoint.ServerCertificate != null)
-        {
             await handle.SessionContext.Pipe!.UpgradeAsync(endpoint.ServerCertificate, endpoint.SupportedSslProtocols, cancellationToken).ConfigureAwait(false);
-        }
     }
 
     internal Task WaitAsync()
     {
         IReadOnlyList<Task> tasks;
-
         lock (_sessionsLock)
         {
             tasks = _sessions.Select(session => session.CompletionTask!).ToList();
@@ -89,9 +77,7 @@ public class SessionManager
         }
 
         public Session Session { get; }
-
         public SessionContext SessionContext { get; }
-
         public Task? CompletionTask { get; set; }
     }
 }

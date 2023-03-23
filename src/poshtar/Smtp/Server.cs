@@ -1,8 +1,9 @@
+using System.Security.Cryptography.X509Certificates;
+
 namespace poshtar.Smtp;
 
 public class Server
 {
-    readonly ServerOptions _options;
     readonly IServiceProvider _serviceProvider;
     readonly EndpointListenerFactory _endpointListenerFactory;
     readonly SessionManager _sessions;
@@ -14,9 +15,8 @@ public class Server
     /// </summary>
     /// <param name="options">The SMTP server options.</param>
     /// <param name="serviceProvider">The service provider to use when resolving services.</param>
-    public Server(ServerOptions options, IServiceProvider serviceProvider)
+    public Server(IServiceProvider serviceProvider)
     {
-        _options = options;
         _serviceProvider = serviceProvider;
         _sessions = new();
         _endpointListenerFactory = new();
@@ -27,9 +27,16 @@ public class Server
     /// </summary>
     /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>A task which performs the operation.</returns>
-    public async Task StartAsync(CancellationToken cancellationToken)
+    public async Task StartAsync(X509Certificate2 cert, CancellationToken cancellationToken)
     {
-        var tasks = _options.Endpoints.Select(e => ListenAsync(e, cancellationToken));
+        var smtpEndpoint = new EndpointDefinition(25, cert);
+        var submissionEndpoint = new EndpointDefinition(587, cert);
+
+        var tasks = new List<Task>
+        {
+            ListenAsync(smtpEndpoint,cancellationToken),
+            ListenAsync(submissionEndpoint,cancellationToken),
+        };
 
         await Task.WhenAll(tasks).ConfigureAwait(false);
 
@@ -62,7 +69,7 @@ public class Server
 
         while (cancellationTokenSource.Token.IsCancellationRequested == false)
         {
-            var sessionContext = new SessionContext(_serviceProvider, _options, endpointDefinition);
+            var sessionContext = new SessionContext(_serviceProvider, endpointDefinition);
 
             try
             {
@@ -76,9 +83,7 @@ public class Server
             }
 
             if (sessionContext.Pipe != null)
-            {
                 _sessions.Run(sessionContext, cancellationTokenSource.Token);
-            }
         }
     }
 
