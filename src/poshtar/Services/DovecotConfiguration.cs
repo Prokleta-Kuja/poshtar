@@ -6,12 +6,13 @@ namespace poshtar.Services;
 
 public static class DovecotConfiguration
 {
-    public static readonly string LogPath = C.Paths.LogDataFor("dovecot.log");
     public static readonly string DovecotRoot = C.Paths.ConfigDataFor("dovecot");
+    public static readonly string LogPath = Path.Join(DovecotRoot, "dovecot.log");
     public static readonly string MainPath = Path.Join(DovecotRoot, "dovecot.conf");
     public static readonly string UsersPath = Path.Join(DovecotRoot, "users.conf");
     public static readonly string PasswordsPath = Path.Join(DovecotRoot, "passes.conf");
     public static readonly string MastersPath = Path.Join(DovecotRoot, "masters.conf");
+    public static readonly string SystemPath = Path.Join(DovecotRoot, "system.conf");
     static void GenerateMain()
     {
         var main = new StringBuilder();
@@ -96,6 +97,7 @@ mail_gid = {C.Gid}");
 
         // Permissions
         main.AppendLine($@"
+!include {SystemPath}
 passdb {{
   driver = sql
   args = {MastersPath}
@@ -158,6 +160,18 @@ FROM Users WHERE Name = '%Lu' AND Disabled IS NULL AND IsMaster = 1",
 
         File.WriteAllText(MastersPath, string.Concat(sqlFilePrefix, query, '\n'));
     }
+    public static void GenerateSystem()
+    {
+        var pair = DovecotHasher.Hash(C.Dovecot.MasterPassword);
+        var pass = DovecotHasher.Password(pair.Salt, pair.Hash);
+        File.WriteAllText(C.Paths.ConfigDataFor(SystemPath), @$"
+passdb {{
+  driver = static
+  args = user={C.Dovecot.MasterUser} password={pass}
+  master = yes
+  result_success = continue-ok
+}}");
+    }
     public static void Generate()
     {
         string? sqlFilePrefix;
@@ -185,6 +199,7 @@ dbpath = {C.Paths.Sqlite}
         Directory.CreateDirectory(DovecotRoot);
         File.Create(LogPath).Dispose();
         GenerateMain();
+        GenerateSystem();
         GenerateUsers(sqlFilePrefix);
         GeneratePasswords(sqlFilePrefix);
         GenerateMasters(sqlFilePrefix);

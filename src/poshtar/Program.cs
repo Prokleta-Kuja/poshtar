@@ -1,5 +1,7 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using Hangfire;
+using Hangfire.Storage.SQLite;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.HttpOverrides;
@@ -77,6 +79,27 @@ public class Program
             // In production, the React files will be served from this directory
             builder.Services.AddSpaStaticFiles(c => { c.RootPath = "client-app"; });
 
+            // Add Hangfire services.
+            builder.Services.AddHangfire(configuration => configuration
+                .SetDataCompatibilityLevel(CompatibilityLevel.Version_170)
+                .UseSimpleAssemblyNameTypeSerializer()
+                .UseRecommendedSerializerSettings()
+                .UseSQLiteStorage(C.Paths.Hangfire, new SQLiteStorageOptions
+                {
+                    QueuePollInterval = TimeSpan.FromSeconds(15),
+                    InvisibilityTimeout = TimeSpan.FromMinutes(30),
+                    DistributedLockLifetime = TimeSpan.FromSeconds(30),
+                    JobExpirationCheckInterval = TimeSpan.FromHours(1),
+                    CountersAggregateInterval = TimeSpan.FromMinutes(5),
+                }));
+
+            // Add the processing server as IHostedService
+            builder.Services.AddHangfireServer(o =>
+            {
+                o.ServerName = nameof(poshtar);
+                o.WorkerCount = Math.Max(2, Environment.ProcessorCount / 2);
+            });
+
             var app = builder.Build();
             await Initialize(app.Services);
             await StartServices(); // TODO: make hosted service
@@ -94,7 +117,7 @@ public class Program
             app.UseHttpsRedirection();
             app.UseAuthentication();
             app.UseAuthorization();
-
+            app.UseHangfireDashboard();
             app.MapControllers().RequireAuthorization();
 
             app.MapWhen(x => !x.Request.Path.Value!.StartsWith("/api/"), builder =>
@@ -127,7 +150,7 @@ public class Program
         Directory.CreateDirectory(C.Paths.CertData);
         Directory.CreateDirectory(C.Paths.ConfigData);
         Directory.CreateDirectory(C.Paths.MailData);
-        Directory.CreateDirectory(C.Paths.LogData);
+        Directory.CreateDirectory(C.Paths.QueueData);
 
         if (string.IsNullOrWhiteSpace(C.Hostname))
             throw new Exception("You must specify HOSTNAME environment variable");
@@ -156,6 +179,8 @@ public class Program
     {
         if (C.StartApiOnly)
             return;
+
+        DovecotConfiguration.GenerateSystem();
 
         var idChange = await BashExec.ChangeDovecotUidGid();
         if (idChange.exitCode == 0)

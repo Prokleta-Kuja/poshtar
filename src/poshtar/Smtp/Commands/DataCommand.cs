@@ -1,3 +1,6 @@
+using System.Buffers;
+using Hangfire;
+
 namespace poshtar.Smtp.Commands;
 
 public class DataCommand : Command
@@ -37,7 +40,7 @@ public class DataCommand : Command
             await ctx.Pipe.Input.ReadDotBlockAsync(
                 async buffer =>
                 {
-                    response = await ctx.SaveAsync(buffer, cancellationToken).ConfigureAwait(false);
+                    response = await SaveAsync(ctx, buffer, cancellationToken).ConfigureAwait(false);
                 },
                 cancellationToken).ConfigureAwait(false);
 
@@ -51,5 +54,13 @@ public class DataCommand : Command
         }
 
         return true;
+    }
+    Task<Response> SaveAsync(SessionContext ctx, ReadOnlySequence<byte> buffer, CancellationToken cancellationToken)
+    {
+        var jobClient = ctx.ServiceScope.ServiceProvider.GetRequiredService<IBackgroundJobClient>();
+
+        // TODO: save or send email
+        Console.WriteLine("Message pushed.");
+        return Task.FromResult(Response.Ok);
     }
 }

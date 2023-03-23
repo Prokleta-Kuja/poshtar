@@ -1,5 +1,6 @@
 using System.Globalization;
 using System.Net;
+using System.Security.Cryptography;
 
 namespace poshtar;
 
@@ -49,6 +50,18 @@ public static class C
         {
             Locale = CultureInfo.InvariantCulture;
         }
+
+    }
+    public static class Dovecot
+    {
+        public static readonly string MasterUser;
+        public static readonly string MasterPassword;
+        static Dovecot()
+        {
+            MasterUser = "sssssssss";
+            MasterPassword = Convert.ToBase64String(RandomNumberGenerator.GetBytes(24));
+        }
+
     }
     public static class CacheKeys
     {
@@ -61,13 +74,15 @@ public static class C
         public static string CertDataFor(string file) => Path.Combine(CertData, file);
         public static readonly string ConfigData = $"{Root}/config";
         public static string ConfigDataFor(string file) => Path.Combine(ConfigData, file);
-        public static readonly string LogData = $"{Root}/logs";
-        public static string LogDataFor(string file) => Path.Combine(LogData, file);
+        public static readonly string QueueData = $"{Root}/queue";
+        public static string QueueDataFor(string file) => Path.Combine(QueueData, file);
         public static readonly string MailData = $"{Root}/mail";
         public static readonly string CertCrt = CertDataFor(CRT_FILE);
         public static readonly string CertKey = CertDataFor(KEY_FILE);
         public static readonly string Sqlite = ConfigDataFor("app.db");
+        public static readonly string Hangfire = ConfigDataFor("queue.db");
         public static readonly string AppDbConnectionString = $"Data Source={Sqlite}";
+        public static readonly string HangfireConnectionString = $"Data Source={Hangfire}";
     }
 }
 
