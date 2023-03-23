@@ -29,32 +29,30 @@ public class MailCommand : Command
         if (ctx.Pipe == null)
             return false;
 
-        if (ctx.EndpointDefinition.AuthenticationRequired && ctx.IsAuthenticated == false)
-        {
-            await ctx.Pipe.Output.WriteReplyAsync(Response.AuthenticationRequired, cancellationToken).ConfigureAwait(false);
-            return false;
-        }
-
-        ctx.Transaction.Reset();
-        ctx.Transaction.Parameters = Parameters;
-
         // check if a size has been defined
         var size = GetMessageSize();
+        var sizeLog = size == default ? string.Empty : $"SIZE={size} ({size / 1024 / 1024:0.00}MB)";
+
+        ctx.Log($"MAIL FROM:{Address} {sizeLog}");
 
         // check against the server supplied maximum
         if (C.MaxMessageSize > 0 && size > C.MaxMessageSize)
         {
+            ctx.Log($"Message size limit exceeded", new { size, limit = C.MaxMessageSize });
             await ctx.Pipe.Output.WriteReplyAsync(Response.SizeLimitExceeded, cancellationToken).ConfigureAwait(false);
             return false;
         }
 
+        ctx.Transaction.Reset();
         ctx.Transaction.From = Address;
+        ctx.Transaction.Parameters = Parameters;
+
         if (ctx.IsSubmissionPort)
         {
             if (ctx.User == null)
             {
-                ctx.Log("Cannot send without authentication", Address);
-                await ctx.Pipe.Output.WriteReplyAsync(Response.MailboxNameNotAllowed, cancellationToken).ConfigureAwait(false);
+                ctx.Log($"Refused mail from, authentication required");
+                await ctx.Pipe.Output.WriteReplyAsync(Response.AuthenticationRequired, cancellationToken).ConfigureAwait(false);
                 return false;
             }
 
@@ -67,12 +65,10 @@ public class MailCommand : Command
 
             if (!canSend)
             {
-                ctx.Log("Sending as address not allowed", Address);
+                ctx.Log("Sending as address not allowed");
                 await ctx.Pipe.Output.WriteReplyAsync(Response.MailboxNameNotAllowed, cancellationToken).ConfigureAwait(false);
                 return false;
             }
-
-            // TODO: does user has enough space to accept message?
         }
         else
         {

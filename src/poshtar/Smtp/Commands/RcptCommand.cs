@@ -27,6 +27,7 @@ public sealed class RcptCommand : Command
         if (ctx.Pipe == null || ctx.Transaction.From == null)
             throw new NotSupportedException("The Acceptance state is not supported.");
 
+        ctx.Log($"RCPT TO: {Address}");
         var internalUsers = await ctx.Db.Users
             .AsNoTracking()
             .Where(u => !u.Disabled.HasValue)
@@ -39,16 +40,26 @@ public sealed class RcptCommand : Command
              .ToListAsync(cancellationToken).ConfigureAwait(false);
 
         if (internalUsers.Count > 0)
+        {
+            var usernames = new List<string>(internalUsers.Count);
             foreach (var internalUser in internalUsers)
+            {
                 ctx.Transaction.ToUsers.TryAdd(internalUser.UserId, internalUser.Name);
+                usernames.Add(internalUser.Name);
+            }
+            ctx.Log($"Resolved to {string.Join(", ", usernames)}");
+        }
         else if (ctx.IsSubmissionPort)
+        {
             ctx.Transaction.To.Add(Address);
+            ctx.Log("Not resolved to internal user(s)");
+        }
         else
         {
+            ctx.Log("Refused recepient");
             await ctx.Pipe.Output.WriteReplyAsync(Response.MailboxNameNotAllowed, cancellationToken).ConfigureAwait(false);
             return false;
         }
-
         await ctx.Pipe.Output.WriteReplyAsync(Response.Ok, cancellationToken).ConfigureAwait(false);
         return true;
     }

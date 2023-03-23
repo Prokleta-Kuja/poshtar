@@ -12,16 +12,17 @@ public class NoopCommand : Command
     /// <summary>
     /// Execute the command.
     /// </summary>
-    /// <param name="context">The execution context to operate on.</param>
+    /// <param name="ctx">The execution context to operate on.</param>
     /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>Returns true if the command executed successfully such that the transition to the next state should occurr, false 
     /// if the current state is to be maintained.</returns>
-    internal override async Task<bool> ExecuteAsync(SessionContext context, CancellationToken cancellationToken)
+    internal override async Task<bool> ExecuteAsync(SessionContext ctx, CancellationToken cancellationToken)
     {
-        if (context.Pipe == null)
+        if (ctx.Pipe == null)
             return false;
 
-        await context.Pipe.Output.WriteReplyAsync(Response.Ok, cancellationToken).ConfigureAwait(false);
+        ctx.Log($"NOOP keep alive");
+        await ctx.Pipe.Output.WriteReplyAsync(Response.Ok, cancellationToken).ConfigureAwait(false);
         return true;
     }
 }

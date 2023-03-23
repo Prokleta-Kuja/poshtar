@@ -12,39 +12,42 @@ public class DataCommand : Command
     /// <summary>
     /// Execute the command.
     /// </summary>
-    /// <param name="context">The execution context to operate on.</param>
+    /// <param name="ctx">The execution context to operate on.</param>
     /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>Returns true if the command executed successfully such that the transition to the next state should occurr, false 
     /// if the current state is to be maintained.</returns>
-    internal override async Task<bool> ExecuteAsync(SessionContext context, CancellationToken cancellationToken)
+    internal override async Task<bool> ExecuteAsync(SessionContext ctx, CancellationToken cancellationToken)
     {
-        if (context.Pipe == null)
+        if (ctx.Pipe == null)
             return false;
 
-        if (context.Transaction.To.Count == 0 && context.Transaction.ToUsers.Count == 0)
+        ctx.Log($"DATA requested");
+        if (ctx.Transaction.To.Count == 0 && ctx.Transaction.ToUsers.Count == 0)
         {
-            await context.Pipe.Output.WriteReplyAsync(Response.NoValidRecipientsGiven, cancellationToken).ConfigureAwait(false);
+            ctx.Log($"Refuse, no recepients given");
+            await ctx.Pipe.Output.WriteReplyAsync(Response.NoValidRecipientsGiven, cancellationToken).ConfigureAwait(false);
             return false;
         }
 
-        await context.Pipe.Output.WriteReplyAsync(new Response(ReplyCode.StartMailInput, "end with <CRLF>.<CRLF>"), cancellationToken).ConfigureAwait(false);
+        await ctx.Pipe.Output.WriteReplyAsync(new Response(ReplyCode.StartMailInput, "end with <CRLF>.<CRLF>"), cancellationToken).ConfigureAwait(false);
 
         try
         {
             Response? response = null;
-            await context.Pipe.Input.ReadDotBlockAsync(
+            await ctx.Pipe.Input.ReadDotBlockAsync(
                 async buffer =>
                 {
-                    response = await context.SaveAsync(buffer, cancellationToken).ConfigureAwait(false);
+                    response = await ctx.SaveAsync(buffer, cancellationToken).ConfigureAwait(false);
                 },
                 cancellationToken).ConfigureAwait(false);
 
             if (response != null)
-                await context.Pipe.Output.WriteReplyAsync(response, cancellationToken).ConfigureAwait(false);
+                await ctx.Pipe.Output.WriteReplyAsync(response, cancellationToken).ConfigureAwait(false);
         }
         catch (Exception)
         {
-            await context.Pipe.Output.WriteReplyAsync(new Response(ReplyCode.TransactionFailed), cancellationToken).ConfigureAwait(false);
+            ctx.Log($"Failed to receive content");
+            await ctx.Pipe.Output.WriteReplyAsync(new Response(ReplyCode.TransactionFailed), cancellationToken).ConfigureAwait(false);
         }
 
         return true;

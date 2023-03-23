@@ -12,16 +12,19 @@ public class RsetCommand : Command
     /// <summary>
     /// Execute the command.
     /// </summary>
-    /// <param name="context">The execution context to operate on.</param>
+    /// <param name="ctx">The execution context to operate on.</param>
     /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>Returns true if the command executed successfully such that the transition to the next state should occurr, false 
     /// if the current state is to be maintained.</returns>
-    internal override async Task<bool> ExecuteAsync(SessionContext context, CancellationToken cancellationToken)
+    internal override async Task<bool> ExecuteAsync(SessionContext ctx, CancellationToken cancellationToken)
     {
-        context.Transaction.Reset();
+        ctx.Transaction.Reset();
 
-        if (context.Pipe != null)
-            await context.Pipe.Output.WriteReplyAsync(Response.Ok, cancellationToken).ConfigureAwait(false);
+        if (ctx.Pipe == null)
+            return false;
+
+        ctx.Log($"RSET - Transaction cleared");
+        await ctx.Pipe.Output.WriteReplyAsync(Response.Ok, cancellationToken).ConfigureAwait(false);
 
         return true;
     }

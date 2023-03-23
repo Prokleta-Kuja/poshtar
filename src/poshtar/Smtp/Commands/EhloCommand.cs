@@ -16,35 +16,35 @@ public class EhloCommand : Command
     /// <summary>
     /// Execute the command.
     /// </summary>
-    /// <param name="context">The execution context to operate on.</param>
+    /// <param name="ctx">The execution context to operate on.</param>
     /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>Returns true if the command executed successfully such that the transition to the next state should occurr, false 
     /// if the current state is to be maintained.</returns>
-    internal override async Task<bool> ExecuteAsync(SessionContext context, CancellationToken cancellationToken)
+    internal override async Task<bool> ExecuteAsync(SessionContext ctx, CancellationToken cancellationToken)
     {
-        if (context.Pipe == null)
+        if (ctx.Pipe == null)
             return false;
 
-        var output = new[] { GetGreeting(context) }.Union(GetExtensions(context)).ToArray();
+        ctx.Log($"EHLO {DomainOrAddress}");
+        var output = new[] { GetGreeting(ctx) }.Union(GetExtensions(ctx)).ToArray();
 
         for (var i = 0; i < output.Length - 1; i++)
-            context.Pipe.Output.WriteLine($"250-{output[i]}");
+            ctx.Pipe.Output.WriteLine($"250-{output[i]}");
 
-        context.Pipe.Output.WriteLine($"250 {output[^1]}");
+        ctx.Pipe.Output.WriteLine($"250 {output[^1]}");
 
-        await context.Pipe.Output.FlushAsync(cancellationToken).ConfigureAwait(false);
-
+        await ctx.Pipe.Output.FlushAsync(cancellationToken).ConfigureAwait(false);
         return true;
     }
 
     /// <summary>
     /// Returns the greeting to display to the remote host.
     /// </summary>
-    /// <param name="context">The session context.</param>
+    /// <param name="ctx">The session context.</param>
     /// <returns>The greeting text to display to the remote host.</returns>
-    protected virtual string GetGreeting(SessionContext context)
+    protected virtual string GetGreeting(SessionContext ctx)
     {
-        if (context.IsSubmissionPort)
+        if (ctx.IsSubmissionPort)
             return $"{C.Hostname} Hello {DomainOrAddress}, what do you want to send today?";
         else
             return $"{C.Hostname} Hello {DomainOrAddress}, got any emails for me?";
@@ -53,9 +53,9 @@ public class EhloCommand : Command
     /// <summary>
     /// Returns the list of extensions that are current for the context.
     /// </summary>
-    /// <param name="context">The session context.</param>
+    /// <param name="ctx">The session context.</param>
     /// <returns>The list of extensions that are current for the context.</returns>
-    protected virtual IEnumerable<string> GetExtensions(SessionContext context)
+    protected virtual IEnumerable<string> GetExtensions(SessionContext ctx)
     {
         yield return "PIPELINING";
         yield return "8BITMIME";
@@ -65,7 +65,7 @@ public class EhloCommand : Command
         if (C.MaxMessageSize > 0)
             yield return $"SIZE {C.MaxMessageSize}";
 
-        if (context.IsSubmissionPort)
+        if (ctx.IsSubmissionPort)
             yield return "AUTH PLAIN LOGIN";
     }
 

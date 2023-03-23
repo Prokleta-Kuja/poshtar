@@ -16,27 +16,29 @@ public class HeloCommand : Command
     /// <summary>
     /// Execute the command.
     /// </summary>
-    /// <param name="context">The execution context to operate on.</param>
+    /// <param name="ctx">The execution context to operate on.</param>
     /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>Returns true if the command executed successfully such that the transition to the next state should occurr, false 
     /// if the current state is to be maintained.</returns>
-    internal override async Task<bool> ExecuteAsync(SessionContext context, CancellationToken cancellationToken)
+    internal override async Task<bool> ExecuteAsync(SessionContext ctx, CancellationToken cancellationToken)
     {
-        var response = new Response(ReplyCode.Ok, GetGreeting(context));
-        if (context.Pipe != null)
-            await context.Pipe.Output.WriteReplyAsync(response, cancellationToken).ConfigureAwait(false);
+        if (ctx.Pipe == null)
+            return false;
 
+        ctx.Log($"HELO {DomainOrAddress}");
+        var response = new Response(ReplyCode.Ok, GetGreeting(ctx));
+        await ctx.Pipe.Output.WriteReplyAsync(response, cancellationToken).ConfigureAwait(false);
         return true;
     }
 
     /// <summary>
     /// Returns the greeting to display to the remote host.
     /// </summary>
-    /// <param name="context">The session context.</param>
+    /// <param name="ctx">The session context.</param>
     /// <returns>The greeting text to display to the remote host.</returns>
-    protected virtual string GetGreeting(SessionContext context)
+    protected virtual string GetGreeting(SessionContext ctx)
     {
-        if (context.IsSubmissionPort)
+        if (ctx.IsSubmissionPort)
             return $"{C.Hostname} Hello {DomainOrAddress}, what do you want to send today?";
         else
             return $"{C.Hostname} Hello {DomainOrAddress}, got any emails for me?";

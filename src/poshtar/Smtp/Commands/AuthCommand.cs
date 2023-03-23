@@ -56,11 +56,13 @@ public class AuthCommand : Command
             case AuthenticationMethod.Plain: // both login and password in the same Base64-encoded string
                 if (await TryPlainAsync(ctx, cancellationToken).ConfigureAwait(false) == false)
                     return await FailResponse(ctx.Pipe, FAIL_NOT_PARSABLE, cancellationToken).ConfigureAwait(false);
+                ctx.Log("AUTH PLAIN");
                 break;
 
             case AuthenticationMethod.Login: // login and password separately
                 if (await TryLoginAsync(ctx, cancellationToken).ConfigureAwait(false) == false)
                     return await FailResponse(ctx.Pipe, FAIL_NOT_PARSABLE, cancellationToken).ConfigureAwait(false);
+                ctx.Log("AUTH LOGIN");
                 break;
         }
 
@@ -87,7 +89,7 @@ public class AuthCommand : Command
         }
 
         ctx.User = dbUser;
-        ctx.Log($"Authenticated", new { _user });
+        ctx.Log($"Authenticated as {_user}");
         await ctx.Pipe.Output.WriteReplyAsync(Response.AuthenticationSuccessful, cancellationToken).ConfigureAwait(false);
         return true;
     }

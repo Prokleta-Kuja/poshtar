@@ -8,7 +8,7 @@ public class SessionContext : IDisposable
 {
     public Guid ContextId { get; } = Guid.NewGuid();
     public bool IsSubmissionPort;
-    public IServiceProvider ServiceProvider { get; }
+    public IServiceScope ServiceScope { get; }
     public AppDbContext Db { get; }
     public EndpointDefinition EndpointDefinition { get; }
     public IPEndPoint? RemoteEndpoint { get; set; }
@@ -20,13 +20,13 @@ public class SessionContext : IDisposable
     public Dictionary<string, object> Properties { get; }
     public SessionContext(IServiceProvider serviceProvider, EndpointDefinition endpointDefinition)
     {
-        ServiceProvider = serviceProvider;
+        ServiceScope = serviceProvider.CreateScope();
         EndpointDefinition = endpointDefinition;
         IsSubmissionPort = endpointDefinition.AuthenticationRequired;
         Transaction = new MessageTransaction();
         Properties = new();
 
-        Db = serviceProvider.GetRequiredService<AppDbContext>();
+        Db = ServiceScope.ServiceProvider.GetRequiredService<AppDbContext>();
     }
     public void Log(string message, object? properties = null) => Db.Logs.Add(new(ContextId, message, properties));
     public Task<Response> SaveAsync(ReadOnlySequence<byte> buffer, CancellationToken cancellationToken)
@@ -44,5 +44,6 @@ public class SessionContext : IDisposable
                 Db.SaveChanges();
             Db.Dispose();
         }
+        ServiceScope?.Dispose();
     }
 }
