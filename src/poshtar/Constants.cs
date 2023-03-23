@@ -1,6 +1,6 @@
 using System.Globalization;
 using System.Net;
-using System.Security.Cryptography;
+using poshtar.Services;
 
 namespace poshtar;
 
@@ -54,14 +54,8 @@ public static class C
     }
     public static class Dovecot
     {
-        public static readonly string MasterUser;
-        public static readonly string MasterPassword;
-        static Dovecot()
-        {
-            MasterUser = "sssssssss";
-            MasterPassword = Convert.ToBase64String(RandomNumberGenerator.GetBytes(24));
-        }
-
+        public static readonly string MasterUser = "master-poshtar";
+        public static readonly string MasterPassword = SecretGenerator.Password(24);
     }
     public static class CacheKeys
     {
@@ -80,9 +74,18 @@ public static class C
         public static readonly string CertCrt = CertDataFor(CRT_FILE);
         public static readonly string CertKey = CertDataFor(KEY_FILE);
         public static readonly string Sqlite = ConfigDataFor("app.db");
-        public static readonly string Hangfire = ConfigDataFor("queue.db");
+        public static readonly string Hangfire = QueueDataFor("queue.db");
         public static readonly string AppDbConnectionString = $"Data Source={Sqlite}";
         public static readonly string HangfireConnectionString = $"Data Source={Hangfire}";
+    }
+    public static class Hangfire
+    {
+        public static class Queue
+        {
+            public const string Default = "default";
+            public const string In = "in";
+            public const string Out = "out";
+        }
     }
 }
 

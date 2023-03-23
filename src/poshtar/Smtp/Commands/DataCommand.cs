@@ -1,5 +1,6 @@
 using System.Buffers;
 using Hangfire;
+using poshtar.Jobs;
 
 namespace poshtar.Smtp.Commands;
 
@@ -55,12 +56,30 @@ public class DataCommand : Command
 
         return true;
     }
-    Task<Response> SaveAsync(SessionContext ctx, ReadOnlySequence<byte> buffer, CancellationToken cancellationToken)
+    async Task<Response> SaveAsync(SessionContext ctx, ReadOnlySequence<byte> buffer, CancellationToken cancellationToken)
     {
-        var jobClient = ctx.ServiceScope.ServiceProvider.GetRequiredService<IBackgroundJobClient>();
+        var eml = C.Paths.QueueDataFor($"{ctx.SessionId}.eml");
+        try
+        {
+            await using var emlStream = File.Create(eml);
+            var position = buffer.GetPosition(0);
+            while (buffer.TryGet(ref position, out var memory))
+                await emlStream.WriteAsync(memory, cancellationToken);
 
-        // TODO: save or send email
-        Console.WriteLine("Message pushed.");
-        return Task.FromResult(Response.Ok);
+            // TODO: save job info in database
+
+            var jobClient = ctx.ServiceScope.ServiceProvider.GetRequiredService<IBackgroundJobClient>();
+            if (ctx.IsSubmissionPort)
+                jobClient.Enqueue<OutgoingJob>(i => i.Deliver(ctx.SessionId));
+            else
+                jobClient.Enqueue<IncomingJob>(i => i.Deliver(ctx.SessionId));
+
+            return Response.Ok;
+        }
+        catch (Exception)
+        {
+            File.Delete(eml);
+            //TODO rethrow
+        }
     }
 }

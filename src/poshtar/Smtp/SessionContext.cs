@@ -6,7 +6,7 @@ namespace poshtar.Smtp;
 
 public class SessionContext : IDisposable
 {
-    public Guid ContextId { get; } = Guid.NewGuid();
+    public Guid SessionId { get; } = Guid.NewGuid();
     public bool IsSubmissionPort;
     public IServiceScope ServiceScope { get; }
     public AppDbContext Db { get; }
@@ -28,7 +28,7 @@ public class SessionContext : IDisposable
 
         Db = ServiceScope.ServiceProvider.GetRequiredService<AppDbContext>();
     }
-    public void Log(string message, object? properties = null) => Db.Logs.Add(new(ContextId, message, properties));
+    public void Log(string message, object? properties = null) => Db.Logs.Add(new(SessionId, message, properties));
     public Task<Response> SaveAsync(ReadOnlySequence<byte> buffer, CancellationToken cancellationToken)
     {
         // TODO: save or send email
