@@ -28,7 +28,6 @@ public class DeliverEmail
     [DisplayName("Deliver Email - {0}")]
     public async Task Run(Guid sessionId, PerformContext context, CancellationToken token)
     {
-
         var emlPath = C.Paths.QueueDataFor($"{sessionId}.eml");
         if (!File.Exists(emlPath))
         {
@@ -44,7 +43,7 @@ public class DeliverEmail
 
         if (recipients.Count == 0)
         {
-            _db.Logs.Add(new(sessionId, "No recipient found, probably already delivered so deleting message", null));
+            _db.Logs.Add(new(sessionId, "No recipients found, probably already delivered so deleting message", null));
             await _db.SaveChangesAsync(token);
             File.Delete(emlPath);
             return;
