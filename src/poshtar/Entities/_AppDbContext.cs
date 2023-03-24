@@ -35,6 +35,7 @@ public partial class AppDbContext : DbContext, IDataProtectionKeyContext
     public DbSet<Domain> Domains => Set<Domain>();
     public DbSet<User> Users => Set<User>();
     public DbSet<LogEntry> Logs => Set<LogEntry>();
+    public DbSet<RecipientEntry> Recipients => Set<RecipientEntry>();
 
     protected void AdditionalConfiguration(DbContextOptionsBuilder options)
     {
@@ -66,6 +67,19 @@ public partial class AppDbContext : DbContext, IDataProtectionKeyContext
         {
             e.HasKey(e => e.UserId);
             e.HasMany(e => e.Addresses).WithMany(e => e.Users);
+        });
+
+        builder.Entity<LogEntry>(e =>
+        {
+            e.HasNoKey();
+            e.HasIndex(e => e.ContextId);
+        });
+
+        builder.Entity<RecipientEntry>(e =>
+        {
+            e.HasNoKey();
+            e.HasIndex(e => e.ContextId);
+            e.HasOne(e => e.User);
         });
 
         // SQLite conversions

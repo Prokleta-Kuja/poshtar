@@ -97,7 +97,6 @@ public class Program
             builder.Services.AddHangfireServer(o =>
             {
                 o.ServerName = nameof(poshtar);
-                o.Queues = new[] { C.Hangfire.Queue.In, C.Hangfire.Queue.Out, C.Hangfire.Queue.Default };
                 o.WorkerCount = Math.Max(2, Environment.ProcessorCount / 2);
             });
 

@@ -1,5 +1,6 @@
 using System.Buffers;
 using Hangfire;
+using poshtar.Entities;
 using poshtar.Jobs;
 
 namespace poshtar.Smtp.Commands;
@@ -56,30 +57,33 @@ public class DataCommand : Command
 
         return true;
     }
-    async Task<Response> SaveAsync(SessionContext ctx, ReadOnlySequence<byte> buffer, CancellationToken cancellationToken)
+    static async Task<Response> SaveAsync(SessionContext ctx, ReadOnlySequence<byte> buffer, CancellationToken cancellationToken)
     {
-        var eml = C.Paths.QueueDataFor($"{ctx.SessionId}.eml");
+        var emlPath = C.Paths.QueueDataFor($"{ctx.SessionId}.eml");
         try
         {
-            await using var emlStream = File.Create(eml);
+            await using var emlStream = File.Create(emlPath);
             var position = buffer.GetPosition(0);
             while (buffer.TryGet(ref position, out var memory))
                 await emlStream.WriteAsync(memory, cancellationToken);
 
-            // TODO: save job info in database
+            if (ctx.Transaction.ToUsers.Count > 0)
+                ctx.Db.Recipients.AddRange(ctx.Transaction.ToUsers.Select(u => new RecipientEntry(ctx.SessionId, u.Key, u.Value)));
+
+            if (ctx.Transaction.To.Count > 0)
+                ctx.Db.Recipients.Add(new(ctx.SessionId, ctx.Transaction.To.Select(e => $"{e.User}@{e.Host}")));
 
             var jobClient = ctx.ServiceScope.ServiceProvider.GetRequiredService<IBackgroundJobClient>();
-            if (ctx.IsSubmissionPort)
-                jobClient.Enqueue<OutgoingJob>(i => i.Deliver(ctx.SessionId));
-            else
-                jobClient.Enqueue<IncomingJob>(i => i.Deliver(ctx.SessionId));
+            jobClient.Enqueue<DeliverEmail>(i => i.Run(ctx.SessionId, null!, CancellationToken.None));
 
-            return Response.Ok;
+            ctx.Log("Email scheduled for delivery");
         }
         catch (Exception)
         {
-            File.Delete(eml);
-            //TODO rethrow
+            File.Delete(emlPath);
+            throw;
         }
+
+        return Response.Ok;
     }
 }

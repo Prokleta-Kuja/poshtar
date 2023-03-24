@@ -78,15 +78,6 @@ public static class C
         public static readonly string AppDbConnectionString = $"Data Source={Sqlite}";
         public static readonly string HangfireConnectionString = $"Data Source={Hangfire}";
     }
-    public static class Hangfire
-    {
-        public static class Queue
-        {
-            public const string Default = "default";
-            public const string In = "in";
-            public const string Out = "out";
-        }
-    }
 }
 
 public enum DbContextType
