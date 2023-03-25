@@ -26,6 +26,7 @@ public class HeloCommand : Command
             return false;
 
         ctx.Log($"HELO {DomainOrAddress}");
+        ctx.Transaction.Client = DomainOrAddress;
         var response = new Response(ReplyCode.Ok, GetGreeting(ctx));
         await ctx.Pipe.Output.WriteReplyAsync(response, cancellationToken).ConfigureAwait(false);
         return true;

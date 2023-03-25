@@ -88,7 +88,7 @@ public class AuthCommand : Command
             return await FailResponse(ctx.Pipe, FAIL_INVALID_PARAMS, cancellationToken).ConfigureAwait(false);
         }
 
-        ctx.User = dbUser;
+        ctx.Transaction.FromUser = dbUser;
         ctx.Log($"Authenticated as {_user}");
         await ctx.Pipe.Output.WriteReplyAsync(Response.AuthenticationSuccessful, cancellationToken).ConfigureAwait(false);
         return true;

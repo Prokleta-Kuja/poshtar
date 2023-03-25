@@ -59,7 +59,7 @@ public class DataCommand : Command
     }
     static async Task<Response> SaveAsync(SessionContext ctx, ReadOnlySequence<byte> buffer, CancellationToken cancellationToken)
     {
-        var emlPath = C.Paths.QueueDataFor($"{ctx.SessionId}.eml");
+        var emlPath = C.Paths.QueueDataFor($"{ctx.Transaction.TransactionId}.eml");
         try
         {
             await using var emlStream = File.Create(emlPath);
@@ -68,7 +68,7 @@ public class DataCommand : Command
                 await emlStream.WriteAsync(memory, cancellationToken);
 
             if (ctx.Transaction.ToUsers.Count > 0)
-                ctx.Db.Recipients.AddRange(ctx.Transaction.ToUsers.Select(u => new RecipientEntry(ctx.SessionId, u.Key, u.Value)));
+                ctx.Db.Recipients.AddRange(ctx.Transaction.ToUsers.Select(u => new Recipient(ctx.SessionId, u.Key, u.Value)));
 
             if (ctx.Transaction.To.Count > 0)
                 ctx.Db.Recipients.Add(new(ctx.SessionId, ctx.Transaction.To.Select(e => $"{e.User}@{e.Host}")));

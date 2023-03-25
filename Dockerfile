@@ -22,32 +22,23 @@ RUN set -eux; \
     apt-get update && apt-get install -y --no-install-recommends \
     ca-certificates \
     ssl-cert \
-    postfix \
-    postfix-pgsql \
-    postfix-mysql \
-    postfix-sqlite \
     dovecot-core \
     dovecot-imapd \
-    dovecot-lmtpd \
-    dovecot-managesieved \
     dovecot-mysql \
     dovecot-pgsql \
-    dovecot-sieve \
     dovecot-sqlite \
-    libsasl2-modules \
     ; \
     groupadd -g 1000 vmail && \
     useradd -u 1000 -g 1000 vmail --shell /usr/sbin/nologin && \
     passwd -l vmail \
     ; \
-    update-rc.d postfix disable && update-rc.d dovecot disable && \
-    cp /etc/resolv.conf /var/spool/postfix/etc/resolv.conf && \
+    update-rc.d dovecot disable && \
     rm -rf /var/lib/apt/lists /etc/dovecot
 
-ENV ASPNETCORE_URLS=http://*:50505 \
+ENV ASPNETCORE_URLS=http://*:5080 \
     LOCALE=en-US \
     TZ=America/Chicago
 
 VOLUME ["/data/certs", "/data/config", "/data/logs", "/data/mail"]
-EXPOSE 25/TCP 587/TCP 993/TCP 50505/TCP
+EXPOSE 5025/TCP 5587/TCP 5993/TCP 5080/TCP
 ENTRYPOINT ["dotnet", "poshtar.dll"]

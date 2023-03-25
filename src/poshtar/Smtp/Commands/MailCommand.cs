@@ -43,13 +43,13 @@ public class MailCommand : Command
             return false;
         }
 
-        ctx.Transaction.Reset();
-        ctx.Transaction.From = Address;
-        ctx.Transaction.Parameters = Parameters;
+        if (!string.IsNullOrWhiteSpace(ctx.Transaction.From))
+            ctx.ResetTransaction();
+        ctx.Transaction.From = Address.ToString();
 
         if (ctx.IsSubmissionPort)
         {
-            if (ctx.User == null)
+            if (!ctx.IsAuthenticated)
             {
                 ctx.Log($"Refused mail from, authentication required");
                 await ctx.Pipe.Output.WriteReplyAsync(Response.AuthenticationRequired, cancellationToken).ConfigureAwait(false);
@@ -59,7 +59,7 @@ public class MailCommand : Command
             var canSend = await ctx.Db.Addresses
                 .AsNoTracking()
                 .Where(a => !a.Disabled.HasValue && (a.Expression == null || EF.Functions.Like(Address.User, a.Expression)))
-                .Where(a => a.Users.Where(u => !u.Disabled.HasValue).Contains(ctx.User))
+                .Where(a => a.Users.Where(u => !u.Disabled.HasValue).Contains(ctx.Transaction.FromUser))
                 .Where(a => a.Domain!.Name.Equals(Address.Host.ToLower()) && !a.Domain.Disabled.HasValue)
                 .AnyAsync(cancellationToken).ConfigureAwait(false);
 

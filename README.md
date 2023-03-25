@@ -68,8 +68,8 @@ cd src/client-app
 npx openapi-typescript-codegen --useOptions --input http://localhost:5000/swagger/v1/swagger.json --output ./src/api
 ```
 
-## Resolve
+## IMAP
 
 ```
-cp /etc/resolv.conf /var/spool/postfix/etc/resolv.conf
+openssl s_client -quiet -crlf -connect localhost:5993
 ```

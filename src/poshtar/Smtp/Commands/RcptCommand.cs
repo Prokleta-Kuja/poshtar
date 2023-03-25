@@ -44,8 +44,9 @@ public sealed class RcptCommand : Command
             var usernames = new List<string>(internalUsers.Count);
             foreach (var internalUser in internalUsers)
             {
-                ctx.Transaction.ToUsers.TryAdd(internalUser.UserId, internalUser.Name);
-                usernames.Add(internalUser.Name);
+                usernames.Add(internalUser.Name);// TODO::::: 
+                if (ctx.Transaction.AddedRecipientIds.Add(internalUser.UserId))
+                    ctx.Transaction.Recipients.Add(new() { UserId = internalUser.UserId, Data = internalUser.Name });
             }
             ctx.Log($"Resolved to {string.Join(", ", usernames)}");
         }

@@ -29,8 +29,8 @@ public class Server
     /// <returns>A task which performs the operation.</returns>
     public async Task StartAsync(X509Certificate2 cert, CancellationToken cancellationToken)
     {
-        var smtpEndpoint = new EndpointDefinition(25, cert);
-        var submissionEndpoint = new EndpointDefinition(587, cert);
+        var smtpEndpoint = new EndpointDefinition(5025, cert);
+        var submissionEndpoint = new EndpointDefinition(5587, cert);
 
         var tasks = new List<Task>
         {

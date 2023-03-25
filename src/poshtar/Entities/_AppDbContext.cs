@@ -34,8 +34,9 @@ public partial class AppDbContext : DbContext, IDataProtectionKeyContext
     public DbSet<Address> Addresses => Set<Address>();
     public DbSet<Domain> Domains => Set<Domain>();
     public DbSet<User> Users => Set<User>();
+    public DbSet<Transaction> Transactions => Set<Transaction>();
     public DbSet<LogEntry> Logs => Set<LogEntry>();
-    public DbSet<RecipientEntry> Recipients => Set<RecipientEntry>();
+    public DbSet<Recipient> Recipients => Set<Recipient>();
 
     protected void AdditionalConfiguration(DbContextOptionsBuilder options)
     {
@@ -67,18 +68,25 @@ public partial class AppDbContext : DbContext, IDataProtectionKeyContext
         {
             e.HasKey(e => e.UserId);
             e.HasMany(e => e.Addresses).WithMany(e => e.Users);
+            e.HasMany(e => e.Transactions).WithOne(e => e.FromUser);
+        });
+
+        builder.Entity<Transaction>(e =>
+        {
+            e.HasKey(e => e.TransactionId);
+            e.HasMany(e => e.Logs).WithOne(e => e.Transaction);
+            e.HasMany(e => e.Recipients).WithOne(e => e.Transaction);
+            e.Ignore(e => e.AddedRecipientIds);
         });
 
         builder.Entity<LogEntry>(e =>
         {
-            e.HasNoKey();
-            e.HasIndex(e => e.ContextId);
+            e.HasKey(e => e.LogEntryId);
         });
 
-        builder.Entity<RecipientEntry>(e =>
+        builder.Entity<Recipient>(e =>
         {
-            e.HasNoKey();
-            e.HasIndex(e => e.ContextId);
+            e.HasKey(e => e.RecipientEntryId);
             e.HasOne(e => e.User);
         });
 

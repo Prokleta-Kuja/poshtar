@@ -154,7 +154,7 @@ class Session
     /// <returns>A task which performs the operation.</returns>
     ValueTask<FlushResult> OutputGreetingAsync(CancellationToken cancellationToken)
     {
-        _context.Pipe?.Output.WriteLine($"220 {C.Hostname} ESMTP {_context.SessionId}");
+        _context.Pipe?.Output.WriteLine($"220 {C.Hostname} ESMTP {_context.ConnectionId}");
         return _context.Pipe!.Output.FlushAsync(cancellationToken);
     }
 }

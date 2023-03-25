@@ -18,7 +18,8 @@ public class RsetCommand : Command
     /// if the current state is to be maintained.</returns>
     internal override async Task<bool> ExecuteAsync(SessionContext ctx, CancellationToken cancellationToken)
     {
-        ctx.Transaction.Reset();
+        if (!string.IsNullOrWhiteSpace(ctx.Transaction.From))
+            ctx.ResetTransaction();
 
         if (ctx.Pipe == null)
             return false;

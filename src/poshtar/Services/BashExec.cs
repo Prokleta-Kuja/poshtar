@@ -43,9 +43,9 @@ public static class BashExec
     public static async Task<(int exitCode, string error, string output)> RestartDovecotAsync()
         => await RunAsync($"dovecot -c {DovecotConfiguration.MainPath} reload");
     public static async Task<(int exitCode, string error, string output)> StopDovecotAsync()
-        => await RunAsync($"dovecot stop");
+        => await RunAsync($"dovecot -c {DovecotConfiguration.MainPath} stop");
     public static async Task<(int exitCode, string error, string output)> StatusDovecotAsync()
-         => await RunAsync($"service dovecot status");
+         => await RunAsync($"dovecot -c {DovecotConfiguration.MainPath} service status");
     public static async Task<(int exitCode, string error, string output)> ChangeDovecotUidGid()
          => await RunAsync($"usermod -u {C.Uid} vmail && groupmod -g {C.Gid} vmail");
 }

@@ -7,16 +7,18 @@ namespace poshtar.Entities;
 public class LogEntry
 {
     public LogEntry() { }
-    public LogEntry(Guid contextId, string message, object? properties)
+    public LogEntry(string message, object? properties = null)
     {
-        ContextId = contextId;
         Timestamp = DateTime.UtcNow;
         Message = message;
         if (properties != null)
             Properties = JsonSerializer.Serialize(properties);
     }
-    public Guid ContextId { get; set; }
+    public int LogEntryId { get; set; }
+    public int TransactionId { get; set; }
     public DateTime Timestamp { get; set; }
     public string Message { get; set; } = string.Empty;
     public string? Properties { get; set; }
+
+    public Transaction? Transaction { get; set; }
 }

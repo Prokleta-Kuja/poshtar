@@ -26,6 +26,7 @@ public class EhloCommand : Command
             return false;
 
         ctx.Log($"EHLO {DomainOrAddress}");
+        ctx.Transaction.Client = DomainOrAddress;
         var output = new[] { GetGreeting(ctx) }.Union(GetExtensions(ctx)).ToArray();
 
         for (var i = 0; i < output.Length - 1; i++)
