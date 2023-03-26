@@ -44,7 +44,7 @@ public sealed class RcptCommand : Command
             var usernames = new List<string>(internalUsers.Count);
             foreach (var internalUser in internalUsers)
             {
-                usernames.Add(internalUser.Name);// TODO::::: 
+                usernames.Add(internalUser.Name);
                 if (ctx.Transaction.AddedRecipientIds.Add(internalUser.UserId))
                     ctx.Transaction.Recipients.Add(new() { UserId = internalUser.UserId, Data = internalUser.Name });
             }
@@ -52,7 +52,7 @@ public sealed class RcptCommand : Command
         }
         else if (ctx.IsSubmissionPort)
         {
-            ctx.Transaction.To.Add(Address);
+            ctx.Transaction.Recipients.Add(new() { Data = Address.ToString() });
             ctx.Log("Not resolved to internal user(s)");
         }
         else

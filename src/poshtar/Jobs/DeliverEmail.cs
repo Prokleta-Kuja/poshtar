@@ -26,24 +26,29 @@ public class DeliverEmail
     }
 
     [DisplayName("Deliver Email - {0}")]
-    public async Task Run(Guid sessionId, PerformContext context, CancellationToken token)
+    public async Task Run(int transactionId, PerformContext context, CancellationToken token)
     {
-        var emlPath = C.Paths.QueueDataFor($"{sessionId}.eml");
+        var transaction = await _db.Transactions
+            .Include(t => t.Recipients)
+            .SingleOrDefaultAsync(t => t.TransactionId == transactionId, token);
+
+        if (transaction == null)
+        {
+            _logger.LogDebug("Could not find transaction with id {transactionId}", transactionId);
+            return;
+        }
+
+        var emlPath = C.Paths.QueueDataFor($"{transactionId}.eml");
         if (!File.Exists(emlPath))
         {
-            _db.Logs.Add(new(sessionId, "Email not found, probably already delivered", null));
+            _db.Logs.Add(new("Email not found, probably already delivered"));
             await _db.SaveChangesAsync(token);
             return;
         }
 
-        var recipients = await _db.Recipients
-            .Where(r => r.ContextId == sessionId)
-            .OrderBy(r => r.UserId)
-            .ToListAsync(token);
-
-        if (recipients.Count == 0)
+        if (transaction.Recipients.Count == 0)
         {
-            _db.Logs.Add(new(sessionId, "No recipients found, probably already delivered so deleting message", null));
+            _db.Logs.Add(new("No recipients found, probably already delivered so deleting message"));
             await _db.SaveChangesAsync(token);
             File.Delete(emlPath);
             return;
@@ -51,14 +56,14 @@ public class DeliverEmail
 
         var errors = 0;
         var msg = await MimeMessage.LoadAsync(emlPath, token);
-        foreach (var recipient in recipients)
+        foreach (var recipient in transaction.Recipients)
         {
             try
             {
                 if (recipient.UserId.HasValue)
                 {
                     await Deliver(msg, recipient.Data, token);
-                    _db.Logs.Add(new(sessionId, $"Delivered to user {recipient.Data}", null));
+                    _db.Logs.Add(new($"Delivered to user {recipient.Data}", null));
                     _db.Recipients.Remove(recipient);
                 }
                 else
@@ -66,13 +71,13 @@ public class DeliverEmail
                     var to = JsonSerializer.Deserialize<List<string>>(recipient.Data);
                     if (to == null)
                     {
-                        _db.Logs.Add(new(sessionId, "External recipients could not be deserialized", null));
+                        _db.Logs.Add(new("External recipients could not be deserialized"));
                         throw new Exception("External recipients could not be deserialized");
                     }
                     else
                     {
                         await Forward(msg, to, token);
-                        _db.Logs.Add(new(sessionId, "Forwarded for external addresses", recipient.Data));
+                        _db.Logs.Add(new("Forwarded for external addresses", recipient.Data));
                         _db.Recipients.Remove(recipient);
                     }
                 }
@@ -81,10 +86,11 @@ public class DeliverEmail
             {
                 errors++;
             }
+            finally
+            {
+                await _db.SaveChangesAsync(token);
+            }
         }
-
-        if (_db.ChangeTracker.HasChanges())
-            await _db.SaveChangesAsync(token);
 
         if (errors == 0)
             File.Delete(emlPath);
@@ -93,17 +99,18 @@ public class DeliverEmail
             var retryCount = context.GetJobParameter<int?>("RetryCount");
             if (retryCount.HasValue && retryCount == 10)
             {
-                _job.Enqueue<ReturnEmail>(j => j.Run(sessionId, null!, CancellationToken.None));
+                // TODO: handle bounces
+                _job.Enqueue<ReturnEmail>(j => j.Run(transactionId, null!, CancellationToken.None));
                 return;
             }
 
             throw new Exception("Could not deliver message to all recipients");
         }
     }
-    async Task Deliver(MimeMessage msg, string toUser, CancellationToken token)
+    static async Task Deliver(MimeMessage msg, string toUser, CancellationToken token)
     {
         using var client = new ImapClient();
-        await client.ConnectAsync("localhost", 993, true, token);
+        await client.ConnectAsync("localhost", C.Dovecot.PORT, true, token);
         await client.AuthenticateAsync($"{toUser}*{C.Dovecot.MasterUser}", C.Dovecot.MasterPassword, token);
 
         var inbox = client.Inbox;
@@ -118,8 +125,8 @@ public class DeliverEmail
         if (msg.From.FirstOrDefault() is not MailboxAddress sender)
             throw new Exception("Could not parse sender");
 
-        var domain = await _db.Domains.SingleAsync(d => d.Name == sender.Domain, token);
         var recipients = to.Select(r => MailboxAddress.Parse(r));
+        var domain = await _db.Domains.SingleAsync(d => d.Name == sender.Domain, token);
 
         using var client = new SmtpClient();
         await client.ConnectAsync(domain.Host, domain.Port, SecureSocketOptions.Auto, token);

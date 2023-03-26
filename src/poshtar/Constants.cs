@@ -54,6 +54,7 @@ public static class C
     }
     public static class Dovecot
     {
+        public const int PORT = 5993;
         public static readonly string MasterUser = "master-poshtar";
         public static readonly string MasterPassword = SecretGenerator.Password(24);
     }

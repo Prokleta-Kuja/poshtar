@@ -47,7 +47,7 @@ auth_mechanisms = plain login
 
 service imap-login {{
   inet_listener imaps {{
-    port = 5993
+    port = {C.Dovecot.PORT}
     ssl = yes
   }}
 }}

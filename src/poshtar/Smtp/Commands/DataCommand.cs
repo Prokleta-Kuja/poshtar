@@ -27,7 +27,7 @@ public class DataCommand : Command
             return false;
 
         ctx.Log($"DATA requested");
-        if (ctx.Transaction.To.Count == 0 && ctx.Transaction.ToUsers.Count == 0)
+        if (ctx.Transaction.Recipients.Count == 0)
         {
             ctx.Log($"Refuse, no recepients given");
             await ctx.Pipe.Output.WriteReplyAsync(Response.NoValidRecipientsGiven, cancellationToken).ConfigureAwait(false);
@@ -67,14 +67,10 @@ public class DataCommand : Command
             while (buffer.TryGet(ref position, out var memory))
                 await emlStream.WriteAsync(memory, cancellationToken);
 
-            if (ctx.Transaction.ToUsers.Count > 0)
-                ctx.Db.Recipients.AddRange(ctx.Transaction.ToUsers.Select(u => new Recipient(ctx.SessionId, u.Key, u.Value)));
-
-            if (ctx.Transaction.To.Count > 0)
-                ctx.Db.Recipients.Add(new(ctx.SessionId, ctx.Transaction.To.Select(e => $"{e.User}@{e.Host}")));
-
+            if (ctx.Db.ChangeTracker.HasChanges())
+                await ctx.Db.SaveChangesAsync(cancellationToken);
             var jobClient = ctx.ServiceScope.ServiceProvider.GetRequiredService<IBackgroundJobClient>();
-            jobClient.Enqueue<DeliverEmail>(i => i.Run(ctx.SessionId, null!, CancellationToken.None));
+            jobClient.Enqueue<DeliverEmail>(i => i.Run(ctx.Transaction.TransactionId, null!, CancellationToken.None));
 
             ctx.Log("Email scheduled for delivery");
         }
