@@ -13,7 +13,7 @@ namespace poshtar.Controllers;
 [AllowAnonymous]
 [ApiController]
 [Route("api/auth")]
-[Tags("auth")]
+[Tags("Auth")]
 [Produces("application/json")]
 [ProducesErrorResponseType(typeof(PlainError))]
 public class AuthController : ControllerBase

@@ -65,7 +65,7 @@ CREATE DATABASE dev_poshtar
 
 ```
 cd src/client-app
-npx openapi-typescript-codegen --useOptions --input http://localhost:5000/swagger/v1/swagger.json --output ./src/api
+npx openapi-typescript-codegen --useOptions --input http://localhost:5080/swagger/v1/swagger.json --output ./src/api
 ```
 
 ## IMAP

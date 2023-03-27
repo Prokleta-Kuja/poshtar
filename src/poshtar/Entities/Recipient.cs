@@ -14,7 +14,7 @@ public class Recipient
     {
         Data = JsonSerializer.Serialize(externalRecipients);
     }
-    public int RecipientEntryId { get; set; }
+    public int RecipientId { get; set; }
     public int TransactionId { get; set; }
     public int? UserId { get; set; }
     public string Data { get; set; } = string.Empty;

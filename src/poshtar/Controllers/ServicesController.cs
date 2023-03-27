@@ -6,7 +6,7 @@ namespace poshtar.Controllers;
 
 [ApiController]
 [Route("api/services")]
-[Tags("services")]
+[Tags("Services")]
 [Produces("application/json")]
 [ProducesErrorResponseType(typeof(PlainError))]
 public class ServicesController : ControllerBase

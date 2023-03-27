@@ -67,11 +67,10 @@ public class DataCommand : Command
             while (buffer.TryGet(ref position, out var memory))
                 await emlStream.WriteAsync(memory, cancellationToken);
 
-            if (ctx.Db.ChangeTracker.HasChanges())
-                await ctx.Db.SaveChangesAsync(cancellationToken);
             var jobClient = ctx.ServiceScope.ServiceProvider.GetRequiredService<IBackgroundJobClient>();
             jobClient.Enqueue<DeliverEmail>(i => i.Run(ctx.Transaction.TransactionId, null!, CancellationToken.None));
 
+            ctx.Transaction.Complete = true;
             ctx.Log("Email scheduled for delivery");
         }
         catch (Exception)

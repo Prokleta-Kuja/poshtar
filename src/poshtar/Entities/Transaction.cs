@@ -9,6 +9,7 @@ public class Transaction
     public string? Client { get; set; }
     public int? FromUserId { get; set; }
     public string? From { get; set; }
+    public bool Complete { get; set; }
 
     public User? FromUser { get; set; }
     public virtual List<LogEntry> Logs { get; set; } = new();

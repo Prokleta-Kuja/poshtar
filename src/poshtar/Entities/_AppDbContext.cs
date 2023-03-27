@@ -74,8 +74,8 @@ public partial class AppDbContext : DbContext, IDataProtectionKeyContext
         builder.Entity<Transaction>(e =>
         {
             e.HasKey(e => e.TransactionId);
-            e.HasMany(e => e.Logs).WithOne(e => e.Transaction);
-            e.HasMany(e => e.Recipients).WithOne(e => e.Transaction);
+            e.HasMany(e => e.Logs).WithOne(e => e.Transaction).OnDelete(DeleteBehavior.Cascade);
+            e.HasMany(e => e.Recipients).WithOne(e => e.Transaction).OnDelete(DeleteBehavior.Cascade);
             e.Ignore(e => e.AddedRecipientIds);
         });
 
@@ -86,7 +86,7 @@ public partial class AppDbContext : DbContext, IDataProtectionKeyContext
 
         builder.Entity<Recipient>(e =>
         {
-            e.HasKey(e => e.RecipientEntryId);
+            e.HasKey(e => e.RecipientId);
             e.HasOne(e => e.User);
         });
 
