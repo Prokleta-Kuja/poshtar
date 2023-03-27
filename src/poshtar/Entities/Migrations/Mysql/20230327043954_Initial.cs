@@ -110,6 +110,33 @@ namespace poshtar.Entities.Migrations.Mysql
                 .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateTable(
+                name: "transactions",
+                columns: table => new
+                {
+                    transaction_id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
+                    connection_id = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci"),
+                    start = table.Column<DateTime>(type: "datetime(6)", nullable: false),
+                    end = table.Column<DateTime>(type: "datetime(6)", nullable: false),
+                    client = table.Column<string>(type: "longtext", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    from_user_id = table.Column<int>(type: "int", nullable: true),
+                    from = table.Column<string>(type: "longtext", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    complete = table.Column<bool>(type: "tinyint(1)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("pk_transactions", x => x.transaction_id);
+                    table.ForeignKey(
+                        name: "fk_transactions_users_from_user_id",
+                        column: x => x.from_user_id,
+                        principalTable: "users",
+                        principalColumn: "user_id");
+                })
+                .Annotation("MySql:CharSet", "utf8mb4");
+
+            migrationBuilder.CreateTable(
                 name: "address_user",
                 columns: table => new
                 {
@@ -134,6 +161,59 @@ namespace poshtar.Entities.Migrations.Mysql
                 })
                 .Annotation("MySql:CharSet", "utf8mb4");
 
+            migrationBuilder.CreateTable(
+                name: "logs",
+                columns: table => new
+                {
+                    log_entry_id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
+                    transaction_id = table.Column<int>(type: "int", nullable: false),
+                    timestamp = table.Column<DateTime>(type: "datetime(6)", nullable: false),
+                    message = table.Column<string>(type: "longtext", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    properties = table.Column<string>(type: "longtext", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4")
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("pk_logs", x => x.log_entry_id);
+                    table.ForeignKey(
+                        name: "fk_logs_transactions_transaction_id",
+                        column: x => x.transaction_id,
+                        principalTable: "transactions",
+                        principalColumn: "transaction_id",
+                        onDelete: ReferentialAction.Cascade);
+                })
+                .Annotation("MySql:CharSet", "utf8mb4");
+
+            migrationBuilder.CreateTable(
+                name: "recipients",
+                columns: table => new
+                {
+                    recipient_id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
+                    transaction_id = table.Column<int>(type: "int", nullable: false),
+                    user_id = table.Column<int>(type: "int", nullable: true),
+                    data = table.Column<string>(type: "longtext", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4")
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("pk_recipients", x => x.recipient_id);
+                    table.ForeignKey(
+                        name: "fk_recipients_transactions_transaction_id",
+                        column: x => x.transaction_id,
+                        principalTable: "transactions",
+                        principalColumn: "transaction_id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "fk_recipients_users_user_id",
+                        column: x => x.user_id,
+                        principalTable: "users",
+                        principalColumn: "user_id");
+                })
+                .Annotation("MySql:CharSet", "utf8mb4");
+
             migrationBuilder.CreateIndex(
                 name: "ix_address_user_users_user_id",
                 table: "address_user",
@@ -148,6 +228,26 @@ namespace poshtar.Entities.Migrations.Mysql
                 name: "ix_domains_name",
                 table: "domains",
                 column: "name");
+
+            migrationBuilder.CreateIndex(
+                name: "ix_logs_transaction_id",
+                table: "logs",
+                column: "transaction_id");
+
+            migrationBuilder.CreateIndex(
+                name: "ix_recipients_transaction_id",
+                table: "recipients",
+                column: "transaction_id");
+
+            migrationBuilder.CreateIndex(
+                name: "ix_recipients_user_id",
+                table: "recipients",
+                column: "user_id");
+
+            migrationBuilder.CreateIndex(
+                name: "ix_transactions_from_user_id",
+                table: "transactions",
+                column: "from_user_id");
         }
 
         /// <inheritdoc />
@@ -160,13 +260,22 @@ namespace poshtar.Entities.Migrations.Mysql
                 name: "data_protection_keys");
 
             migrationBuilder.DropTable(
+                name: "logs");
+
+            migrationBuilder.DropTable(
+                name: "recipients");
+
+            migrationBuilder.DropTable(
                 name: "addresses");
 
             migrationBuilder.DropTable(
-                name: "users");
+                name: "transactions");
 
             migrationBuilder.DropTable(
                 name: "domains");
+
+            migrationBuilder.DropTable(
+                name: "users");
         }
     }
 }

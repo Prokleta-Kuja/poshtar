@@ -26,6 +26,7 @@ public class DomainLM
 {
     [Required] public required int Id { get; set; }
     [Required] public required string Name { get; set; }
+    [Required] public required string Username { get; set; }
     [Required] public required string Host { get; set; }
     [Required] public required int Port { get; set; }
     public required DateTime? Disabled { get; set; }

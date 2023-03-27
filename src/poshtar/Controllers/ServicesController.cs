@@ -6,7 +6,7 @@ namespace poshtar.Controllers;
 
 [ApiController]
 [Route("api/services")]
-[Tags("services")]
+[Tags("Services")]
 [Produces("application/json")]
 [ProducesErrorResponseType(typeof(PlainError))]
 public class ServicesController : ControllerBase
@@ -28,10 +28,6 @@ public class ServicesController : ControllerBase
 
         var result = (model.Name, model.Type) switch
         {
-            (ServiceName.Postfix, ServiceRequestType.Status) => await BashExec.StatusPostfixAsync(),
-            (ServiceName.Postfix, ServiceRequestType.Start) => await BashExec.StartPostfixAsync(),
-            (ServiceName.Postfix, ServiceRequestType.Restart) => await BashExec.RestartPostfixAsync(),
-            (ServiceName.Postfix, ServiceRequestType.Stop) => await BashExec.StopPostfixAsync(),
             (ServiceName.Dovecot, ServiceRequestType.Status) => await BashExec.StatusDovecotAsync(),
             (ServiceName.Dovecot, ServiceRequestType.Start) => await BashExec.StartDovecotAsync(),
             (ServiceName.Dovecot, ServiceRequestType.Restart) => await BashExec.RestartDovecotAsync(),
@@ -46,8 +42,7 @@ public class ServicesController : ControllerBase
 public enum ServiceName
 {
     None = 0,
-    Postfix = 1,
-    Dovecot = 2,
+    Dovecot = 1,
 }
 
 public enum ServiceRequestType

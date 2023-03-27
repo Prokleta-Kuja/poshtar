@@ -1,4 +1,6 @@
 using System.Globalization;
+using System.Net;
+using poshtar.Services;
 
 namespace poshtar;
 
@@ -11,6 +13,7 @@ public static class C
     public static readonly int Uid;
     public static readonly int Gid;
     public static readonly string Hostname;
+    public static readonly int MaxMessageSize;
     public static readonly string PostgresConnectionString;
     public static readonly string MysqlConnectionString;
     public static readonly DbContextType DbContextType;
@@ -23,6 +26,7 @@ public static class C
         Uid = int.TryParse(Environment.GetEnvironmentVariable("UID"), out var uid) ? uid : 1000;
         Gid = int.TryParse(Environment.GetEnvironmentVariable("GID"), out var gid) ? gid : 1000;
         Hostname = Environment.GetEnvironmentVariable("HOSTNAME") ?? string.Empty;
+        MaxMessageSize = int.TryParse(Environment.GetEnvironmentVariable("MAX_MESSAGE_SIZE_MB"), out var maxMessageSize) ? maxMessageSize * 1024 * 1024 : 0;
         PostgresConnectionString = Environment.GetEnvironmentVariable("POSTGRES") ?? string.Empty;
         MysqlConnectionString = Environment.GetEnvironmentVariable("MYSQL") ?? string.Empty;
         DbContextType = !string.IsNullOrWhiteSpace(PostgresConnectionString) ? DbContextType.PostgreSQL :
@@ -46,6 +50,17 @@ public static class C
         {
             Locale = CultureInfo.InvariantCulture;
         }
+
+    }
+    public static class Dovecot
+    {
+        public const int PORT = 5993;
+        public static readonly string MasterUser = "master-poshtar";
+        public static readonly string MasterPassword = SecretGenerator.Password(24);
+    }
+    public static class CacheKeys
+    {
+        public static string FailedAuthCountFor(IPEndPoint ip) => $"IpFailedAuthCount-{ip.Address}";
     }
     public static class Paths
     {
@@ -54,13 +69,15 @@ public static class C
         public static string CertDataFor(string file) => Path.Combine(CertData, file);
         public static readonly string ConfigData = $"{Root}/config";
         public static string ConfigDataFor(string file) => Path.Combine(ConfigData, file);
-        public static readonly string LogData = $"{Root}/logs";
-        public static string LogDataFor(string file) => Path.Combine(LogData, file);
+        public static readonly string QueueData = $"{Root}/queue";
+        public static string QueueDataFor(string file) => Path.Combine(QueueData, file);
         public static readonly string MailData = $"{Root}/mail";
         public static readonly string CertCrt = CertDataFor(CRT_FILE);
         public static readonly string CertKey = CertDataFor(KEY_FILE);
         public static readonly string Sqlite = ConfigDataFor("app.db");
+        public static readonly string Hangfire = QueueDataFor("queue.db");
         public static readonly string AppDbConnectionString = $"Data Source={Sqlite}";
+        public static readonly string HangfireConnectionString = $"Data Source={Hangfire}";
     }
 }
 

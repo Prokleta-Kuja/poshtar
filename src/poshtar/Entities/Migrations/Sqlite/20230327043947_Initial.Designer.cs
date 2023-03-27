@@ -11,14 +11,14 @@ using poshtar.Entities;
 namespace poshtar.Entities.Migrations.Sqlite
 {
     [DbContext(typeof(SqliteDbContext))]
-    [Migration("20230314040726_Initial")]
+    [Migration("20230327043947_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
-            modelBuilder.HasAnnotation("ProductVersion", "7.0.3");
+            modelBuilder.HasAnnotation("ProductVersion", "7.0.4");
 
             modelBuilder.Entity("AddressUser", b =>
                 {
@@ -147,6 +147,115 @@ namespace poshtar.Entities.Migrations.Sqlite
                     b.ToTable("domains", (string)null);
                 });
 
+            modelBuilder.Entity("poshtar.Entities.LogEntry", b =>
+                {
+                    b.Property<int>("LogEntryId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER")
+                        .HasColumnName("log_entry_id");
+
+                    b.Property<string>("Message")
+                        .IsRequired()
+                        .HasColumnType("TEXT")
+                        .HasColumnName("message");
+
+                    b.Property<string>("Properties")
+                        .HasColumnType("TEXT")
+                        .HasColumnName("properties");
+
+                    b.Property<long>("Timestamp")
+                        .HasColumnType("INTEGER")
+                        .HasColumnName("timestamp");
+
+                    b.Property<int>("TransactionId")
+                        .HasColumnType("INTEGER")
+                        .HasColumnName("transaction_id");
+
+                    b.HasKey("LogEntryId")
+                        .HasName("pk_logs");
+
+                    b.HasIndex("TransactionId")
+                        .HasDatabaseName("ix_logs_transaction_id");
+
+                    b.ToTable("logs", (string)null);
+                });
+
+            modelBuilder.Entity("poshtar.Entities.Recipient", b =>
+                {
+                    b.Property<int>("RecipientId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER")
+                        .HasColumnName("recipient_id");
+
+                    b.Property<string>("Data")
+                        .IsRequired()
+                        .HasColumnType("TEXT")
+                        .HasColumnName("data");
+
+                    b.Property<int>("TransactionId")
+                        .HasColumnType("INTEGER")
+                        .HasColumnName("transaction_id");
+
+                    b.Property<int?>("UserId")
+                        .HasColumnType("INTEGER")
+                        .HasColumnName("user_id");
+
+                    b.HasKey("RecipientId")
+                        .HasName("pk_recipients");
+
+                    b.HasIndex("TransactionId")
+                        .HasDatabaseName("ix_recipients_transaction_id");
+
+                    b.HasIndex("UserId")
+                        .HasDatabaseName("ix_recipients_user_id");
+
+                    b.ToTable("recipients", (string)null);
+                });
+
+            modelBuilder.Entity("poshtar.Entities.Transaction", b =>
+                {
+                    b.Property<int>("TransactionId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER")
+                        .HasColumnName("transaction_id");
+
+                    b.Property<string>("Client")
+                        .HasColumnType("TEXT")
+                        .HasColumnName("client");
+
+                    b.Property<bool>("Complete")
+                        .HasColumnType("INTEGER")
+                        .HasColumnName("complete");
+
+                    b.Property<Guid>("ConnectionId")
+                        .HasColumnType("TEXT")
+                        .HasColumnName("connection_id");
+
+                    b.Property<long>("End")
+                        .HasColumnType("INTEGER")
+                        .HasColumnName("end");
+
+                    b.Property<string>("From")
+                        .HasColumnType("TEXT")
+                        .HasColumnName("from");
+
+                    b.Property<int?>("FromUserId")
+                        .HasColumnType("INTEGER")
+                        .HasColumnName("from_user_id");
+
+                    b.Property<long>("Start")
+                        .HasColumnType("INTEGER")
+                        .HasColumnName("start");
+
+                    b.HasKey("TransactionId")
+                        .HasName("pk_transactions");
+
+                    b.HasIndex("FromUserId")
+                        .HasDatabaseName("ix_transactions_from_user_id");
+
+                    b.ToTable("transactions", (string)null);
+                });
+
             modelBuilder.Entity("poshtar.Entities.User", b =>
                 {
                     b.Property<int>("UserId")
@@ -225,9 +334,62 @@ namespace poshtar.Entities.Migrations.Sqlite
                     b.Navigation("Domain");
                 });
 
+            modelBuilder.Entity("poshtar.Entities.LogEntry", b =>
+                {
+                    b.HasOne("poshtar.Entities.Transaction", "Transaction")
+                        .WithMany("Logs")
+                        .HasForeignKey("TransactionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_logs_transactions_transaction_id");
+
+                    b.Navigation("Transaction");
+                });
+
+            modelBuilder.Entity("poshtar.Entities.Recipient", b =>
+                {
+                    b.HasOne("poshtar.Entities.Transaction", "Transaction")
+                        .WithMany("Recipients")
+                        .HasForeignKey("TransactionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_recipients_transactions_transaction_id");
+
+                    b.HasOne("poshtar.Entities.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .HasConstraintName("fk_recipients_users_user_id");
+
+                    b.Navigation("Transaction");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("poshtar.Entities.Transaction", b =>
+                {
+                    b.HasOne("poshtar.Entities.User", "FromUser")
+                        .WithMany("Transactions")
+                        .HasForeignKey("FromUserId")
+                        .HasConstraintName("fk_transactions_users_from_user_id");
+
+                    b.Navigation("FromUser");
+                });
+
             modelBuilder.Entity("poshtar.Entities.Domain", b =>
                 {
                     b.Navigation("Addresses");
+                });
+
+            modelBuilder.Entity("poshtar.Entities.Transaction", b =>
+                {
+                    b.Navigation("Logs");
+
+                    b.Navigation("Recipients");
+                });
+
+            modelBuilder.Entity("poshtar.Entities.User", b =>
+                {
+                    b.Navigation("Transactions");
                 });
 #pragma warning restore 612, 618
         }

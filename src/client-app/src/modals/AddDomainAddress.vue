@@ -25,6 +25,8 @@ const submit = () => {
 
     address.submitting = true;
     address.error = undefined;
+    if (address.model.type === AddressType.CatchAll)
+        address.model.pattern = '*';
     AddressService.createAddress({ requestBody: address.model })
         .then(r => {
             address.model = blank();

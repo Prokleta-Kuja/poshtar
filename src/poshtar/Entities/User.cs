@@ -16,4 +16,5 @@ public class User
     public DateTime? Disabled { get; set; }
 
     public virtual List<Address> Addresses { get; set; } = new();
+    public virtual List<Transaction> Transactions { get; set; } = new();
 }

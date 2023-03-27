@@ -5,6 +5,7 @@
 export type DomainLM = {
     id: number;
     name: string;
+    username: string;
     host: string;
     port: number;
     disabled?: string | null;
