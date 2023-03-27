@@ -6,6 +6,7 @@ using MailKit;
 using MailKit.Net.Imap;
 using MailKit.Net.Smtp;
 using MailKit.Security;
+using Microsoft.AspNetCore.DataProtection;
 using Microsoft.EntityFrameworkCore;
 using MimeKit;
 using poshtar.Entities;
@@ -17,11 +18,13 @@ public class DeliverEmail
 {
     readonly ILogger<DeliverEmail> _logger;
     readonly AppDbContext _db;
+    readonly IDataProtectionProvider _dpp;
     readonly IBackgroundJobClient _job;
-    public DeliverEmail(ILogger<DeliverEmail> logger, AppDbContext db, IBackgroundJobClient job)
+    public DeliverEmail(ILogger<DeliverEmail> logger, AppDbContext db, IDataProtectionProvider dpp, IBackgroundJobClient job)
     {
         _logger = logger;
         _db = db;
+        _dpp = dpp;
         _job = job;
     }
 
@@ -99,7 +102,6 @@ public class DeliverEmail
             var retryCount = context.GetJobParameter<int?>("RetryCount");
             if (retryCount.HasValue && retryCount == 10)
             {
-                // TODO: handle bounces
                 _job.Enqueue<ReturnEmail>(j => j.Run(transactionId, null!, CancellationToken.None));
                 return;
             }
@@ -127,10 +129,11 @@ public class DeliverEmail
 
         var recipients = to.Select(r => MailboxAddress.Parse(r));
         var domain = await _db.Domains.SingleAsync(d => d.Name == sender.Domain, token);
+        var serverProtector = _dpp.CreateProtector(nameof(Domain));
 
         using var client = new SmtpClient();
         await client.ConnectAsync(domain.Host, domain.Port, SecureSocketOptions.Auto, token);
-        await client.AuthenticateAsync(domain.Username, domain.Password, token);
+        await client.AuthenticateAsync(domain.Username, serverProtector.Unprotect(domain.Password), token);
         await client.SendAsync(msg, sender, recipients, token);
         await client.DisconnectAsync(true, token);
     }

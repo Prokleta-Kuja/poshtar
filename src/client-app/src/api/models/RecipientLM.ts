@@ -4,7 +4,7 @@
 
 export type RecipientLM = {
     id: number;
-    username?: string | null;
+    userId?: number | null;
     data: string;
 };
 

@@ -1,6 +1,5 @@
 using System.Buffers;
 using Hangfire;
-using poshtar.Entities;
 using poshtar.Jobs;
 
 namespace poshtar.Smtp.Commands;
@@ -27,7 +26,7 @@ public class DataCommand : Command
             return false;
 
         ctx.Log($"DATA requested");
-        if (ctx.Transaction.Recipients.Count == 0)
+        if (ctx.Transaction.InternalUsers.Count == 0 && ctx.Transaction.ExternalAddresses.Count == 0)
         {
             ctx.Log($"Refuse, no recepients given");
             await ctx.Pipe.Output.WriteReplyAsync(Response.NoValidRecipientsGiven, cancellationToken).ConfigureAwait(false);
@@ -67,11 +66,17 @@ public class DataCommand : Command
             while (buffer.TryGet(ref position, out var memory))
                 await emlStream.WriteAsync(memory, cancellationToken);
 
-            var jobClient = ctx.ServiceScope.ServiceProvider.GetRequiredService<IBackgroundJobClient>();
-            jobClient.Enqueue<DeliverEmail>(i => i.Run(ctx.Transaction.TransactionId, null!, CancellationToken.None));
+            foreach (var internalUser in ctx.Transaction.InternalUsers)
+                ctx.Transaction.Recipients.Add(new(internalUser.Key, internalUser.Value));
+            if (ctx.Transaction.ExternalAddresses.Count > 0)
+                ctx.Transaction.Recipients.Add(new(ctx.Transaction.ExternalAddresses));
 
             ctx.Transaction.Complete = true;
             ctx.Log("Email scheduled for delivery");
+            await ctx.Db.SaveChangesAsync(cancellationToken);
+
+            var jobClient = ctx.ServiceScope.ServiceProvider.GetRequiredService<IBackgroundJobClient>();
+            jobClient.Enqueue<DeliverEmail>(i => i.Run(ctx.Transaction.TransactionId, null!, CancellationToken.None));
         }
         catch (Exception)
         {

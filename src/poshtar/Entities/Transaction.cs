@@ -15,5 +15,6 @@ public class Transaction
     public virtual List<LogEntry> Logs { get; set; } = new();
     public virtual List<Recipient> Recipients { get; set; } = new();
 
-    public HashSet<int> AddedRecipientIds = new();
+    public Dictionary<int, string> InternalUsers = new();
+    public HashSet<string> ExternalAddresses = new(StringComparer.InvariantCultureIgnoreCase);
 }

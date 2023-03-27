@@ -1,3 +1,5 @@
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using poshtar.Entities;
@@ -70,7 +72,9 @@ public class TransactionsController : ControllerBase
     [ProducesResponseType(typeof(ListResponse<LogEntryLM>), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetLogsAsnyc(int transactionId, [FromQuery] FilterQuery req)
     {
-        var query = _db.Logs.AsNoTracking();
+        var query = _db.Logs
+            .Where(r => r.TransactionId == transactionId)
+            .AsNoTracking();
 
         if (!string.IsNullOrWhiteSpace(req.SearchTerm))
             query = query.Where(l => EF.Functions.Like(l.Message, $"%{req.SearchTerm}%") || EF.Functions.Like(l.Properties!, $"%{req.SearchTerm}%"));
@@ -104,7 +108,7 @@ public class TransactionsController : ControllerBase
     public async Task<IActionResult> GetRecipientsAsnyc(int transactionId, [FromQuery] FilterQuery req)
     {
         var query = _db.Recipients
-            .Include(r => r.User)
+            .Where(r => r.TransactionId == transactionId)
             .AsNoTracking();
 
         if (!string.IsNullOrWhiteSpace(req.SearchTerm))
@@ -125,7 +129,7 @@ public class TransactionsController : ControllerBase
             .Select(r => new RecipientLM
             {
                 Id = r.RecipientId,
-                Username = r.User != null ? r.User.Name : string.Empty,
+                UserId = r.UserId,
                 Data = r.Data,
             })
             .ToListAsync();

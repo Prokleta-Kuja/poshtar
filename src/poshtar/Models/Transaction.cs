@@ -25,6 +25,6 @@ public class LogEntryLM
 public class RecipientLM
 {
     [Required] public int Id { get; set; }
-    public string? Username { get; set; }
+    public int? UserId { get; set; }
     [Required] public required string Data { get; set; }
 }

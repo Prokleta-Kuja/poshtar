@@ -15,11 +15,13 @@ public class DomainsController : ControllerBase
 {
     readonly ILogger<DomainsController> _logger;
     readonly AppDbContext _db;
+    readonly IDataProtectionProvider _dpp;
 
-    public DomainsController(ILogger<DomainsController> logger, AppDbContext db)
+    public DomainsController(ILogger<DomainsController> logger, AppDbContext db, IDataProtectionProvider dpp)
     {
         _logger = logger;
         _db = db;
+        _dpp = dpp;
     }
 
     [HttpGet(Name = "GetDomains")]
@@ -102,7 +104,7 @@ public class DomainsController : ControllerBase
         if (isDuplicate)
             return BadRequest(new ValidationError(nameof(model.Name), "Already exists"));
 
-        // var serverProtector = _dpp.CreateProtector(nameof(Domain));
+        var serverProtector = _dpp.CreateProtector(nameof(Domain));
 
         var domain = new Domain
         {
@@ -110,7 +112,7 @@ public class DomainsController : ControllerBase
             Host = model.Host,
             Port = model.Port,
             Username = model.Username,
-            Password = model.Password,
+            Password = serverProtector.Protect(model.Password),
         };
 
         _db.Domains.Add(domain);
@@ -152,8 +154,8 @@ public class DomainsController : ControllerBase
         domain.Username = model.Username;
         if (!string.IsNullOrWhiteSpace(model.NewPassword))
         {
-            // var serverProtector = _dpp.CreateProtector(nameof(Domain));
-            domain.Password = model.NewPassword;
+            var serverProtector = _dpp.CreateProtector(nameof(Domain));
+            domain.Password = serverProtector.Protect(model.NewPassword);
         }
         if (model.Disabled.HasValue)
             domain.Disabled = model.Disabled.Value ? domain.Disabled.HasValue ? domain.Disabled : DateTime.UtcNow : null;

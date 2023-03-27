@@ -76,7 +76,8 @@ public partial class AppDbContext : DbContext, IDataProtectionKeyContext
             e.HasKey(e => e.TransactionId);
             e.HasMany(e => e.Logs).WithOne(e => e.Transaction).OnDelete(DeleteBehavior.Cascade);
             e.HasMany(e => e.Recipients).WithOne(e => e.Transaction).OnDelete(DeleteBehavior.Cascade);
-            e.Ignore(e => e.AddedRecipientIds);
+            e.Ignore(e => e.InternalUsers);
+            e.Ignore(e => e.ExternalAddresses);
         });
 
         builder.Entity<LogEntry>(e =>
