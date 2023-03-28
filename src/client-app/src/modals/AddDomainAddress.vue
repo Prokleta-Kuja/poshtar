@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import { reactive, ref } from 'vue';
-import { AddressCM, AddressService, AddressType } from '../api';
-import IModelState from '../components/form/modelState';
-import Modal from '../components/Modal.vue';
-import SelectBox from '../components/form/SelectBox.vue';
-import SpinButton from '../components/form/SpinButton.vue';
-import Text from '../components/form/TextBox.vue';
+import { type AddressCM, AddressService, AddressType } from '@/api';
+import type IModelState from '@/components/form/modelState';
+import Modal from '@/components/Modal.vue';
+import SelectBox from '@/components/form/SelectBox.vue';
+import SpinButton from '@/components/form/SpinButton.vue';
+import Text from '@/components/form/TextBox.vue';
 
 const props = defineProps<{ domainId: number, onAdded?: () => void }>()
 const blank = (): AddressCM => ({ domainId: props.domainId, pattern: '', type: AddressType.Exact })

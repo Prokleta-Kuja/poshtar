@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { reactive, ref } from 'vue';
-import { UserService, UserVM, PlainError, DomainLM, DomainService } from '../api';
-import UserAddressList from '../lists/UserAddressList.vue';
-import Modal from '../components/Modal.vue';
-import EditUser from '../modals/EditUser.vue';
+import { UserService, type UserVM, type PlainError, type DomainLM, DomainService } from '@/api';
+import UserAddressList from '@/lists/UserAddressList.vue';
+import Modal from '@/components/Modal.vue';
+import EditUser from '@/modals/EditUser.vue';
 
 const props = defineProps<{ id: number }>()
 const addressChange = ref(new Date)

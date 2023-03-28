@@ -18,10 +18,10 @@ public class ServicesController : ControllerBase
         _logger = logger;
     }
 
-    [HttpGet(Name = "Request")]
-    [ProducesResponseType(typeof(AuthStatusModel), StatusCodes.Status200OK)]
+    [HttpPatch(Name = "Request")]
+    [ProducesResponseType(typeof(ServiceResultModel), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ValidationError), StatusCodes.Status400BadRequest)]
-    public async Task<IActionResult> Status(ServiceRequestModel model)
+    public async Task<IActionResult> Exec(ServiceRequestModel model)
     {
         if (model.IsInvalid(out var errorModel))
             return BadRequest(errorModel);

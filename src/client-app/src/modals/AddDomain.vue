@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import { reactive, ref } from 'vue';
-import { DomainCM, DomainService } from '../api';
-import IModelState from '../components/form/modelState';
-import Modal from '../components/Modal.vue';
-import SpinButton from '../components/form/SpinButton.vue';
-import IntegerBox from '../components/form/IntegerBox.vue';
-import Text from '../components/form/TextBox.vue';
+import { type DomainCM, DomainService } from '@/api';
+import type IModelState from '@/components/form/modelState';
+import Modal from '@/components/Modal.vue';
+import SpinButton from '@/components/form/SpinButton.vue';
+import IntegerBox from '@/components/form/IntegerBox.vue';
+import Text from '@/components/form/TextBox.vue';
 import { useRouter } from 'vue-router';
 
 const router = useRouter()

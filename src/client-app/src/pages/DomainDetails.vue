@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { reactive, ref } from 'vue';
-import { DomainService, DomainVM, PlainError } from '../api';
-import AddressList from '../lists/DomainAddressList.vue';
-import AddDomainAddress from '../modals/AddDomainAddress.vue';
-import EditDomain from '../modals/EditDomain.vue';
+import { DomainService, type DomainVM, type PlainError } from '@/api';
+import AddressList from '@/lists/DomainAddressList.vue';
+import AddDomainAddress from '@/modals/AddDomainAddress.vue';
+import EditDomain from '@/modals/EditDomain.vue';
 
 const props = defineProps<{ id: number }>()
 const addressChange = ref(new Date)

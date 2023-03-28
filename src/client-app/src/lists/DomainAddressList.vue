@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { reactive, ref, watch } from "vue";
-import { AddressLM, AddressService, AddressType, AddressVM } from "../api";
-import Search from '../components/form/Search.vue'
-import { Header, Pages, Sizes, ITableParams, initParams, updateParams } from "../components/table"
-import EditAddress from "../modals/EditAddress.vue";
+import { type AddressLM, type AddressVM, AddressService, AddressType } from "@/api";
+import Search from '@/components/form/SearchBox.vue'
+import { Header, Pages, Sizes, type ITableParams, initParams, updateParams } from "@/components/table"
+import EditAddress from "@/modals/EditAddress.vue";
 
 interface IAddressParams extends ITableParams {
     searchTerm?: string;

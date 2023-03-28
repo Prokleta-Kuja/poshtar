@@ -1,29 +1,29 @@
-import { defineStore } from "pinia";
-import { ref } from "vue";
-import { AuthService, AuthStatusModel } from "../api";
+import { defineStore } from 'pinia'
+import { ref } from 'vue'
+import { AuthService, type AuthStatusModel } from '@/api'
 
-export const useAuth = defineStore("auth", () => {
-  const initialized = ref(false);
-  const isAuthenticated = ref(false);
-  const username = ref<string | undefined | null>(undefined);
+export const useAuth = defineStore('auth', () => {
+  const initialized = ref(false)
+  const isAuthenticated = ref(false)
+  const username = ref<string | undefined | null>(undefined)
 
   const setLoginInfo = (info: AuthStatusModel) => {
-    isAuthenticated.value = info.authenticated;
-    username.value = info.username;
-  };
+    isAuthenticated.value = info.authenticated
+    username.value = info.username
+  }
 
   const clearLoginInfo = () => {
-    isAuthenticated.value = false;
-    username.value = "";
-  };
+    isAuthenticated.value = false
+    username.value = ''
+  }
 
   const initialize = () =>
     AuthService.status()
       .then((r) => {
-        isAuthenticated.value = r.authenticated;
-        username.value = r.username;
+        isAuthenticated.value = r.authenticated
+        username.value = r.username
       })
-      .finally(() => (initialized.value = true));
+      .finally(() => (initialized.value = true))
 
   return {
     isAuthenticated,
@@ -31,6 +31,6 @@ export const useAuth = defineStore("auth", () => {
     initialized,
     setLoginInfo,
     clearLoginInfo,
-    initialize,
-  };
-});
+    initialize
+  }
+})

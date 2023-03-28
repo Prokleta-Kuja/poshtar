@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import DovecotIndicator from './components/DovecotIndicator.vue';
 import { useAuth } from './stores/auth.store';
 
 const auth = useAuth()
@@ -48,15 +49,8 @@ auth.initialize()
             </ul>
             <hr class="d-lg-none text-white-50">
             <ul class="navbar-nav flex-row flex-wrap ms-md-auto">
-              <li class="nav-item col-6 col-lg-auto" data-bs-target="#appNavbar" data-bs-dismiss="offcanvas"
-                title="Service status">
-                <RouterLink class="nav-link py-2 px-0 px-lg-2" :to="{ name: 'route.root' }">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
-                    class="bi bi-circle-fill text-warning" viewBox="0 0 16 16">
-                    <circle cx="8" cy="8" r="8" />
-                  </svg>
-                  <small class="d-lg-none ms-2">Service status</small>
-                </RouterLink>
+              <li class="nav-item col-6 col-lg-auto" data-bs-target="#appNavbar" data-bs-dismiss="offcanvas">
+                <DovecotIndicator />
               </li>
               <li class="nav-item py-2 py-lg-1 col-12 col-lg-auto">
                 <div class="vr d-none d-lg-flex h-100 mx-lg-2 text-white"></div>

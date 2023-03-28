@@ -27,6 +27,7 @@ export type { RecipientLMListResponse } from './models/RecipientLMListResponse';
 export { ServiceName } from './models/ServiceName';
 export type { ServiceRequestModel } from './models/ServiceRequestModel';
 export { ServiceRequestType } from './models/ServiceRequestType';
+export type { ServiceResultModel } from './models/ServiceResultModel';
 export type { TransactionLM } from './models/TransactionLM';
 export type { TransactionLMListResponse } from './models/TransactionLMListResponse';
 export type { UserCM } from './models/UserCM';

@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { reactive } from 'vue';
-import { RecipientLM, TransactionService } from '../api';
-import Search from '../components/form/Search.vue'
-import { Header, Pages, Sizes, ITableParams, initParams, updateParams } from '../components/table';
+import { type RecipientLM, TransactionService } from '@/api';
+import Search from '@/components/form/SearchBox.vue'
+import { Header, Pages, Sizes, type ITableParams, initParams, updateParams } from '@/components/table';
 
 interface ITransactionRecipientsParams extends ITableParams {
     searchTerm?: string;
@@ -54,7 +54,7 @@ refresh();
                         <td>External addresse(s)</td>
                         <td>
                             <ul>
-                                <li v-for="address in getAddresses(item)">{{ address }}</li>
+                                <li v-for="address in getAddresses(item)" :key="address">{{ address }}</li>
                             </ul>
                         </td>
                     </template>

@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import { reactive, ref } from 'vue';
 import { useRouter } from 'vue-router';
-import { AuthService, LoginModel } from '../api';
-import IModelState from '../components/form/modelState';
-import TextBox from '../components/form/TextBox.vue';
-import SpinButton from '../components/form/SpinButton.vue';
-import { useAuth } from '../stores/auth.store';
+import { AuthService, type LoginModel } from '@/api';
+import type IModelState from '@/components/form/modelState';
+import TextBox from '@/components/form/TextBox.vue';
+import SpinButton from '@/components/form/SpinButton.vue';
+import { useAuth } from '@/stores/auth.store';
 
 const auth = useAuth();
 const router = useRouter()

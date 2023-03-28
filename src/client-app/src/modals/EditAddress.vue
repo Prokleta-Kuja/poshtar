@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import { reactive, ref, watch } from 'vue';
-import { AddressUM, AddressService, AddressVM, AddressType } from '../api';
-import IModelState from '../components/form/modelState';
-import Modal from '../components/Modal.vue';
-import SpinButton from '../components/form/SpinButton.vue';
-import Text from '../components/form/TextBox.vue';
-import SelectBox from '../components/form/SelectBox.vue';
-import CheckBox from '../components/form/CheckBox.vue';
+import { type AddressUM, AddressService, type AddressVM, AddressType } from '@/api';
+import type IModelState from '@/components/form/modelState';
+import Modal from '@/components/Modal.vue';
+import SpinButton from '@/components/form/SpinButton.vue';
+import Text from '@/components/form/TextBox.vue';
+import SelectBox from '@/components/form/SelectBox.vue';
+import CheckBox from '@/components/form/CheckBox.vue';
 export interface IEditAddress {
     model?: AddressVM,
     onUpdated?: (updatedAddress?: AddressVM) => void

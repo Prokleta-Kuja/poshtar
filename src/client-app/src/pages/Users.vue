@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { reactive } from "vue";
-import { UserLM, UserService } from "../api";
-import Search from '../components/form/Search.vue'
-import { Header, Pages, Sizes, ITableParams, initParams, updateParams } from "../components/table"
-import AddUser from "../modals/AddUser.vue";
+import { type UserLM, UserService } from "@/api";
+import Search from '@/components/form/SearchBox.vue'
+import { Header, Pages, Sizes, type ITableParams, initParams, updateParams } from "@/components/table"
+import AddUser from "@/modals/AddUser.vue";
 
 interface IUserParams extends ITableParams {
     searchTerm?: string;

@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { reactive, watch } from "vue";
-import { AddressLM, AddressService, AddressType, DomainService } from "../api";
-import Search from '../components/form/Search.vue'
-import TypeaheadBox, { KV } from "../components/form/TypeaheadBox.vue";
-import { Header, Pages, Sizes, ITableParams, initParams, updateParams } from "../components/table"
+import { type AddressLM, AddressService, AddressType, DomainService } from "@/api";
+import Search from '@/components/form/SearchBox.vue'
+import TypeaheadBox, { type KV } from "@/components/form/TypeaheadBox.vue";
+import { Header, Pages, Sizes, type ITableParams, initParams, updateParams } from "@/components/table"
 
 interface IAddressParams extends ITableParams {
     searchTerm?: string;

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ITableParams, defaultPageSizes } from '.';
+import { type ITableParams, defaultPageSizes } from '.';
 
 const props = defineProps<{ params: ITableParams, onChange: (params: ITableParams) => void }>();
 const change = () => {

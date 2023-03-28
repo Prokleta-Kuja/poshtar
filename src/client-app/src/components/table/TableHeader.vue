@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue';
-import { ITableParams } from '.';
+import type { ITableParams } from '.';
 
 const props = defineProps<{ params: ITableParams, onSort: (params: ITableParams) => void, column: string, display?: string, unsortable?: boolean }>();
 

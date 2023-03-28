@@ -1,8 +1,8 @@
-import { ValidationError } from "../../api";
+import type { ValidationError } from '@/api'
 
 export default interface IModelState<T> {
-  loading?: boolean;
-  submitting?: boolean;
-  model: T;
-  error?: ValidationError;
+  loading?: boolean
+  submitting?: boolean
+  model: T
+  error?: ValidationError
 }

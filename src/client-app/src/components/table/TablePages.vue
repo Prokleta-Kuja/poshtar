@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue';
-import { ITableParams } from '.';
+import type { ITableParams } from '.';
 
 const pageOffset = 2;
 const props = defineProps<{ params: ITableParams, onChange: (params: ITableParams) => void }>();
