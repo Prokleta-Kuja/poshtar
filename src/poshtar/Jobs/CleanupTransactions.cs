@@ -24,5 +24,7 @@ public class CleanupTransactions
         _logger.LogInformation("Cleaning up transaction(s) before {Date}", before);
         var affected = await _db.Transactions.Where(t => t.Start < before).ExecuteDeleteAsync(token);
         _logger.LogInformation("Cleaned up {Count} transaction(s)", affected);
+
+        // TODO: delete eml files
     }
 }
