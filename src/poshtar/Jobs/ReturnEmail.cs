@@ -25,7 +25,7 @@ public class ReturnEmail
     public async Task Run(int transactionId, PerformContext context, CancellationToken token)
     {
         var transaction = await _db.Transactions
-            .Include(t => t.Recipients)
+            .Include(t => t.Recipients.Where(r => !r.Delivered))
             .Include(t => t.FromUser)
             .SingleOrDefaultAsync(t => t.TransactionId == transactionId, token);
 

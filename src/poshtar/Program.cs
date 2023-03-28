@@ -66,9 +66,13 @@ public class Program
                     opt.Events.OnRedirectToLogin = ctx => { ctx.Response.StatusCode = StatusCodes.Status401Unauthorized; return Task.CompletedTask; };
                 });
 
-            builder.Services.AddControllers(options =>
+            builder.Services.AddControllers(opt =>
                 {
-                    options.Filters.Add<ExceptionFilter>();
+                    opt.Filters.Add<ExceptionFilter>();
+                })
+                .ConfigureApiBehaviorOptions(opt =>
+                {
+                    opt.InvalidModelStateResponseFactory = BadRequestFactory.Handle;
                 })
                 .AddJsonOptions(o =>
                 {
@@ -117,7 +121,10 @@ public class Program
             app.UseHttpsRedirection();
             app.UseAuthentication();
             app.UseAuthorization();
+
             app.UseHangfireDashboard();
+            app.ReregisterRecurringJobs();
+
             app.MapControllers().RequireAuthorization();
 
             app.MapWhen(x => !x.Request.Path.Value!.StartsWith("/api/"), builder =>

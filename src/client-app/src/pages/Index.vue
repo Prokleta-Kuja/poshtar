@@ -18,7 +18,9 @@ const refresh = (params?: ITableParams) => {
     if (params)
         data.params = params;
 
-    TransactionService.getTransactions({ ...data.params }).then(r => { data.items = r.items; updateParams(data.params, r) });
+    TransactionService.getTransactions({ ...data.params })
+        .then(r => { data.items = r.items; updateParams(data.params, r) })
+        .catch(r => {/* TODO: show error  */ });
 };
 const showLogs = (transactionId: number) => show.logsId = transactionId;
 const hideLogs = () => show.logsId = undefined;
@@ -55,8 +57,8 @@ refresh();
         <Sizes class="me-3 mb-2" style="max-width:8rem" :params="data.params" :on-change="refresh" />
         <Search autoFocus class="me-3 mb-2" style="max-width:16rem" placeholder="Client, from"
             v-model="data.params.searchTerm" :on-change="refresh" />
-        <Search autoFocus class="me-3 mb-2" style="max-width:16rem" placeholder="Connection Id"
-            v-model="data.params.connectionId" :on-change="refresh" />
+        <Search autoFocus class="me-3 mb-2" style="max-width:16rem" label="Connection Id" v-model="data.params.connectionId"
+            :on-change="refresh" />
     </div>
     <div class="table-responsive">
         <table class="table">

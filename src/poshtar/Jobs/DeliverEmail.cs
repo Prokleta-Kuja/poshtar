@@ -32,7 +32,7 @@ public class DeliverEmail
     public async Task Run(int transactionId, PerformContext context, CancellationToken token)
     {
         var transaction = await _db.Transactions
-            .Include(t => t.Recipients)
+            .Include(t => t.Recipients.Where(r => !r.Delivered))
             .SingleOrDefaultAsync(t => t.TransactionId == transactionId, token);
 
         if (transaction == null)
@@ -67,7 +67,7 @@ public class DeliverEmail
                 {
                     await Deliver(msg, recipient.Data, token);
                     _db.Logs.Add(new($"Delivered to user {recipient.Data}", null));
-                    _db.Recipients.Remove(recipient);
+                    recipient.Delivered = true;
                 }
                 else
                 {
@@ -81,7 +81,7 @@ public class DeliverEmail
                     {
                         await Forward(msg, to, token);
                         _db.Logs.Add(new("Forwarded for external addresses", recipient.Data));
-                        _db.Recipients.Remove(recipient);
+                        recipient.Delivered = true;
                     }
                 }
             }
