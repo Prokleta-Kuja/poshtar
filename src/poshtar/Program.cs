@@ -1,6 +1,7 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using Hangfire;
+using Hangfire.Common;
 using Hangfire.Storage.SQLite;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.DataProtection;
@@ -97,6 +98,11 @@ public class Program
                     CountersAggregateInterval = TimeSpan.FromMinutes(5),
                 }));
 
+            // Remove Hangfire culture filter
+            var captureFilter = GlobalJobFilters.Filters.OfType<JobFilter>().Where(c => c.Instance is CaptureCultureAttribute).FirstOrDefault();
+            if (captureFilter != null)
+                GlobalJobFilters.Filters.Remove(captureFilter.Instance);
+
             // Add the processing server as IHostedService
             builder.Services.AddHangfireServer(o =>
             {
@@ -156,6 +162,7 @@ public class Program
     {
         Directory.CreateDirectory(C.Paths.CertData);
         Directory.CreateDirectory(C.Paths.ConfigData);
+        Directory.CreateDirectory(C.Paths.DovecotData);
         Directory.CreateDirectory(C.Paths.MailData);
         Directory.CreateDirectory(C.Paths.QueueData);
 
@@ -165,8 +172,7 @@ public class Program
         if (!File.Exists(C.Paths.CertCrt) || !File.Exists(C.Paths.CertKey))
             throw new Exception($"Could not load certs from {C.Paths.CertData}");
 
-        if (!Directory.Exists(DovecotConfiguration.DovecotRoot))
-            DovecotConfiguration.Generate();
+        DovecotConfiguration.Generate();
 
         using var scope = provider.CreateScope();
         using var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
@@ -186,8 +192,6 @@ public class Program
     {
         if (C.StartApiOnly)
             return;
-
-        DovecotConfiguration.GenerateSystem();
 
         var idChange = await BashExec.ChangeDovecotUidGid();
         if (idChange.exitCode == 0)

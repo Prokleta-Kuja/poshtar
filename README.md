@@ -63,6 +63,18 @@ cd src/client-app
 npx openapi-typescript-codegen --useOptions --input http://localhost:5080/swagger/v1/swagger.json --output ./src/api
 ```
 
+## SMTP test
+
+```
+From: Sender <sender@example.com>
+Date: Wed, 22 Mar 2023 07:15:35 +0100
+Subject: Re: Testing
+To: Recipient <recipient@example.com>
+
+Test
+.
+```
+
 ## IMAP
 
 ```

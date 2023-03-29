@@ -6,13 +6,12 @@ namespace poshtar.Services;
 
 public static class DovecotConfiguration
 {
-    public static readonly string DovecotRoot = C.Paths.ConfigDataFor("dovecot");
-    public static readonly string LogPath = Path.Join(DovecotRoot, "dovecot.log");
-    public static readonly string MainPath = Path.Join(DovecotRoot, "dovecot.conf");
-    public static readonly string UsersPath = Path.Join(DovecotRoot, "users.conf");
-    public static readonly string PasswordsPath = Path.Join(DovecotRoot, "passes.conf");
-    public static readonly string MastersPath = Path.Join(DovecotRoot, "masters.conf");
-    public static readonly string SystemPath = Path.Join(DovecotRoot, "system.conf");
+    public static readonly string LogPath = C.Paths.DovecotDataFor("dovecot.log");
+    public static readonly string MainPath = C.Paths.DovecotDataFor("dovecot.conf");
+    public static readonly string UsersPath = C.Paths.DovecotDataFor("users.conf");
+    public static readonly string PasswordsPath = C.Paths.DovecotDataFor("passes.conf");
+    public static readonly string MastersPath = C.Paths.DovecotDataFor("masters.conf");
+    public static readonly string SystemPath = C.Paths.DovecotDataFor("system.conf");
     static void GenerateMain()
     {
         var main = new StringBuilder();
@@ -208,7 +207,6 @@ dbpath = {C.Paths.Sqlite}
                 break;
         }
 
-        Directory.CreateDirectory(DovecotRoot);
         File.Create(LogPath).Dispose();
         GenerateMain();
         GenerateSystem();

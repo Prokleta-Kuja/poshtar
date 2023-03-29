@@ -32,7 +32,7 @@ refresh();
 <template>
     <div class="d-flex flex-wrap">
         <Sizes class="me-3 mb-2" style="max-width:8rem" :params="data.params" :on-change="refresh" />
-        <Search autoFocus class="me-3 mb-2" style="max-width:16rem" placeholder="User, address"
+        <Search autoFocus class="me-3 mb-2" style="max-width:16rem" placeholder="User, destination"
             v-model="data.params.searchTerm" :on-change="refresh" />
     </div>
     <div class="table-responsive">
@@ -40,7 +40,7 @@ refresh();
             <thead>
                 <tr>
                     <Header :params="data.params" :on-sort="refresh" column="type" unsortable />
-                    <Header :params="data.params" :on-sort="refresh" column="address" unsortable />
+                    <Header :params="data.params" :on-sort="refresh" column="destination" unsortable />
                     <th></th>
                 </tr>
             </thead>
@@ -51,7 +51,7 @@ refresh();
                         <td>{{ item.data }}</td>
                     </template>
                     <template v-else>
-                        <td>External addresse(s)</td>
+                        <td>External address(es)</td>
                         <td>
                             <ul>
                                 <li v-for="address in getAddresses(item)" :key="address">{{ address }}</li>
