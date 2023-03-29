@@ -23,7 +23,7 @@ const timestampText = (dateTime: string | null | undefined) => {
     if (!dateTime)
         return '-';
     var dt = new Date(dateTime);
-    return dt.toLocaleString();
+    return dt.toLocaleTimeString();
 }
 
 refresh();
@@ -40,7 +40,6 @@ refresh();
                 <tr>
                     <Header :params="data.params" :on-sort="refresh" column="timestamp" />
                     <Header :params="data.params" :on-sort="refresh" column="message" />
-                    <th></th>
                 </tr>
             </thead>
             <tbody>

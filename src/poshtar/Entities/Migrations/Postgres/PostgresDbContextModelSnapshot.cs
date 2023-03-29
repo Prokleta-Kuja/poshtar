@@ -241,10 +241,6 @@ namespace poshtar.Entities.Migrations.Postgres
                         .HasColumnType("text")
                         .HasColumnName("client");
 
-                    b.Property<bool>("Complete")
-                        .HasColumnType("boolean")
-                        .HasColumnName("complete");
-
                     b.Property<Guid>("ConnectionId")
                         .HasColumnType("uuid")
                         .HasColumnName("connection_id");
@@ -260,6 +256,10 @@ namespace poshtar.Entities.Migrations.Postgres
                     b.Property<int?>("FromUserId")
                         .HasColumnType("integer")
                         .HasColumnName("from_user_id");
+
+                    b.Property<bool>("Secure")
+                        .HasColumnType("boolean")
+                        .HasColumnName("secure");
 
                     b.Property<DateTime>("Start")
                         .HasColumnType("timestamp with time zone")

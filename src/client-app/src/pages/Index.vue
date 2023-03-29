@@ -63,32 +63,28 @@ refresh();
         <Sizes class="me-3 mb-2" style="max-width:8rem" :params="data.params" :on-change="refresh" />
         <Search autoFocus class="me-3 mb-2" style="max-width:16rem" placeholder="Client, from"
             v-model="data.params.searchTerm" :on-change="refresh" />
-        <Search class="me-3 mb-2" style="max-width:16rem" label="Connection Id" v-model="data.params.connectionId"
-            :on-change="refresh" />
+        <!-- <Search class="me-3 mb-2" style="max-width:16rem" label="Connection Id" v-model="data.params.connectionId"
+                        :on-change="refresh" /> -->
     </div>
     <div class="table-responsive">
         <table class="table">
             <thead>
-                <Header :params="data.params" :on-sort="refresh" column="connectionId" />
-                <Header :params="data.params" :on-sort="refresh" column="client" />
                 <Header :params="data.params" :on-sort="refresh" column="start" />
-                <Header :params="data.params" :on-sort="refresh" column="end" />
+                <Header :params="data.params" :on-sort="refresh" column="client" />
                 <Header :params="data.params" :on-sort="refresh" column="from" />
-                <Header :params="data.params" :on-sort="refresh" column="complete" />
+                <Header :params="data.params" :on-sort="refresh" column="secure" />
                 <th></th>
             </thead>
             <tbody>
                 <tr v-for="item in data.items" :key="item.id">
-                    <td class="user-select-all">{{ item.connectionId }}</td>
-                    <td>{{ item.client }}</td>
                     <td>{{ timeText(item.start) }}</td>
-                    <td>{{ timeText(item.end) }}</td>
+                    <td>{{ item.client }}</td>
                     <td>
                         <span>{{ item.from }}</span>
                         <span v-if="item.username">- {{ item.username }}</span>
                     </td>
                     <td>
-                        <svg v-if="item.complete" xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+                        <svg v-if="item.secure" xmlns="http://www.w3.org/2000/svg" width="16" height="16"
                             fill="currentColor" class="bi bi-check-lg text-success" viewBox="0 0 16 16">
                             <path
                                 d="M12.736 3.97a.733.733 0 0 1 1.047 0c.286.289.29.756.01 1.05L7.88 12.01a.733.733 0 0 1-1.065.02L3.217 8.384a.757.757 0 0 1 0-1.06.733.733 0 0 1 1.047 0l3.052 3.093 5.4-6.425a.247.247 0 0 1 .02-.022Z" />
@@ -101,7 +97,7 @@ refresh();
                     </td>
                     <td class="text-end">
                         <div class="btn-group" role="group">
-                            <button class="btn btn-secondary" @click="showLogs(item.id)" title="Logs">
+                            <button class="btn btn-primary" @click="showLogs(item.id)" title="Logs">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
                                     class="bi bi-stack" viewBox="0 0 16 16">
                                     <path
@@ -110,7 +106,7 @@ refresh();
                                         d="m14.12 6.576 1.715.858c.22.11.22.424 0 .534l-7.568 3.784a.598.598 0 0 1-.534 0L.165 7.968a.299.299 0 0 1 0-.534l1.716-.858 5.317 2.659c.505.252 1.1.252 1.604 0l5.317-2.659z" />
                                 </svg>
                             </button>
-                            <button v-if="item.complete" class="btn btn-secondary" @click="showRecipients(item.id)"
+                            <button v-if="item.queued" class="btn btn-success" @click="showRecipients(item.id)"
                                 title="Recipients">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
                                     class="bi bi-postcard" viewBox="0 0 16 16">

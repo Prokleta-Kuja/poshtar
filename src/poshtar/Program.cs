@@ -24,7 +24,8 @@ public class Program
     {
         Log.Logger = new LoggerConfiguration()
                 .MinimumLevel.Is(C.IsDebug ? LogEventLevel.Debug : LogEventLevel.Information)
-                .MinimumLevel.Override(nameof(Microsoft), LogEventLevel.Information)
+                .MinimumLevel.Override(nameof(Microsoft), LogEventLevel.Warning)
+                .MinimumLevel.Override(nameof(Hangfire), LogEventLevel.Warning)
                 .Enrich.FromLogContext()
                 .WriteTo.Console(
                     outputTemplate: "[{Timestamp:yyyy-MM-dd HH:mm:ss} {Level:u3}] {SourceContext}: {Message:lj}{NewLine}{Exception}"

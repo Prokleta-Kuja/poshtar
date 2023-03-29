@@ -10,6 +10,7 @@ export type TransactionLM = {
     client?: string | null;
     username?: string | null;
     from?: string | null;
-    complete: boolean;
+    queued: boolean;
+    secure: boolean;
 };
 

@@ -226,10 +226,6 @@ namespace poshtar.Entities.Migrations.Mysql
                         .HasColumnType("longtext")
                         .HasColumnName("client");
 
-                    b.Property<bool>("Complete")
-                        .HasColumnType("tinyint(1)")
-                        .HasColumnName("complete");
-
                     b.Property<Guid>("ConnectionId")
                         .HasColumnType("char(36)")
                         .HasColumnName("connection_id");
@@ -245,6 +241,10 @@ namespace poshtar.Entities.Migrations.Mysql
                     b.Property<int?>("FromUserId")
                         .HasColumnType("int")
                         .HasColumnName("from_user_id");
+
+                    b.Property<bool>("Secure")
+                        .HasColumnType("tinyint(1)")
+                        .HasColumnName("secure");
 
                     b.Property<DateTime>("Start")
                         .HasColumnType("datetime(6)")

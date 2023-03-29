@@ -72,7 +72,6 @@ public class DataCommand : Command
             if (ctx.Transaction.ExternalAddresses.Count > 0)
                 ctx.Transaction.Recipients.Add(new(ctx.Transaction.ExternalAddresses));
 
-            ctx.Transaction.Complete = true;
             ctx.Log("Email scheduled for delivery");
             await ctx.Db.SaveChangesAsync(cancellationToken);
 

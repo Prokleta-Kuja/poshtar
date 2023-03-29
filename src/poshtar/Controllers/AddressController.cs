@@ -108,7 +108,12 @@ public class AddressesController : ControllerBase
             .AnyAsync();
 
         if (isDuplicate)
-            return BadRequest(new ValidationError(nameof(model.Pattern), "Already exists"));
+        {
+            if (model.Type == AddressType.CatchAll)
+                return BadRequest(new ValidationError(nameof(model.Type), "Catch all already exists for this domain"));
+            else
+                return BadRequest(new ValidationError(nameof(model.Pattern), "Already exists"));
+        }
 
         var address = new Address
         {

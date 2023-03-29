@@ -11,7 +11,8 @@ public class TransactionLM
     public string? Client { get; set; }
     public string? Username { get; set; }
     public string? From { get; set; }
-    [Required] public bool Complete { get; set; }
+    [Required] public bool Queued { get; set; }
+    [Required] public bool Secure { get; set; }
 }
 
 public class LogEntryLM

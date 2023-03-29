@@ -47,7 +47,7 @@ public class TransactionsController : ControllerBase
                 TransactionsSortBy.Client => query.Order(t => t.Client, req.Ascending),
                 TransactionsSortBy.Username => query.Order(t => t.FromUser!.Name, req.Ascending),
                 TransactionsSortBy.From => query.Order(t => t.From, req.Ascending),
-                TransactionsSortBy.Complete => query.Order(t => t.Complete, req.Ascending),
+                TransactionsSortBy.Secure => query.Order(t => t.Secure, req.Ascending),
                 _ => query
             };
 
@@ -62,7 +62,8 @@ public class TransactionsController : ControllerBase
                 Client = t.Client,
                 Username = t.FromUser != null ? t.FromUser.Name : string.Empty,
                 From = t.From,
-                Complete = t.Complete,
+                Secure = t.Secure,
+                Queued = t.Recipients.Any(),
             })
             .ToListAsync();
         return Ok(new ListResponse<TransactionLM>(req, count, items));
@@ -168,7 +169,7 @@ public enum TransactionsSortBy
     Client = 2,
     Username = 3,
     From = 4,
-    Complete = 5,
+    Secure = 5,
 }
 
 public enum LogsSortBy

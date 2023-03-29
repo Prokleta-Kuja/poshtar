@@ -2,29 +2,37 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
+using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using poshtar.Entities;
 
 #nullable disable
 
-namespace poshtar.Entities.Migrations.Sqlite
+namespace poshtar.Entities.Migrations.Postgres
 {
-    [DbContext(typeof(SqliteDbContext))]
-    partial class SqliteDbContextModelSnapshot : ModelSnapshot
+    [DbContext(typeof(PostgresDbContext))]
+    [Migration("20230329095250_SecureTransaction")]
+    partial class SecureTransaction
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
-            modelBuilder.HasAnnotation("ProductVersion", "7.0.4");
+            modelBuilder
+                .HasAnnotation("ProductVersion", "7.0.4")
+                .HasAnnotation("Relational:MaxIdentifierLength", 63);
+
+            NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
             modelBuilder.Entity("AddressUser", b =>
                 {
                     b.Property<int>("AddressesAddressId")
-                        .HasColumnType("INTEGER")
+                        .HasColumnType("integer")
                         .HasColumnName("addresses_address_id");
 
                     b.Property<int>("UsersUserId")
-                        .HasColumnType("INTEGER")
+                        .HasColumnType("integer")
                         .HasColumnName("users_user_id");
 
                     b.HasKey("AddressesAddressId", "UsersUserId")
@@ -40,15 +48,17 @@ namespace poshtar.Entities.Migrations.Sqlite
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER")
+                        .HasColumnType("integer")
                         .HasColumnName("id");
 
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
                     b.Property<string>("FriendlyName")
-                        .HasColumnType("TEXT")
+                        .HasColumnType("text")
                         .HasColumnName("friendly_name");
 
                     b.Property<string>("Xml")
-                        .HasColumnType("TEXT")
+                        .HasColumnType("text")
                         .HasColumnName("xml");
 
                     b.HasKey("Id")
@@ -61,34 +71,36 @@ namespace poshtar.Entities.Migrations.Sqlite
                 {
                     b.Property<int>("AddressId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER")
+                        .HasColumnType("integer")
                         .HasColumnName("address_id");
 
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("AddressId"));
+
                     b.Property<string>("Description")
-                        .HasColumnType("TEXT")
+                        .HasColumnType("text")
                         .HasColumnName("description");
 
-                    b.Property<long?>("Disabled")
-                        .HasColumnType("INTEGER")
+                    b.Property<DateTime?>("Disabled")
+                        .HasColumnType("timestamp with time zone")
                         .HasColumnName("disabled");
 
                     b.Property<int>("DomainId")
-                        .HasColumnType("INTEGER")
+                        .HasColumnType("integer")
                         .HasColumnName("domain_id");
 
                     b.Property<string>("Expression")
                         .ValueGeneratedOnAddOrUpdate()
-                        .HasColumnType("TEXT")
+                        .HasColumnType("text")
                         .HasColumnName("expression")
                         .HasComputedColumnSql("CASE type WHEN 0 THEN pattern WHEN 1 THEN pattern || '%' WHEN 2 THEN '%' || pattern ELSE NULL END", true);
 
                     b.Property<string>("Pattern")
                         .IsRequired()
-                        .HasColumnType("TEXT")
+                        .HasColumnType("text")
                         .HasColumnName("pattern");
 
                     b.Property<int>("Type")
-                        .HasColumnType("INTEGER")
+                        .HasColumnType("integer")
                         .HasColumnName("type");
 
                     b.HasKey("AddressId")
@@ -104,35 +116,37 @@ namespace poshtar.Entities.Migrations.Sqlite
                 {
                     b.Property<int>("DomainId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER")
+                        .HasColumnType("integer")
                         .HasColumnName("domain_id");
 
-                    b.Property<long?>("Disabled")
-                        .HasColumnType("INTEGER")
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("DomainId"));
+
+                    b.Property<DateTime?>("Disabled")
+                        .HasColumnType("timestamp with time zone")
                         .HasColumnName("disabled");
 
                     b.Property<string>("Host")
                         .IsRequired()
-                        .HasColumnType("TEXT")
+                        .HasColumnType("text")
                         .HasColumnName("host");
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("TEXT")
+                        .HasColumnType("text")
                         .HasColumnName("name");
 
                     b.Property<string>("Password")
                         .IsRequired()
-                        .HasColumnType("TEXT")
+                        .HasColumnType("text")
                         .HasColumnName("password");
 
                     b.Property<int>("Port")
-                        .HasColumnType("INTEGER")
+                        .HasColumnType("integer")
                         .HasColumnName("port");
 
                     b.Property<string>("Username")
                         .IsRequired()
-                        .HasColumnType("TEXT")
+                        .HasColumnType("text")
                         .HasColumnName("username");
 
                     b.HasKey("DomainId")
@@ -148,24 +162,26 @@ namespace poshtar.Entities.Migrations.Sqlite
                 {
                     b.Property<int>("LogEntryId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER")
+                        .HasColumnType("integer")
                         .HasColumnName("log_entry_id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("LogEntryId"));
 
                     b.Property<string>("Message")
                         .IsRequired()
-                        .HasColumnType("TEXT")
+                        .HasColumnType("text")
                         .HasColumnName("message");
 
                     b.Property<string>("Properties")
-                        .HasColumnType("TEXT")
+                        .HasColumnType("text")
                         .HasColumnName("properties");
 
-                    b.Property<long>("Timestamp")
-                        .HasColumnType("INTEGER")
+                    b.Property<DateTime>("Timestamp")
+                        .HasColumnType("timestamp with time zone")
                         .HasColumnName("timestamp");
 
                     b.Property<int>("TransactionId")
-                        .HasColumnType("INTEGER")
+                        .HasColumnType("integer")
                         .HasColumnName("transaction_id");
 
                     b.HasKey("LogEntryId")
@@ -181,24 +197,26 @@ namespace poshtar.Entities.Migrations.Sqlite
                 {
                     b.Property<int>("RecipientId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER")
+                        .HasColumnType("integer")
                         .HasColumnName("recipient_id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("RecipientId"));
 
                     b.Property<string>("Data")
                         .IsRequired()
-                        .HasColumnType("TEXT")
+                        .HasColumnType("text")
                         .HasColumnName("data");
 
                     b.Property<bool>("Delivered")
-                        .HasColumnType("INTEGER")
+                        .HasColumnType("boolean")
                         .HasColumnName("delivered");
 
                     b.Property<int>("TransactionId")
-                        .HasColumnType("INTEGER")
+                        .HasColumnType("integer")
                         .HasColumnName("transaction_id");
 
                     b.Property<int?>("UserId")
-                        .HasColumnType("INTEGER")
+                        .HasColumnType("integer")
                         .HasColumnName("user_id");
 
                     b.HasKey("RecipientId")
@@ -217,35 +235,37 @@ namespace poshtar.Entities.Migrations.Sqlite
                 {
                     b.Property<int>("TransactionId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER")
+                        .HasColumnType("integer")
                         .HasColumnName("transaction_id");
 
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("TransactionId"));
+
                     b.Property<string>("Client")
-                        .HasColumnType("TEXT")
+                        .HasColumnType("text")
                         .HasColumnName("client");
 
                     b.Property<Guid>("ConnectionId")
-                        .HasColumnType("TEXT")
+                        .HasColumnType("uuid")
                         .HasColumnName("connection_id");
 
-                    b.Property<long>("End")
-                        .HasColumnType("INTEGER")
+                    b.Property<DateTime>("End")
+                        .HasColumnType("timestamp with time zone")
                         .HasColumnName("end");
 
                     b.Property<string>("From")
-                        .HasColumnType("TEXT")
+                        .HasColumnType("text")
                         .HasColumnName("from");
 
                     b.Property<int?>("FromUserId")
-                        .HasColumnType("INTEGER")
+                        .HasColumnType("integer")
                         .HasColumnName("from_user_id");
 
                     b.Property<bool>("Secure")
-                        .HasColumnType("INTEGER")
+                        .HasColumnType("boolean")
                         .HasColumnName("secure");
 
-                    b.Property<long>("Start")
-                        .HasColumnType("INTEGER")
+                    b.Property<DateTime>("Start")
+                        .HasColumnType("timestamp with time zone")
                         .HasColumnName("start");
 
                     b.HasKey("TransactionId")
@@ -261,43 +281,45 @@ namespace poshtar.Entities.Migrations.Sqlite
                 {
                     b.Property<int>("UserId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER")
+                        .HasColumnType("integer")
                         .HasColumnName("user_id");
 
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("UserId"));
+
                     b.Property<string>("Description")
-                        .HasColumnType("TEXT")
+                        .HasColumnType("text")
                         .HasColumnName("description");
 
-                    b.Property<long?>("Disabled")
-                        .HasColumnType("INTEGER")
+                    b.Property<DateTime?>("Disabled")
+                        .HasColumnType("timestamp with time zone")
                         .HasColumnName("disabled");
 
                     b.Property<string>("Hash")
                         .IsRequired()
-                        .HasColumnType("TEXT")
+                        .HasColumnType("text")
                         .HasColumnName("hash");
 
                     b.Property<bool>("IsMaster")
-                        .HasColumnType("INTEGER")
+                        .HasColumnType("boolean")
                         .HasColumnName("is_master");
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("TEXT")
+                        .HasColumnType("text")
                         .HasColumnName("name");
 
                     b.Property<string>("Password")
                         .IsRequired()
-                        .HasColumnType("TEXT")
+                        .HasColumnType("text")
                         .HasColumnName("password");
 
                     b.Property<int?>("Quota")
-                        .HasColumnType("INTEGER")
+                        .HasColumnType("integer")
                         .HasColumnName("quota");
 
                     b.Property<string>("Salt")
                         .IsRequired()
-                        .HasColumnType("TEXT")
+                        .HasColumnType("text")
                         .HasColumnName("salt");
 
                     b.HasKey("UserId")

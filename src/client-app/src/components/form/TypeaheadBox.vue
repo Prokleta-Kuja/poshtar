@@ -33,7 +33,7 @@ const search = (e: Event) => {
     if (input.value)
         timeoutRef = setTimeout(async () => {
             results.value = await props.onSearch(input.value)
-        }, 800);
+        }, 500);
 };
 
 const select = (item: KV) => {
