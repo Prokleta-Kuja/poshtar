@@ -41,7 +41,6 @@ refresh();
                 <tr>
                     <Header :params="data.params" :on-sort="refresh" column="type" unsortable />
                     <Header :params="data.params" :on-sort="refresh" column="destination" unsortable />
-                    <th></th>
                 </tr>
             </thead>
             <tbody>

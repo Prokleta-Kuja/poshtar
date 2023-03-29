@@ -59,7 +59,7 @@ const link = (addressId: number) => {
         </svg>
         Address
     </button>
-    <Modal title="Add domain address" :shown="shown" :onClose="toggle">
+    <Modal title="Add user address" :shown="shown" :onClose="toggle">
         <template #body>
             <form @submit.prevent="submit">
                 <TypeaheadBox class="mb-3" label="Domain" v-model="address.model.domainId"

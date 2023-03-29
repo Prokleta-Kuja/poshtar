@@ -37,7 +37,7 @@ public class Program
             var builder = WebApplication.CreateBuilder(args);
             builder.Host.UseSerilog();
             builder.Services.AddSmtp();
-            builder.Services.Configure<ForwardedHeadersOptions>(options => options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto);
+            builder.Services.Configure<ForwardedHeadersOptions>(options => options.ForwardedHeaders = ForwardedHeaders.All);
             builder.Services.AddDataProtection().PersistKeysToDbContext<AppDbContext>();
             switch (C.DbContextType)
             {
@@ -125,7 +125,8 @@ public class Program
                 app.UseForwardedHeaders();
 
             app.UseSpaStaticFiles();
-            app.UseHttpsRedirection();
+            if (C.IsDebug) // Reverse proxy will handle the redirection
+                app.UseHttpsRedirection();
             app.UseAuthentication();
             app.UseAuthorization();
 
@@ -144,6 +145,7 @@ public class Program
                 });
             });
 
+            Log.Information("App started");
             app.Run();
 
             return 0;

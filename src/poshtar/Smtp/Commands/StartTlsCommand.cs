@@ -29,7 +29,7 @@ public class StartTlsCommand : Command
         var protocols = SslProtocols.Tls13 | SslProtocols.Tls12;
 
         await ctx.Pipe.UpgradeAsync(certificate, protocols, cancellationToken).ConfigureAwait(false);
-
+        ctx.Transaction.Secure = true;
         return true;
     }
 }
