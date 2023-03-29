@@ -33,6 +33,7 @@ public class EndpointListener : IDisposable
 
         if (tcpClient.Client.RemoteEndPoint is IPEndPoint ip)
         {
+            context.Transaction.Start = DateTime.UtcNow;
             context.Log("Connection established", new { ip = ip.Address.ToString() });
             context.RemoteEndpoint = ip;
         }

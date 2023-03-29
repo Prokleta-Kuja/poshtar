@@ -25,6 +25,9 @@ public class CleanupTransactions
         var affected = await _db.Transactions.Where(t => t.Start < before).ExecuteDeleteAsync(token);
         _logger.LogInformation("Cleaned up {Count} transaction(s)", affected);
 
-        // TODO: delete eml files
+        var files = Directory.EnumerateFiles(C.Paths.QueueData, "*.eml", SearchOption.TopDirectoryOnly);
+        foreach (var file in files)
+            if (File.GetCreationTimeUtc(file) < before)
+                File.Delete(file);
     }
 }

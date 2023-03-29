@@ -5,6 +5,7 @@ using Hangfire;
 using Hangfire.Server;
 using MailKit;
 using MailKit.Net.Imap;
+using MailKit.Security;
 using Microsoft.EntityFrameworkCore;
 using MimeKit;
 using poshtar.Entities;
@@ -38,14 +39,14 @@ public class ReturnEmail
         var emlPath = C.Paths.QueueDataFor($"{transactionId}.eml");
         if (!File.Exists(emlPath))
         {
-            _db.Logs.Add(new("Email not found, probably already delivered"));
+            transaction.Logs.Add(new("Email not found, probably already delivered"));
             await _db.SaveChangesAsync(token);
             return;
         }
 
         if (transaction.Recipients.Count == 0)
         {
-            _db.Logs.Add(new("No recipients found, probably already delivered so deleting message"));
+            transaction.Logs.Add(new("No recipients found, probably already delivered so deleting message"));
             await _db.SaveChangesAsync(token);
             File.Delete(emlPath);
             return;
@@ -67,16 +68,16 @@ public class ReturnEmail
             {
                 using var emlStream = File.OpenRead(emlPath);
                 await Bounce(transaction.FromUser, transaction.ConnectionId, emlStream, internalUsers, externalAddresses, token);
-                _db.Logs.Add(new($"Email bounced to user {transaction.FromUser.Name}"));
+                transaction.Logs.Add(new($"Email bounced to user {transaction.FromUser.Name}"));
             }
             else
-                _db.Logs.Add(new("Email is from external user, skipping sending bounce"));
+                transaction.Logs.Add(new("Email is from external user, skipping sending bounce"));
 
             File.Delete(emlPath);
         }
-        catch (Exception)
+        catch (Exception ex)
         {
-            _db.Logs.Add(new("Email failed to bounce"));
+            transaction.Logs.Add(new($"Email failed to bounce: {ex.Message}"));
         }
         finally
         {
@@ -119,7 +120,7 @@ delete your own text from the attached returned message.");
         msg.Body = bb.ToMessageBody();
 
         using var client = new ImapClient();
-        await client.ConnectAsync("localhost", C.Dovecot.PORT, true, token);
+        await client.ConnectAsync(C.Dovecot.INTERNAL_HOST, C.Dovecot.INSECURE_PORT, SecureSocketOptions.None, token);
         await client.AuthenticateAsync($"{user.Name}*{C.Dovecot.MasterUser}", C.Dovecot.MasterPassword, token);
 
         var inbox = client.Inbox;

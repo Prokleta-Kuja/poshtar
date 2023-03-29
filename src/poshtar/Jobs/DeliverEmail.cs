@@ -44,14 +44,14 @@ public class DeliverEmail
         var emlPath = C.Paths.QueueDataFor($"{transactionId}.eml");
         if (!File.Exists(emlPath))
         {
-            _db.Logs.Add(new("Email not found, probably already delivered"));
+            transaction.Logs.Add(new("Email not found, probably already delivered"));
             await _db.SaveChangesAsync(token);
             return;
         }
 
         if (transaction.Recipients.Count == 0)
         {
-            _db.Logs.Add(new("No recipients found, probably already delivered so deleting message"));
+            transaction.Logs.Add(new("No recipients found, probably already delivered so deleting message"));
             await _db.SaveChangesAsync(token);
             File.Delete(emlPath);
             return;
@@ -66,7 +66,7 @@ public class DeliverEmail
                 if (recipient.UserId.HasValue)
                 {
                     await Deliver(msg, recipient.Data, token);
-                    _db.Logs.Add(new($"Delivered to user {recipient.Data}", null));
+                    transaction.Logs.Add(new($"Delivered to user {recipient.Data}"));
                     recipient.Delivered = true;
                 }
                 else
@@ -74,20 +74,24 @@ public class DeliverEmail
                     var to = JsonSerializer.Deserialize<List<string>>(recipient.Data);
                     if (to == null)
                     {
-                        _db.Logs.Add(new("External recipients could not be deserialized"));
+                        transaction.Logs.Add(new("External recipients could not be deserialized"));
                         throw new Exception("External recipients could not be deserialized");
                     }
                     else
                     {
                         await Forward(msg, to, token);
-                        _db.Logs.Add(new("Forwarded for external addresses", recipient.Data));
+                        transaction.Logs.Add(new("Forwarded for external addresses", recipient.Data));
                         recipient.Delivered = true;
                     }
                 }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
                 errors++;
+                if (recipient.UserId.HasValue)
+                    transaction.Logs.Add(new($"Failed to process recipient {recipient.Data}: {ex.Message}"));
+                else
+                    transaction.Logs.Add(new($"Failed to forward message: {ex.Message}"));
             }
             finally
             {
@@ -112,7 +116,9 @@ public class DeliverEmail
     static async Task Deliver(MimeMessage msg, string toUser, CancellationToken token)
     {
         using var client = new ImapClient();
-        await client.ConnectAsync("localhost", C.Dovecot.PORT, true, token);
+        await client.ConnectAsync(C.Dovecot.INTERNAL_HOST, C.Dovecot.INSECURE_PORT, SecureSocketOptions.None, token);
+        // TODO: test
+        // await client.AuthenticateAsync($"{toUser}*nanadmin", "admin", token);
         await client.AuthenticateAsync($"{toUser}*{C.Dovecot.MasterUser}", C.Dovecot.MasterPassword, token);
 
         var inbox = client.Inbox;

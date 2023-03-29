@@ -33,7 +33,11 @@ public class MailCommand : Command
         var size = GetMessageSize();
         var sizeLog = size == default ? string.Empty : $"SIZE={size} ({size / 1024 / 1024:0.00}MB)";
 
+        if (!string.IsNullOrWhiteSpace(ctx.Transaction.From))
+            ctx.ResetTransaction();
+
         ctx.Log($"MAIL FROM:{Address} {sizeLog}");
+        ctx.Transaction.From = Address.ToString();
 
         // check against the server supplied maximum
         if (C.MaxMessageSize > 0 && size > C.MaxMessageSize)
@@ -42,10 +46,6 @@ public class MailCommand : Command
             await ctx.Pipe.Output.WriteReplyAsync(Response.SizeLimitExceeded, cancellationToken).ConfigureAwait(false);
             return false;
         }
-
-        if (!string.IsNullOrWhiteSpace(ctx.Transaction.From))
-            ctx.ResetTransaction();
-        ctx.Transaction.From = Address.ToString();
 
         if (ctx.IsSubmissionPort)
         {

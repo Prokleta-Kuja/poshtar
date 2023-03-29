@@ -24,7 +24,7 @@ public class SessionContext : IDisposable
         Properties = new();
 
         Db = ServiceScope.ServiceProvider.GetRequiredService<AppDbContext>();
-        Transaction = new() { ConnectionId = ConnectionId, Start = DateTime.UtcNow };
+        Transaction = new() { ConnectionId = ConnectionId, Start = DateTime.MaxValue };
         Db.Transactions.Add(Transaction);
     }
     public void ResetTransaction()

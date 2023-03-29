@@ -33,7 +33,7 @@ public class DataCommand : Command
             return false;
         }
 
-        await ctx.Pipe.Output.WriteReplyAsync(new Response(ReplyCode.StartMailInput, "end with <CRLF>.<CRLF>"), cancellationToken).ConfigureAwait(false);
+        await ctx.Pipe.Output.WriteReplyAsync(new Response(ReplyCode.StartMailInput, "Go ahead with the message and end it with <CRLF>.<CRLF>"), cancellationToken).ConfigureAwait(false);
 
         try
         {
@@ -58,6 +58,7 @@ public class DataCommand : Command
     }
     static async Task<Response> SaveAsync(SessionContext ctx, ReadOnlySequence<byte> buffer, CancellationToken cancellationToken)
     {
+        await ctx.Db.SaveChangesAsync(cancellationToken); // Must get TransactionId before using it for file name
         var emlPath = C.Paths.QueueDataFor($"{ctx.Transaction.TransactionId}.eml");
         try
         {

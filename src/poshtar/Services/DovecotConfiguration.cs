@@ -25,7 +25,7 @@ ssl_cert = <{C.Paths.CertCrt}
 ssl_key = <{C.Paths.CertKey}
 protocols = imap
 mail_location = maildir:{C.Paths.MailData}/%Ln
-auth_master_user_separator=*
+auth_master_user_separator = *
 mail_plugins = $mail_plugins quota
 mailbox_list_index = yes
 mail_always_cache_fields = date.save
@@ -46,8 +46,12 @@ plugin {{
 auth_mechanisms = plain login
 
 service imap-login {{
+  inet_listener imap {{
+    port = {C.Dovecot.INSECURE_PORT}
+    ssl = no
+  }}
   inet_listener imaps {{
-    port = {C.Dovecot.PORT}
+    port = {C.Dovecot.SECURE_PORT}
     ssl = yes
   }}
 }}
@@ -104,13 +108,14 @@ mail_gid = {C.Gid}");
 
         // Permissions
         main.AppendLine($@"
-!include {SystemPath}
 passdb {{
   driver = sql
   args = {MastersPath}
   master = yes
-  result_success = continue-ok
+  result_success = continue
 }}
+# Static master must be after sql master
+!include {SystemPath}
 passdb {{
   driver = sql
   args = {PasswordsPath}
@@ -176,7 +181,7 @@ passdb {{
   driver = static
   args = user={C.Dovecot.MasterUser} password={pass}
   master = yes
-  result_success = continue-ok
+  result_success = continue
 }}");
     }
     public static void Generate()

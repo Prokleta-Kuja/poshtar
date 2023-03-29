@@ -198,6 +198,14 @@ public class Program
         var dovecot = await BashExec.StartDovecotAsync();
         if (dovecot.exitCode == 0)
             Log.Debug("Dovecot started");
+        else if (C.IsDebug)
+        {
+            dovecot = await BashExec.RestartDovecotAsync();
+            if (dovecot.exitCode == 0)
+                Log.Debug("Dovecot re-started");
+            else
+                Log.Error("Could not re-start dovecot: {error}", dovecot.error);
+        }
         else
             Log.Error("Could not start dovecot: {error}", dovecot.error);
     }

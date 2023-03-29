@@ -17,6 +17,7 @@
 	"appPort": [
 		"0.0.0.0:5025:5025",
 		"0.0.0.0:5587:5587",
+		"0.0.0.0:5143:5143",
 		"0.0.0.0:5993:5993"
 	],
 	"portsAttributes": {
@@ -38,8 +39,14 @@
 			"requireLocalPort": true,
 			"elevateIfNeeded": true
 		},
-		"5993": {
+		"5143": {
 			"label": "IMAP",
+			"onAutoForward": "notify",
+			"requireLocalPort": true,
+			"elevateIfNeeded": true
+		},
+		"5993": {
+			"label": "IMAPs",
 			"onAutoForward": "notify",
 			"requireLocalPort": true,
 			"elevateIfNeeded": true

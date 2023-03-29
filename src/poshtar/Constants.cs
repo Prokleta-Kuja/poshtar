@@ -54,7 +54,9 @@ public static class C
     }
     public static class Dovecot
     {
-        public const int PORT = 5993;
+        public const string INTERNAL_HOST = "127.0.0.1";
+        public const int INSECURE_PORT = 5143;
+        public const int SECURE_PORT = 5993;
         public static readonly string MasterUser = "master-poshtar";
         public static readonly string MasterPassword = SecretGenerator.Password(24);
     }
