@@ -35,7 +35,7 @@ refresh();
             v-model="data.params.searchTerm" :on-change="refresh" />
     </div>
     <div class="table-responsive">
-        <table class="table">
+        <table class="table table-sm">
             <thead>
                 <tr>
                     <Header :params="data.params" :on-sort="refresh" column="timestamp" />
@@ -43,7 +43,7 @@ refresh();
                 </tr>
             </thead>
             <tbody>
-                <tr v-for="item in data.items" :key="item.id">
+                <tr v-for="item in data.items" :key="item.id" class="align-middle">
                     <td>{{ timestampText(item.timestamp) }}</td>
                     <td>{{ item.message }}</td>
                 </tr>

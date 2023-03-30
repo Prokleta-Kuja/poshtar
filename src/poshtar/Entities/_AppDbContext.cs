@@ -88,7 +88,7 @@ public partial class AppDbContext : DbContext, IDataProtectionKeyContext
         builder.Entity<Recipient>(e =>
         {
             e.HasKey(e => e.RecipientId);
-            e.HasOne(e => e.User);
+            e.HasOne(e => e.User).WithMany().OnDelete(DeleteBehavior.Cascade);
         });
 
         // SQLite conversions

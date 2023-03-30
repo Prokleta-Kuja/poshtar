@@ -4,13 +4,14 @@ import { type AddressLM, type AddressVM, AddressService, AddressType } from "@/a
 import Search from '@/components/form/SearchBox.vue'
 import { Header, Pages, Sizes, type ITableParams, initParams, updateParams } from "@/components/table"
 import EditAddress from "@/modals/EditAddress.vue";
+import ConfirmationModal from "@/components/ConfirmationModal.vue";
 
 interface IAddressParams extends ITableParams {
     searchTerm?: string;
 }
 
 const props = defineProps<{ domainId: number, lastChange?: Date }>()
-const data = reactive<{ params: IAddressParams, items: AddressLM[] }>({ params: initParams(), items: [] });
+const data = reactive<{ params: IAddressParams, items: AddressLM[], delete?: AddressLM }>({ params: initParams(), items: [] });
 const address = ref<AddressVM | undefined>(undefined);
 
 const refresh = (params?: ITableParams) => {
@@ -20,11 +21,21 @@ const refresh = (params?: ITableParams) => {
     AddressService.getAddresses({ ...data.params, domainId: props.domainId })
         .then(r => { data.items = r.items; updateParams(data.params, r) });
 };
+const showDelete = (domain: AddressLM) => data.delete = domain;
+const hideDelete = () => data.delete = undefined;
+const deleteAddress = () => {
+    if (!data.delete)
+        return;
+
+    AddressService.deleteAddress({ addressId: data.delete.id })
+        .then(() => {
+            refresh();
+            hideDelete();
+        })
+        .catch(() => {/* TODO: show error */ })
+}
 
 watch(() => props.lastChange, () => refresh());
-
-const remove = (addressId: number) => AddressService.deleteAddress({ addressId: addressId })
-    .then(() => refresh())
 
 const edit = (model: AddressVM) => address.value = model;
 const update = (updatedAddress?: AddressVM) => {
@@ -73,7 +84,7 @@ refresh();
     </div>
     <EditAddress :model="address" @updated="update" />
     <div class="table-responsive">
-        <table class="table">
+        <table class="table table-sm">
             <thead>
                 <tr>
                     <Header :params="data.params" :on-sort="refresh" column="pattern" />
@@ -85,7 +96,7 @@ refresh();
                 </tr>
             </thead>
             <tbody>
-                <tr v-for="item in data.items" :key="item.id">
+                <tr v-for="item in data.items" :key="item.id" class="align-middle">
                     <td>
                         {{ patternText(item.type, item.pattern, item.domainName) }}
                     </td>
@@ -93,9 +104,9 @@ refresh();
                     <td>{{ item.description }}</td>
                     <td>{{ disabledText(item.disabled) }}</td>
                     <td>{{ item.userCount }}</td>
-                    <td class="text-end">
+                    <td class="text-end p-1">
                         <div class="btn-group" role="group">
-                            <button class="btn btn-secondary" @click="edit(item)" title="Edit">
+                            <button class="btn btn-sm btn-secondary" @click="edit(item)" title="Edit">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
                                     class="bi bi-pencil-square" viewBox="0 0 16 16">
                                     <path
@@ -104,7 +115,7 @@ refresh();
                                         d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5v11z" />
                                 </svg>
                             </button>
-                            <button class="btn btn-danger" @click="remove(item.id)" title="Delete">
+                            <button class="btn btn-sm btn-danger" title="Delete" @click="showDelete(item)">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
                                     class="bi bi-x-lg" viewBox="0 0 16 16">
                                     <path
@@ -118,4 +129,8 @@ refresh();
         </table>
     </div>
     <Pages class="mb-2" :params="data.params" :on-change="refresh" />
+    <ConfirmationModal v-if="data.delete" title="Address deletion" :onClose="hideDelete" :onConfirm="deleteAddress" shown>
+        Are you sure you want to remove <b>{{ patternText(data.delete.type, data.delete.pattern,
+            data.delete.domainName) }}</b>?
+    </ConfirmationModal>
 </template>

@@ -4,18 +4,32 @@ import { type UserLM, UserService } from "@/api";
 import Search from '@/components/form/SearchBox.vue'
 import { Header, Pages, Sizes, type ITableParams, initParams, updateParams } from "@/components/table"
 import AddUser from "@/modals/AddUser.vue";
+import ConfirmationModal from "@/components/ConfirmationModal.vue";
 
 interface IUserParams extends ITableParams {
     searchTerm?: string;
 }
 
-const data = reactive<{ params: IUserParams, items: UserLM[] }>({ params: initParams(), items: [] });
+const data = reactive<{ params: IUserParams, items: UserLM[], delete?: UserLM }>({ params: initParams(), items: [] });
 const refresh = (params?: ITableParams) => {
     if (params)
         data.params = params;
 
     UserService.getUsers({ ...data.params }).then(r => { data.items = r.items; updateParams(data.params, r) });
 };
+const showDelete = (user: UserLM) => data.delete = user;
+const hideDelete = () => data.delete = undefined;
+const deleteUser = () => {
+    if (!data.delete)
+        return;
+
+    UserService.deleteUser({ userId: data.delete.id })
+        .then(() => {
+            refresh();
+            hideDelete();
+        })
+        .catch(() => {/* TODO: show error */ })
+}
 
 const disabledText = (dateTime: string | null | undefined) => {
     if (!dateTime)
@@ -46,10 +60,11 @@ refresh();
                     <Header :params="data.params" :on-sort="refresh" column="quotaMegaBytes" display="Quota" />
                     <Header :params="data.params" :on-sort="refresh" column="addressCount" display="Address count" />
                     <Header :params="data.params" :on-sort="refresh" column="disabled" display="Disabled" />
+                    <th></th>
                 </tr>
             </thead>
             <tbody>
-                <tr v-for="item in data.items" :key="item.id">
+                <tr v-for="item in data.items" :key="item.id" class="align-middle">
                     <td>
                         <RouterLink :to="{ name: 'route.userDetails', params: { id: item.id } }">{{ item.name }}
                         </RouterLink>
@@ -77,9 +92,23 @@ refresh();
                     </td>
                     <td>{{ item.addressCount }}</td>
                     <td>{{ disabledText(item.disabled) }}</td>
+                    <td class="text-end p-1">
+                        <div class="btn-group" role="group">
+                            <button class="btn btn-sm btn-danger" title="Delete" @click="showDelete(item)">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                                    class="bi bi-x-lg" viewBox="0 0 16 16">
+                                    <path
+                                        d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8 2.146 2.854Z" />
+                                </svg>
+                            </button>
+                        </div>
+                    </td>
                 </tr>
             </tbody>
         </table>
     </div>
     <Pages :params="data.params" :on-change="refresh" />
+    <ConfirmationModal v-if="data.delete" title="User deletion" :onClose="hideDelete" :onConfirm="deleteUser" shown>
+        Are you sure you want to remove user <b>{{ data.delete.name }}</b> and all their messages?
+    </ConfirmationModal>
 </template>

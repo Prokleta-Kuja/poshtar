@@ -63,41 +63,44 @@ refresh();
         <Sizes class="me-3 mb-2" style="max-width:8rem" :params="data.params" :on-change="refresh" />
         <Search autoFocus class="me-3 mb-2" style="max-width:16rem" placeholder="Client, from"
             v-model="data.params.searchTerm" :on-change="refresh" />
-        <!-- <Search class="me-3 mb-2" style="max-width:16rem" label="Connection Id" v-model="data.params.connectionId"
-                        :on-change="refresh" /> -->
+        <Search class="me-3 mb-2" style="max-width:16rem" label="Connection Id" v-model="data.params.connectionId"
+            :on-change="refresh" />
     </div>
     <div class="table-responsive">
-        <table class="table">
+        <table class="table table-sm">
             <thead>
                 <Header :params="data.params" :on-sort="refresh" column="start" />
                 <Header :params="data.params" :on-sort="refresh" column="client" />
                 <Header :params="data.params" :on-sort="refresh" column="from" />
-                <Header :params="data.params" :on-sort="refresh" column="secure" />
                 <th></th>
             </thead>
             <tbody>
-                <tr v-for="item in data.items" :key="item.id">
-                    <td>{{ timeText(item.start) }}</td>
+                <tr v-for="item in data.items" :key="item.id" class="align-middle">
+                    <td>
+                        <span v-if="item.secure" class="text-success" title="Secure">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                                class="bi bi-lock" viewBox="0 0 16 16">
+                                <path
+                                    d="M8 1a2 2 0 0 1 2 2v4H6V3a2 2 0 0 1 2-2zm3 6V3a3 3 0 0 0-6 0v4a2 2 0 0 0-2 2v5a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2zM5 8h6a1 1 0 0 1 1 1v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1z" />
+                            </svg>
+                        </span>
+                        <span v-else class="text-danger" title="Insecure">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                                class="bi bi-unlock" viewBox="0 0 16 16">
+                                <path
+                                    d="M11 1a2 2 0 0 0-2 2v4a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2h5V3a3 3 0 0 1 6 0v4a.5.5 0 0 1-1 0V3a2 2 0 0 0-2-2zM3 8a1 1 0 0 0-1 1v5a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V9a1 1 0 0 0-1-1H3z" />
+                            </svg>
+                        </span>
+                        <span class="ms-2" :title="timeText(item.end)">{{ timeText(item.start) }}</span>
+                    </td>
                     <td>{{ item.client }}</td>
                     <td>
                         <span>{{ item.from }}</span>
                         <span v-if="item.username">- {{ item.username }}</span>
                     </td>
-                    <td>
-                        <svg v-if="item.secure" xmlns="http://www.w3.org/2000/svg" width="16" height="16"
-                            fill="currentColor" class="bi bi-check-lg text-success" viewBox="0 0 16 16">
-                            <path
-                                d="M12.736 3.97a.733.733 0 0 1 1.047 0c.286.289.29.756.01 1.05L7.88 12.01a.733.733 0 0 1-1.065.02L3.217 8.384a.757.757 0 0 1 0-1.06.733.733 0 0 1 1.047 0l3.052 3.093 5.4-6.425a.247.247 0 0 1 .02-.022Z" />
-                        </svg>
-                        <svg v-else xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
-                            class="bi bi-x-lg text-danger" viewBox="0 0 16 16">
-                            <path
-                                d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8 2.146 2.854Z" />
-                        </svg>
-                    </td>
-                    <td class="text-end">
+                    <td class="text-end p-1">
                         <div class="btn-group" role="group">
-                            <button class="btn btn-primary" @click="showLogs(item.id)" title="Logs">
+                            <button class="btn btn-sm btn-primary" @click="showLogs(item.id)" title="Logs">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
                                     class="bi bi-stack" viewBox="0 0 16 16">
                                     <path
@@ -106,7 +109,7 @@ refresh();
                                         d="m14.12 6.576 1.715.858c.22.11.22.424 0 .534l-7.568 3.784a.598.598 0 0 1-.534 0L.165 7.968a.299.299 0 0 1 0-.534l1.716-.858 5.317 2.659c.505.252 1.1.252 1.604 0l5.317-2.659z" />
                                 </svg>
                             </button>
-                            <button v-if="item.queued" class="btn btn-success" @click="showRecipients(item.id)"
+                            <button v-if="item.queued" class="btn btn-sm btn-success" @click="showRecipients(item.id)"
                                 title="Recipients">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
                                     class="bi bi-postcard" viewBox="0 0 16 16">
@@ -114,7 +117,7 @@ refresh();
                                         d="M2 2a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H2ZM1 4a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1v8a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V4Zm7.5.5a.5.5 0 0 0-1 0v7a.5.5 0 0 0 1 0v-7ZM2 5.5a.5.5 0 0 1 .5-.5H6a.5.5 0 0 1 0 1H2.5a.5.5 0 0 1-.5-.5Zm0 2a.5.5 0 0 1 .5-.5H6a.5.5 0 0 1 0 1H2.5a.5.5 0 0 1-.5-.5Zm0 2a.5.5 0 0 1 .5-.5H6a.5.5 0 0 1 0 1H2.5a.5.5 0 0 1-.5-.5ZM10.5 5a.5.5 0 0 0-.5.5v3a.5.5 0 0 0 .5.5h3a.5.5 0 0 0 .5-.5v-3a.5.5 0 0 0-.5-.5h-3ZM13 8h-2V6h2v2Z" />
                                 </svg>
                             </button>
-                            <button class="btn btn-danger" title="Delete" @click="remove(item.id)">
+                            <button class="btn btn-sm btn-danger" title="Delete" @click="remove(item.id)">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
                                     class="bi bi-x-lg" viewBox="0 0 16 16">
                                     <path
@@ -127,5 +130,5 @@ refresh();
             </tbody>
         </table>
     </div>
-    <Pages :params="data.params" :on-change="refresh" />
+    <Pages class="mb-3" :params="data.params" :on-change="refresh" />
 </template>

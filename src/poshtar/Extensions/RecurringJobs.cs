@@ -18,6 +18,13 @@ public static class RecurringJobs
            "0 4 * * *", // Every day @ 4
            C.TZ);
 
+        activeJobIds.Add(nameof(CertReload));
+        RecurringJob.AddOrUpdate<CertReload>(
+            nameof(CertReload),
+            j => j.Run(CancellationToken.None),
+            "55 3 * * SUN", // Every Sunday @ 3:55
+            C.TZ);
+
         // Get all registered recurring jobs
         var conn = JobStorage.Current.GetConnection();
         var jobs = conn.GetRecurringJobs();

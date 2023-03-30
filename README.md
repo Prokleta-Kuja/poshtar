@@ -1,11 +1,10 @@
 # TODO
 
-Toasts
-A recurring job to check if there are maildirs for deleted users and/or delete it when deleting users
-Reload certs https://doc.dovecot.org/admin_manual/doveadm_http_api/#doveadm-reload
-shutdown services https://stackoverflow.com/questions/35257287/kestrel-shutdown-function-in-startup-cs-in-asp-net-core
-password checking and generation https://api.pwnedpasswords.com/ https://haveibeenpwned.com/API/v2
-pooling for auth expiration in auth store
+- dovecot log has some index errors
+- loading indicator na stranicama
+- Toasts
+- one outgoing smtp for multiple domains
+- password checking and generation https://api.pwnedpasswords.com/ https://haveibeenpwned.com/API/v2
 
 # Important dovecot conf
 

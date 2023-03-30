@@ -180,8 +180,14 @@ public class UsersController : ControllerBase
         if (user == null)
             return NotFound(new PlainError("Not found"));
 
+        using var transaction = _db.Database.BeginTransaction();
         _db.Users.Remove(user);
         await _db.SaveChangesAsync();
+
+        var messageDir = C.Paths.MailDataFor(user.Name);
+        Directory.Delete(messageDir, true);
+
+        await transaction.CommitAsync();
 
         return NoContent();
     }

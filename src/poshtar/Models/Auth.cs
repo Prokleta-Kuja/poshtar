@@ -12,4 +12,5 @@ public class AuthStatusModel
 {
     [Required] public required bool Authenticated { get; set; }
     public string? Username { get; set; }
+    public DateTime? Expires { get; set; }
 }

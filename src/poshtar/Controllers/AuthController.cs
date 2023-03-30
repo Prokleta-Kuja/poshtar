@@ -32,7 +32,14 @@ public class AuthController : ControllerBase
     public IActionResult Status()
     {
         if (HttpContext.User.Identity?.IsAuthenticated ?? false)
-            return Ok(new AuthStatusModel { Authenticated = true, Username = HttpContext.User.Identity!.Name });
+        {
+            var expires = DateTime.MinValue;
+            var expiresStr = HttpContext.User.FindFirst(ClaimTypes.Expiration)?.Value;
+            if (!string.IsNullOrWhiteSpace(expiresStr) && long.TryParse(expiresStr, out var expiresVal))
+                expires = DateTime.FromBinary(expiresVal);
+
+            return Ok(new AuthStatusModel { Authenticated = true, Username = HttpContext.User.Identity!.Name, Expires = expires });
+        }
         else
             return Ok(new AuthStatusModel { Authenticated = false });
     }
@@ -46,12 +53,14 @@ public class AuthController : ControllerBase
         if (hasMasters)
             return BadRequest(new PlainError("There are master users in database, autologin disabled."));
 
-        var claims = new List<Claim> { new(ClaimTypes.Name, "temporary admin"), new(ClaimTypes.Role, "master") };
+        _logger.LogInformation("No master users in database, autologing in...");
+        var expires = DateTime.UtcNow.AddMinutes(10);
+        var claims = new List<Claim> { new(ClaimTypes.Name, "temporary admin"), new(ClaimTypes.Role, "master"), new(ClaimTypes.Expiration, expires.ToBinary().ToString()) };
         var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
-        var authProperties = new AuthenticationProperties { AllowRefresh = false, ExpiresUtc = DateTime.UtcNow.AddMinutes(10), IsPersistent = true };
+        var authProperties = new AuthenticationProperties { AllowRefresh = false, ExpiresUtc = expires, IsPersistent = true };
         await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(claimsIdentity), authProperties);
 
-        return Ok(new AuthStatusModel { Authenticated = true, Username = "temporary admin" });
+        return Ok(new AuthStatusModel { Authenticated = true, Username = "temporary admin", Expires = expires });
     }
 
     [HttpPost(Name = "Login")]
@@ -66,15 +75,16 @@ public class AuthController : ControllerBase
         if (user == null || !DovecotHasher.Verify(user.Salt, user.Hash, model.Password))
             return BadRequest(new PlainError("Invalid username or password"));
 
-        var claims = new List<Claim> { new(ClaimTypes.Name, user.Name), new(ClaimTypes.Sid, user.UserId.ToString()), };
+        var expires = DateTime.UtcNow.AddHours(1);
+        var claims = new List<Claim> { new(ClaimTypes.Name, user.Name), new(ClaimTypes.Sid, user.UserId.ToString()), new(ClaimTypes.Expiration, expires.ToBinary().ToString()) };
         if (user.IsMaster)
             claims.Add(new Claim(ClaimTypes.Role, "master"));
 
         var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
-        var authProperties = new AuthenticationProperties { AllowRefresh = false, ExpiresUtc = DateTime.UtcNow.AddHours(1), IsPersistent = true };
+        var authProperties = new AuthenticationProperties { AllowRefresh = false, ExpiresUtc = expires, IsPersistent = true };
         await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(claimsIdentity), authProperties);
 
-        return Ok(new AuthStatusModel { Authenticated = true, Username = user.Name });
+        return Ok(new AuthStatusModel { Authenticated = true, Username = user.Name, Expires = expires });
     }
 
     [HttpDelete(Name = "Logout")]

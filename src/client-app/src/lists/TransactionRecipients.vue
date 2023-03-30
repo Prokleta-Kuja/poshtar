@@ -36,7 +36,7 @@ refresh();
             v-model="data.params.searchTerm" :on-change="refresh" />
     </div>
     <div class="table-responsive">
-        <table class="table">
+        <table class="table table-sm">
             <thead>
                 <tr>
                     <Header :params="data.params" :on-sort="refresh" column="type" unsortable />
@@ -44,7 +44,7 @@ refresh();
                 </tr>
             </thead>
             <tbody>
-                <tr v-for="item in data.items" :key="item.id">
+                <tr v-for="item in data.items" :key="item.id" class="align-middle">
                     <template v-if="item.userId">
                         <td>Internal user</td>
                         <td>{{ item.data }}</td>
