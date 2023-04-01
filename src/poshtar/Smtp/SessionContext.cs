@@ -8,6 +8,7 @@ public class SessionContext : IDisposable
     public Guid ConnectionId { get; set; } = Guid.NewGuid();
     public Transaction Transaction { get; private set; }
     public bool IsSubmissionPort;
+    public bool CanRelay;
     public IServiceScope ServiceScope { get; }
     public AppDbContext Db { get; }
     public EndpointDefinition EndpointDefinition { get; }

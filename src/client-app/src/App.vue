@@ -41,10 +41,10 @@ auth.initialize()
             <hr class="d-lg-none text-white-50">
             <ul class="navbar-nav flex-row flex-wrap">
               <li class="nav-item col-6 col-lg-auto" data-bs-target="#appNavbar" data-bs-dismiss="offcanvas">
-                <RouterLink class="nav-link py-2 px-0 px-lg-2" :to="{ name: 'route.domains' }">Domains</RouterLink>
+                <RouterLink class="nav-link py-2 px-0 px-lg-2" :to="{ name: 'route.users' }">Users</RouterLink>
               </li>
               <li class="nav-item col-6 col-lg-auto" data-bs-target="#appNavbar" data-bs-dismiss="offcanvas">
-                <RouterLink class="nav-link py-2 px-0 px-lg-2" :to="{ name: 'route.users' }">Users</RouterLink>
+                <RouterLink class="nav-link py-2 px-0 px-lg-2" :to="{ name: 'route.domains' }">Domains</RouterLink>
               </li>
             </ul>
             <hr class="d-lg-none text-white-50">

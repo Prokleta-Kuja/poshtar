@@ -2,31 +2,32 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using poshtar.Entities;
 
 #nullable disable
 
-namespace poshtar.Entities.Migrations.Mysql
+namespace poshtar.Entities.Migrations.Sqlite
 {
-    [DbContext(typeof(MysqlDbContext))]
-    partial class MysqlDbContextModelSnapshot : ModelSnapshot
+    [DbContext(typeof(SqliteDbContext))]
+    [Migration("20230401080054_Relays")]
+    partial class Relays
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
-            modelBuilder
-                .HasAnnotation("ProductVersion", "7.0.4")
-                .HasAnnotation("Relational:MaxIdentifierLength", 64);
+            modelBuilder.HasAnnotation("ProductVersion", "7.0.4");
 
             modelBuilder.Entity("AddressUser", b =>
                 {
                     b.Property<int>("AddressesAddressId")
-                        .HasColumnType("int")
+                        .HasColumnType("INTEGER")
                         .HasColumnName("addresses_address_id");
 
                     b.Property<int>("UsersUserId")
-                        .HasColumnType("int")
+                        .HasColumnType("INTEGER")
                         .HasColumnName("users_user_id");
 
                     b.HasKey("AddressesAddressId", "UsersUserId")
@@ -42,15 +43,15 @@ namespace poshtar.Entities.Migrations.Mysql
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
+                        .HasColumnType("INTEGER")
                         .HasColumnName("id");
 
                     b.Property<string>("FriendlyName")
-                        .HasColumnType("longtext")
+                        .HasColumnType("TEXT")
                         .HasColumnName("friendly_name");
 
                     b.Property<string>("Xml")
-                        .HasColumnType("longtext")
+                        .HasColumnType("TEXT")
                         .HasColumnName("xml");
 
                     b.HasKey("Id")
@@ -63,34 +64,34 @@ namespace poshtar.Entities.Migrations.Mysql
                 {
                     b.Property<int>("AddressId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
+                        .HasColumnType("INTEGER")
                         .HasColumnName("address_id");
 
                     b.Property<string>("Description")
-                        .HasColumnType("longtext")
+                        .HasColumnType("TEXT")
                         .HasColumnName("description");
 
-                    b.Property<DateTime?>("Disabled")
-                        .HasColumnType("datetime(6)")
+                    b.Property<long?>("Disabled")
+                        .HasColumnType("INTEGER")
                         .HasColumnName("disabled");
 
                     b.Property<int>("DomainId")
-                        .HasColumnType("int")
+                        .HasColumnType("INTEGER")
                         .HasColumnName("domain_id");
 
                     b.Property<string>("Expression")
                         .ValueGeneratedOnAddOrUpdate()
-                        .HasColumnType("longtext")
+                        .HasColumnType("TEXT")
                         .HasColumnName("expression")
                         .HasComputedColumnSql("CASE type WHEN 0 THEN pattern WHEN 1 THEN pattern || '%' WHEN 2 THEN '%' || pattern ELSE NULL END", true);
 
                     b.Property<string>("Pattern")
                         .IsRequired()
-                        .HasColumnType("longtext")
+                        .HasColumnType("TEXT")
                         .HasColumnName("pattern");
 
                     b.Property<int>("Type")
-                        .HasColumnType("int")
+                        .HasColumnType("INTEGER")
                         .HasColumnName("type");
 
                     b.HasKey("AddressId")
@@ -106,20 +107,20 @@ namespace poshtar.Entities.Migrations.Mysql
                 {
                     b.Property<int>("DomainId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
+                        .HasColumnType("INTEGER")
                         .HasColumnName("domain_id");
 
-                    b.Property<DateTime?>("Disabled")
-                        .HasColumnType("datetime(6)")
+                    b.Property<long?>("Disabled")
+                        .HasColumnType("INTEGER")
                         .HasColumnName("disabled");
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("varchar(255)")
+                        .HasColumnType("TEXT")
                         .HasColumnName("name");
 
                     b.Property<int?>("RelayId")
-                        .HasColumnType("int")
+                        .HasColumnType("INTEGER")
                         .HasColumnName("relay_id");
 
                     b.HasKey("DomainId")
@@ -138,24 +139,24 @@ namespace poshtar.Entities.Migrations.Mysql
                 {
                     b.Property<int>("LogEntryId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
+                        .HasColumnType("INTEGER")
                         .HasColumnName("log_entry_id");
 
                     b.Property<string>("Message")
                         .IsRequired()
-                        .HasColumnType("longtext")
+                        .HasColumnType("TEXT")
                         .HasColumnName("message");
 
                     b.Property<string>("Properties")
-                        .HasColumnType("longtext")
+                        .HasColumnType("TEXT")
                         .HasColumnName("properties");
 
-                    b.Property<DateTime>("Timestamp")
-                        .HasColumnType("datetime(6)")
+                    b.Property<long>("Timestamp")
+                        .HasColumnType("INTEGER")
                         .HasColumnName("timestamp");
 
                     b.Property<int>("TransactionId")
-                        .HasColumnType("int")
+                        .HasColumnType("INTEGER")
                         .HasColumnName("transaction_id");
 
                     b.HasKey("LogEntryId")
@@ -171,24 +172,24 @@ namespace poshtar.Entities.Migrations.Mysql
                 {
                     b.Property<int>("RecipientId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
+                        .HasColumnType("INTEGER")
                         .HasColumnName("recipient_id");
 
                     b.Property<string>("Data")
                         .IsRequired()
-                        .HasColumnType("longtext")
+                        .HasColumnType("TEXT")
                         .HasColumnName("data");
 
                     b.Property<bool>("Delivered")
-                        .HasColumnType("tinyint(1)")
+                        .HasColumnType("INTEGER")
                         .HasColumnName("delivered");
 
                     b.Property<int>("TransactionId")
-                        .HasColumnType("int")
+                        .HasColumnType("INTEGER")
                         .HasColumnName("transaction_id");
 
                     b.Property<int?>("UserId")
-                        .HasColumnType("int")
+                        .HasColumnType("INTEGER")
                         .HasColumnName("user_id");
 
                     b.HasKey("RecipientId")
@@ -207,35 +208,35 @@ namespace poshtar.Entities.Migrations.Mysql
                 {
                     b.Property<int>("RelayId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
+                        .HasColumnType("INTEGER")
                         .HasColumnName("relay_id");
 
-                    b.Property<DateTime?>("Disabled")
-                        .HasColumnType("datetime(6)")
+                    b.Property<long?>("Disabled")
+                        .HasColumnType("INTEGER")
                         .HasColumnName("disabled");
 
                     b.Property<string>("Host")
                         .IsRequired()
-                        .HasColumnType("longtext")
+                        .HasColumnType("TEXT")
                         .HasColumnName("host");
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("varchar(255)")
+                        .HasColumnType("TEXT")
                         .HasColumnName("name");
 
                     b.Property<string>("Password")
                         .IsRequired()
-                        .HasColumnType("longtext")
+                        .HasColumnType("TEXT")
                         .HasColumnName("password");
 
                     b.Property<int>("Port")
-                        .HasColumnType("int")
+                        .HasColumnType("INTEGER")
                         .HasColumnName("port");
 
                     b.Property<string>("Username")
                         .IsRequired()
-                        .HasColumnType("longtext")
+                        .HasColumnType("TEXT")
                         .HasColumnName("username");
 
                     b.HasKey("RelayId")
@@ -251,35 +252,35 @@ namespace poshtar.Entities.Migrations.Mysql
                 {
                     b.Property<int>("TransactionId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
+                        .HasColumnType("INTEGER")
                         .HasColumnName("transaction_id");
 
                     b.Property<string>("Client")
-                        .HasColumnType("longtext")
+                        .HasColumnType("TEXT")
                         .HasColumnName("client");
 
                     b.Property<Guid>("ConnectionId")
-                        .HasColumnType("char(36)")
+                        .HasColumnType("TEXT")
                         .HasColumnName("connection_id");
 
-                    b.Property<DateTime>("End")
-                        .HasColumnType("datetime(6)")
+                    b.Property<long>("End")
+                        .HasColumnType("INTEGER")
                         .HasColumnName("end");
 
                     b.Property<string>("From")
-                        .HasColumnType("longtext")
+                        .HasColumnType("TEXT")
                         .HasColumnName("from");
 
                     b.Property<int?>("FromUserId")
-                        .HasColumnType("int")
+                        .HasColumnType("INTEGER")
                         .HasColumnName("from_user_id");
 
                     b.Property<bool>("Secure")
-                        .HasColumnType("tinyint(1)")
+                        .HasColumnType("INTEGER")
                         .HasColumnName("secure");
 
-                    b.Property<DateTime>("Start")
-                        .HasColumnType("datetime(6)")
+                    b.Property<long>("Start")
+                        .HasColumnType("INTEGER")
                         .HasColumnName("start");
 
                     b.HasKey("TransactionId")
@@ -295,43 +296,43 @@ namespace poshtar.Entities.Migrations.Mysql
                 {
                     b.Property<int>("UserId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
+                        .HasColumnType("INTEGER")
                         .HasColumnName("user_id");
 
                     b.Property<string>("Description")
-                        .HasColumnType("longtext")
+                        .HasColumnType("TEXT")
                         .HasColumnName("description");
 
-                    b.Property<DateTime?>("Disabled")
-                        .HasColumnType("datetime(6)")
+                    b.Property<long?>("Disabled")
+                        .HasColumnType("INTEGER")
                         .HasColumnName("disabled");
 
                     b.Property<string>("Hash")
                         .IsRequired()
-                        .HasColumnType("longtext")
+                        .HasColumnType("TEXT")
                         .HasColumnName("hash");
 
                     b.Property<bool>("IsMaster")
-                        .HasColumnType("tinyint(1)")
+                        .HasColumnType("INTEGER")
                         .HasColumnName("is_master");
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("longtext")
+                        .HasColumnType("TEXT")
                         .HasColumnName("name");
 
                     b.Property<string>("Password")
                         .IsRequired()
-                        .HasColumnType("longtext")
+                        .HasColumnType("TEXT")
                         .HasColumnName("password");
 
                     b.Property<int?>("Quota")
-                        .HasColumnType("int")
+                        .HasColumnType("INTEGER")
                         .HasColumnName("quota");
 
                     b.Property<string>("Salt")
                         .IsRequired()
-                        .HasColumnType("longtext")
+                        .HasColumnType("TEXT")
                         .HasColumnName("salt");
 
                     b.HasKey("UserId")

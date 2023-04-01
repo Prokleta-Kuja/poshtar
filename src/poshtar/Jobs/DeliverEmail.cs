@@ -133,13 +133,19 @@ public class DeliverEmail
         if (msg.From.FirstOrDefault() is not MailboxAddress sender)
             throw new Exception("Could not parse sender");
 
+        var domain = await _db.Domains
+            .Include(d => d.Relay)
+            .SingleAsync(d => d.Name == sender.Domain, token);
+
+        if (domain.Relay == null)
+            throw new Exception("Could not forward without a domain relay configured");
+
         var recipients = to.Select(r => MailboxAddress.Parse(r));
-        var domain = await _db.Domains.SingleAsync(d => d.Name == sender.Domain, token);
-        var serverProtector = _dpp.CreateProtector(nameof(Domain));
+        var serverProtector = _dpp.CreateProtector(nameof(Relay));
 
         using var client = new SmtpClient();
-        await client.ConnectAsync(domain.Host, domain.Port, SecureSocketOptions.Auto, token);
-        await client.AuthenticateAsync(domain.Username, serverProtector.Unprotect(domain.Password), token);
+        await client.ConnectAsync(domain.Relay.Host, domain.Relay.Port, SecureSocketOptions.Auto, token);
+        await client.AuthenticateAsync(domain.Relay.Username, serverProtector.Unprotect(domain.Relay.Password), token);
         await client.SendAsync(msg, sender, recipients, token);
         await client.DisconnectAsync(true, token);
     }

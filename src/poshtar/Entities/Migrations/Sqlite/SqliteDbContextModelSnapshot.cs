@@ -111,35 +111,23 @@ namespace poshtar.Entities.Migrations.Sqlite
                         .HasColumnType("INTEGER")
                         .HasColumnName("disabled");
 
-                    b.Property<string>("Host")
-                        .IsRequired()
-                        .HasColumnType("TEXT")
-                        .HasColumnName("host");
-
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("TEXT")
                         .HasColumnName("name");
 
-                    b.Property<string>("Password")
-                        .IsRequired()
-                        .HasColumnType("TEXT")
-                        .HasColumnName("password");
-
-                    b.Property<int>("Port")
+                    b.Property<int?>("RelayId")
                         .HasColumnType("INTEGER")
-                        .HasColumnName("port");
-
-                    b.Property<string>("Username")
-                        .IsRequired()
-                        .HasColumnType("TEXT")
-                        .HasColumnName("username");
+                        .HasColumnName("relay_id");
 
                     b.HasKey("DomainId")
                         .HasName("pk_domains");
 
                     b.HasIndex("Name")
                         .HasDatabaseName("ix_domains_name");
+
+                    b.HasIndex("RelayId")
+                        .HasDatabaseName("ix_domains_relay_id");
 
                     b.ToTable("domains", (string)null);
                 });
@@ -211,6 +199,50 @@ namespace poshtar.Entities.Migrations.Sqlite
                         .HasDatabaseName("ix_recipients_user_id");
 
                     b.ToTable("recipients", (string)null);
+                });
+
+            modelBuilder.Entity("poshtar.Entities.Relay", b =>
+                {
+                    b.Property<int>("RelayId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER")
+                        .HasColumnName("relay_id");
+
+                    b.Property<long?>("Disabled")
+                        .HasColumnType("INTEGER")
+                        .HasColumnName("disabled");
+
+                    b.Property<string>("Host")
+                        .IsRequired()
+                        .HasColumnType("TEXT")
+                        .HasColumnName("host");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("TEXT")
+                        .HasColumnName("name");
+
+                    b.Property<string>("Password")
+                        .IsRequired()
+                        .HasColumnType("TEXT")
+                        .HasColumnName("password");
+
+                    b.Property<int>("Port")
+                        .HasColumnType("INTEGER")
+                        .HasColumnName("port");
+
+                    b.Property<string>("Username")
+                        .IsRequired()
+                        .HasColumnType("TEXT")
+                        .HasColumnName("username");
+
+                    b.HasKey("RelayId")
+                        .HasName("pk_relays");
+
+                    b.HasIndex("Name")
+                        .HasDatabaseName("ix_relays_name");
+
+                    b.ToTable("relays", (string)null);
                 });
 
             modelBuilder.Entity("poshtar.Entities.Transaction", b =>
@@ -335,6 +367,17 @@ namespace poshtar.Entities.Migrations.Sqlite
                     b.Navigation("Domain");
                 });
 
+            modelBuilder.Entity("poshtar.Entities.Domain", b =>
+                {
+                    b.HasOne("poshtar.Entities.Relay", "Relay")
+                        .WithMany("Domains")
+                        .HasForeignKey("RelayId")
+                        .OnDelete(DeleteBehavior.SetNull)
+                        .HasConstraintName("fk_domains_relays_relay_id");
+
+                    b.Navigation("Relay");
+                });
+
             modelBuilder.Entity("poshtar.Entities.LogEntry", b =>
                 {
                     b.HasOne("poshtar.Entities.Transaction", "Transaction")
@@ -359,6 +402,7 @@ namespace poshtar.Entities.Migrations.Sqlite
                     b.HasOne("poshtar.Entities.User", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
                         .HasConstraintName("fk_recipients_users_user_id");
 
                     b.Navigation("Transaction");
@@ -379,6 +423,11 @@ namespace poshtar.Entities.Migrations.Sqlite
             modelBuilder.Entity("poshtar.Entities.Domain", b =>
                 {
                     b.Navigation("Addresses");
+                });
+
+            modelBuilder.Entity("poshtar.Entities.Relay", b =>
+                {
+                    b.Navigation("Domains");
                 });
 
             modelBuilder.Entity("poshtar.Entities.Transaction", b =>

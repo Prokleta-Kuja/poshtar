@@ -1,20 +1,21 @@
 <script setup lang="ts">
 import { reactive, ref } from 'vue';
-import { DomainService, type DomainVM, type PlainError } from '@/api';
+import { DomainService, RelayService, type DomainVM, type PlainError } from '@/api';
 import AddressList from '@/lists/DomainAddressList.vue';
 import AddDomainAddress from '@/modals/AddDomainAddress.vue';
-import EditDomain from '@/modals/EditDomain.vue';
 
 const props = defineProps<{ id: number }>()
 const addressChange = ref(new Date)
 const domain = reactive<{ error?: PlainError, value?: DomainVM }>({});
+const relayKv = ref<{ value: number, label: string }[]>([]);
 
-const updateDomain = (updatedDomain: DomainVM) => domain.value = updatedDomain;
 const updateAddresses = () => addressChange.value = new Date;
 
 DomainService.getDomain({ domainId: props.id })
     .then(r => domain.value = r)
     .catch(r => domain.error = r.body);
+
+RelayService.getRelays({}).then(r => r.items.forEach(e => relayKv.value.push({ value: e.id, label: e.name })))
 </script>
 <template>
     <div class="d-flex align-items-center flex-wrap">
@@ -25,7 +26,6 @@ DomainService.getDomain({ domainId: props.id })
         </h1>
         <button class="btn btn-sm btn-secondary me-3" @click="$router.back()">Back</button>
         <template v-if="domain.value">
-            <EditDomain :model="domain.value" @updated="updateDomain" />
             <AddDomainAddress :domain-id="props.id" @added="updateAddresses" />
         </template>
     </div>

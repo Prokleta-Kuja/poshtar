@@ -51,8 +51,17 @@ public sealed class RcptCommand : Command
         }
         else if (ctx.IsSubmissionPort)
         {
-            ctx.Transaction.ExternalAddresses.Add(Address.ToString());
-            ctx.Log("Not resolved to internal user(s)");
+            if (ctx.CanRelay)
+            {
+                ctx.Log("Not resolved to internal user(s), will relay");
+                ctx.Transaction.ExternalAddresses.Add(Address.ToString());
+            }
+            else
+            {
+                ctx.Log("Not resolved to internal user(s), can't relay so refused");
+                await ctx.Pipe.Output.WriteReplyAsync(Response.MailboxUnavailable, cancellationToken).ConfigureAwait(false);
+                return false;
+            }
         }
         else
         {

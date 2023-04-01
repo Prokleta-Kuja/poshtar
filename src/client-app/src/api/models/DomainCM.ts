@@ -4,9 +4,6 @@
 
 export type DomainCM = {
     name: string;
-    host: string;
-    port: number;
-    username: string;
-    password: string;
+    relayId?: number | null;
 };
 

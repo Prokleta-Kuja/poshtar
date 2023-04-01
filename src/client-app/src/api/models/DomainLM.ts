@@ -5,9 +5,8 @@
 export type DomainLM = {
     id: number;
     name: string;
-    username: string;
-    host: string;
-    port: number;
+    relayId?: number | null;
+    relayName?: string | null;
     disabled?: string | null;
     addressCount: number;
 };

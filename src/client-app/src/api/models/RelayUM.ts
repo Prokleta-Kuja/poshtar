@@ -2,9 +2,12 @@
 /* tslint:disable */
 /* eslint-disable */
 
-export type DomainUM = {
+export type RelayUM = {
     name: string;
-    relayId?: number | null;
+    host: string;
+    port: number;
+    username: string;
+    newPassword?: string | null;
     disabled?: boolean | null;
 };
 

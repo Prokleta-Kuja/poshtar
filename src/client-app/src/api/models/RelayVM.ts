@@ -2,10 +2,12 @@
 /* tslint:disable */
 /* eslint-disable */
 
-export type DomainVM = {
+export type RelayVM = {
     id: number;
-    relayId?: number | null;
     name: string;
+    host: string;
+    port: number;
+    username: string;
     disabled?: string | null;
 };
 

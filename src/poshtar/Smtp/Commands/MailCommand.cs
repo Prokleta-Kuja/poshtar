@@ -69,6 +69,12 @@ public class MailCommand : Command
                 await ctx.Pipe.Output.WriteReplyAsync(Response.MailboxNameNotAllowed, cancellationToken).ConfigureAwait(false);
                 return false;
             }
+
+            var senderDomain = await ctx.Db.Domains
+                .AsNoTracking()
+                .SingleOrDefaultAsync(d => d.Name.Equals(Address.Host.ToLower()), cancellationToken);
+
+            ctx.CanRelay = senderDomain?.RelayId.HasValue ?? false;
         }
         else
         {

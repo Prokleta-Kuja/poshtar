@@ -33,6 +33,7 @@ public partial class AppDbContext : DbContext, IDataProtectionKeyContext
     public DbSet<DataProtectionKey> DataProtectionKeys { get; set; } = null!;
     public DbSet<Address> Addresses => Set<Address>();
     public DbSet<Domain> Domains => Set<Domain>();
+    public DbSet<Relay> Relays => Set<Relay>();
     public DbSet<User> Users => Set<User>();
     public DbSet<Transaction> Transactions => Set<Transaction>();
     public DbSet<LogEntry> Logs => Set<LogEntry>();
@@ -62,6 +63,13 @@ public partial class AppDbContext : DbContext, IDataProtectionKeyContext
         {
             e.HasKey(e => e.DomainId);
             e.HasIndex(e => e.Name);
+        });
+
+        builder.Entity<Relay>(e =>
+        {
+            e.HasKey(e => e.RelayId);
+            e.HasIndex(e => e.Name);
+            e.HasMany(e => e.Domains).WithOne(e => e.Relay).OnDelete(DeleteBehavior.SetNull);
         });
 
         builder.Entity<User>(e =>
@@ -117,23 +125,24 @@ public partial class AppDbContext : DbContext, IDataProtectionKeyContext
             return;
 
         // var serverProtector = dpProvider.CreateProtector(nameof(Domain));
-        var ica = new Domain
+        var fakeRelay = new Relay
         {
-            Name = "ica.hr",
+            Name = "Fake Relay",
             Host = "relay.ica.hr",
             Port = 587,
             Username = "fake",
             Password = "P@ssw0rd",
         };
+        var ica = new Domain
+        {
+            Name = "ica.hr",
+            Relay = fakeRelay,
+        };
         var nan = new Domain
         {
             Name = "nan.hr",
-            Host = "relay.nan.hr",
-            Port = 587,
-            Username = "fake",
-            Password = "P@ssw0rd",
         };
-        Domains.Add(nan);
+        Domains.AddRange(ica, nan);
 
         var admin = DovecotHasher.Hash("admin");
         var user = DovecotHasher.Hash("user");

@@ -7,6 +7,7 @@ export interface ISelectBox {
     modelValue?: number | null;
     help?: string;
     error?: string;
+    undefinedLabel?: string;
     options: { value: number, label: string }[];
 }
 
@@ -34,8 +35,12 @@ onMounted(() => {
 <template>
     <div>
         <label class="form-label" :for="state.id">{{ props.label }} <span v-if="required">*</span></label>
-        <select class="form-select" :class="{ 'is-invalid': error }" :id="state.id" :required="required" @input="update">
-            <option v-for="option in props.options" :key="option.value" :value="option.value">{{ option.label }}</option>
+        <select class="form-select" :class="{ 'is-invalid': error }" :id="state.id" :required="required" @input="update"
+            :value="modelValue">
+            <option v-if="props.undefinedLabel" value="">{{ props.undefinedLabel }}</option>
+            <option v-for="option in props.options" :key="option.value" :value="option.value">
+                {{ option.label }}
+            </option>
         </select>
         <div v-if="error" class="invalid-feedback">{{ error }}</div>
         <div v-else-if="help" class="form-text">{{ help }}</div>

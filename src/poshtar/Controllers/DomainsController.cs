@@ -15,13 +15,11 @@ public class DomainsController : ControllerBase
 {
     readonly ILogger<DomainsController> _logger;
     readonly AppDbContext _db;
-    readonly IDataProtectionProvider _dpp;
 
-    public DomainsController(ILogger<DomainsController> logger, AppDbContext db, IDataProtectionProvider dpp)
+    public DomainsController(ILogger<DomainsController> logger, AppDbContext db)
     {
         _logger = logger;
         _db = db;
-        _dpp = dpp;
     }
 
     [HttpGet(Name = "GetDomains")]
@@ -31,7 +29,7 @@ public class DomainsController : ControllerBase
         var query = _db.Domains.AsNoTracking();
 
         if (!string.IsNullOrWhiteSpace(req.SearchTerm))
-            query = query.Where(d => EF.Functions.Like(d.Name, $"%{req.SearchTerm}%") || EF.Functions.Like(d.Host, $"%{req.SearchTerm}%"));
+            query = query.Where(d => EF.Functions.Like(d.Name, $"%{req.SearchTerm}%"));
 
         if (req.AddressId.HasValue)
             query = query.Where(u => u.Addresses.Any(a => a.AddressId == req.AddressId.Value));
@@ -44,9 +42,7 @@ public class DomainsController : ControllerBase
             query = sortBy switch
             {
                 DomainsSortBy.Name => query.Order(d => d.Name, req.Ascending),
-                DomainsSortBy.Host => query.Order(d => d.Host, req.Ascending),
-                DomainsSortBy.Username => query.Order(d => d.Username, req.Ascending),
-                DomainsSortBy.Port => query.Order(d => d.Port, req.Ascending),
+                DomainsSortBy.RelayName => query.Order(d => d.Relay!.Name, req.Ascending),
                 DomainsSortBy.Disabled => query.Order(d => d.Disabled, req.Ascending),
                 DomainsSortBy.AddressCount => query.Order(d => d.Addresses.Count(), req.Ascending),
                 _ => query
@@ -54,13 +50,13 @@ public class DomainsController : ControllerBase
 
         var items = await query
             .Paginate(req)
+            .Include(d => d.Relay)
             .Select(d => new DomainLM
             {
                 Id = d.DomainId,
                 Name = d.Name,
-                Host = d.Host,
-                Username = d.Username,
-                Port = d.Port,
+                RelayId = d.RelayId,
+                RelayName = d.Relay!.Name,
                 Disabled = d.Disabled,
                 AddressCount = d.Addresses.Count,
             })
@@ -91,28 +87,26 @@ public class DomainsController : ControllerBase
     public async Task<IActionResult> CreateAsync(DomainCM model)
     {
         model.Name = model.Name.Trim().ToLower();
-        model.Host = model.Host.Trim().ToLower();
 
         if (model.IsInvalid(out var errorModel))
             return BadRequest(errorModel);
 
-        var isDuplicate = await _db.Domains
-            .AsNoTracking()
-            .Where(d => d.Name == model.Name)
-            .AnyAsync();
+        var isDuplicate = await _db.Domains.AsNoTracking().AnyAsync(d => d.Name == model.Name);
 
         if (isDuplicate)
             return BadRequest(new ValidationError(nameof(model.Name), "Already exists"));
 
-        var serverProtector = _dpp.CreateProtector(nameof(Domain));
+        if (model.RelayId.HasValue)
+        {
+            var validRelay = await _db.Relays.AsNoTracking().AnyAsync(r => r.RelayId == model.RelayId.Value);
+            if (!validRelay)
+                return BadRequest(new ValidationError(nameof(model.RelayId), "Invalid"));
+        }
 
         var domain = new Domain
         {
             Name = model.Name,
-            Host = model.Host,
-            Port = model.Port,
-            Username = model.Username,
-            Password = serverProtector.Protect(model.Password),
+            RelayId = model.RelayId,
         };
 
         _db.Domains.Add(domain);
@@ -135,7 +129,6 @@ public class DomainsController : ControllerBase
             return NotFound(new PlainError("Not found"));
 
         model.Name = model.Name.Trim().ToLower();
-        model.Host = model.Host.Trim().ToLower();
 
         if (model.IsInvalid(out var errorModel))
             return BadRequest(errorModel);
@@ -148,15 +141,15 @@ public class DomainsController : ControllerBase
         if (isDuplicate)
             return BadRequest(new ValidationError(nameof(model.Name), "Already exists"));
 
-        domain.Name = model.Name;
-        domain.Host = model.Host;
-        domain.Port = model.Port;
-        domain.Username = model.Username;
-        if (!string.IsNullOrWhiteSpace(model.NewPassword))
+        if (model.RelayId.HasValue)
         {
-            var serverProtector = _dpp.CreateProtector(nameof(Domain));
-            domain.Password = serverProtector.Protect(model.NewPassword);
+            var validRelay = await _db.Relays.AsNoTracking().AnyAsync(r => r.RelayId == model.RelayId.Value);
+            if (!validRelay)
+                return BadRequest(new ValidationError(nameof(model.RelayId), "Invalid"));
         }
+
+        domain.Name = model.Name;
+        domain.RelayId = model.RelayId;
         if (model.Disabled.HasValue)
             domain.Disabled = model.Disabled.Value ? domain.Disabled.HasValue ? domain.Disabled : DateTime.UtcNow : null;
 
@@ -195,9 +188,7 @@ public class DomainQuery : FilterQuery
 public enum DomainsSortBy
 {
     Name = 0,
-    Host = 1,
-    Username = 2,
-    Port = 3,
+    RelayName = 1,
     Disabled = 4,
     AddressCount = 5,
 }

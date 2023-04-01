@@ -4,10 +4,10 @@ import App from './App.vue'
 import Index from './pages/Index.vue'
 import Login from './pages/Login.vue'
 import Logout from './pages/Logout.vue'
-import Domains from './pages/Domains.vue'
-import DomainDetails from './pages/DomainDetails.vue'
 import Users from './pages/Users.vue'
 import UserDetails from './pages/UserDetails.vue'
+import Domains from './pages/Domains.vue'
+import DomainDetails from './pages/DomainDetails.vue'
 import { createPinia } from 'pinia'
 import { useAuth } from './stores/auth.store'
 
@@ -42,17 +42,6 @@ const router = createRouter({
       component: Logout
     },
     {
-      path: '/domains',
-      name: 'route.domains',
-      component: Domains
-    },
-    {
-      path: '/domains/:id(\\d+)',
-      name: 'route.domainDetails',
-      component: DomainDetails,
-      props: parseId
-    },
-    {
       path: '/users',
       name: 'route.users',
       component: Users
@@ -61,6 +50,17 @@ const router = createRouter({
       path: '/users/:id(\\d+)',
       name: 'route.userDetails',
       component: UserDetails,
+      props: parseId
+    },
+    {
+      path: '/domains',
+      name: 'route.domains',
+      component: Domains
+    },
+    {
+      path: '/domains/:id(\\d+)',
+      name: 'route.domainDetails',
+      component: DomainDetails,
       props: parseId
     },
     { path: '/:pathMatch(.*)*', name: 'NotFound', component: Index } // NotFound
