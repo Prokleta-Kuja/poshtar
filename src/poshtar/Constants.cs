@@ -1,5 +1,6 @@
 using System.Globalization;
 using System.Net;
+using System.Security.Authentication;
 using poshtar.Services;
 
 namespace poshtar;
@@ -51,6 +52,13 @@ public static class C
             Locale = CultureInfo.InvariantCulture;
         }
 
+    }
+    public static class Smtp
+    {
+        public const int RELAY_PORT = 25;
+        public const int EXPLICIT_SUBMISSION_PORT = 5587;
+        public const int IMPLICIT_SUBMISSION_PORT = 5465;
+        public static readonly SslProtocols TLS_PROTOCOLS = SslProtocols.Tls13 | SslProtocols.Tls12;
     }
     public static class Dovecot
     {

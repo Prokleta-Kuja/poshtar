@@ -1,5 +1,4 @@
 using System.Net;
-using System.Security.Authentication;
 using System.Security.Cryptography.X509Certificates;
 
 namespace poshtar.Smtp;
@@ -11,17 +10,11 @@ public class EndpointDefinition
         Endpoint = new IPEndPoint(IPAddress.Any, port);
         ServerCertificate = cert;
         ReadTimeout = TimeSpan.FromMinutes(2);
-        SupportedSslProtocols = SslProtocols.Tls13 | SslProtocols.Tls12;
     }
     /// <summary>
     /// The IP endpoint to listen on.
     /// </summary>
     public IPEndPoint Endpoint { get; set; }
-
-    /// <summary>
-    /// Gets a value indicating whether the client must authenticate in order to proceed.
-    /// </summary>
-    public bool AuthenticationRequired { get; set; }
 
     /// <summary>
     /// The timeout on each individual buffer read.
@@ -32,9 +25,4 @@ public class EndpointDefinition
     /// Gets the Server Certificate to use when starting a TLS session.
     /// </summary>
     public X509Certificate ServerCertificate { get; set; }
-
-    /// <summary>
-    /// The supported SSL protocols.
-    /// </summary>
-    public SslProtocols SupportedSslProtocols { get; set; }
 }

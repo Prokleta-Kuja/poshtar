@@ -16,6 +16,7 @@
 	],
 	"appPort": [
 		"0.0.0.0:5025:5025",
+		"0.0.0.0:5465:5465",
 		"0.0.0.0:5587:5587",
 		"0.0.0.0:5143:5143",
 		"0.0.0.0:5993:5993"
@@ -32,6 +33,12 @@
 		},
 		"5443": {
 			"protocol": "https"
+		},
+		"5465": {
+			"label": "Submission implicit",
+			"onAutoForward": "notify",
+			"requireLocalPort": true,
+			"elevateIfNeeded": true
 		},
 		"5587": {
 			"label": "Submission explicit",

@@ -29,16 +29,15 @@ public class Server
     /// <returns>A task which performs the operation.</returns>
     public async Task StartAsync(X509Certificate2 cert, CancellationToken cancellationToken)
     {
-        var smtpEndpoint = new EndpointDefinition(5025, cert);
-        var submissionEndpoint = new EndpointDefinition(5587, cert)
-        {
-            AuthenticationRequired = true,
-        };
+        var smtpEndpoint = new EndpointDefinition(C.Smtp.RELAY_PORT, cert);
+        var implicitSubmissionEndpoint = new EndpointDefinition(C.Smtp.IMPLICIT_SUBMISSION_PORT, cert);
+        var explicitSubmissionEndpoint = new EndpointDefinition(C.Smtp.EXPLICIT_SUBMISSION_PORT, cert);
 
         var tasks = new List<Task>
         {
             ListenAsync(smtpEndpoint, cancellationToken),
-            ListenAsync(submissionEndpoint, cancellationToken),
+            ListenAsync(implicitSubmissionEndpoint, cancellationToken),
+            ListenAsync(explicitSubmissionEndpoint, cancellationToken),
         };
 
         await Task.WhenAll(tasks).ConfigureAwait(false);

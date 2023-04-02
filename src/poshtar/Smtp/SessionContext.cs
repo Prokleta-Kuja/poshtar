@@ -7,7 +7,7 @@ public class SessionContext : IDisposable
 {
     public Guid ConnectionId { get; set; } = Guid.NewGuid();
     public Transaction Transaction { get; private set; }
-    public bool IsSubmissionPort;
+    public bool IsSubmissionPort { get; }
     public bool CanRelay;
     public IServiceScope ServiceScope { get; }
     public AppDbContext Db { get; }
@@ -21,7 +21,8 @@ public class SessionContext : IDisposable
     {
         ServiceScope = serviceProvider.CreateScope();
         EndpointDefinition = endpointDefinition;
-        IsSubmissionPort = endpointDefinition.AuthenticationRequired;
+        IsSubmissionPort = endpointDefinition.Endpoint.Port == C.Smtp.EXPLICIT_SUBMISSION_PORT ||
+                           endpointDefinition.Endpoint.Port == C.Smtp.IMPLICIT_SUBMISSION_PORT;
         Properties = new();
 
         Db = ServiceScope.ServiceProvider.GetRequiredService<AppDbContext>();

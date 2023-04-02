@@ -78,3 +78,9 @@ Test
 ```
 openssl s_client -quiet -crlf -connect localhost:5993
 ```
+
+## Thunderbird
+
+- 5993 SSL/TLS
+- 5465 SSL/TLS
+- 5587 STARTTLS
