@@ -30,12 +30,15 @@ public class Server
     public async Task StartAsync(X509Certificate2 cert, CancellationToken cancellationToken)
     {
         var smtpEndpoint = new EndpointDefinition(5025, cert);
-        var submissionEndpoint = new EndpointDefinition(5587, cert);
+        var submissionEndpoint = new EndpointDefinition(5587, cert)
+        {
+            AuthenticationRequired = true,
+        };
 
         var tasks = new List<Task>
         {
-            ListenAsync(smtpEndpoint,cancellationToken),
-            ListenAsync(submissionEndpoint,cancellationToken),
+            ListenAsync(smtpEndpoint, cancellationToken),
+            ListenAsync(submissionEndpoint, cancellationToken),
         };
 
         await Task.WhenAll(tasks).ConfigureAwait(false);

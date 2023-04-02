@@ -31,12 +31,12 @@ public class MailCommand : Command
 
         // check if a size has been defined
         var size = GetMessageSize();
-        var sizeLog = size == default ? string.Empty : $"SIZE={size} ({size / 1024 / 1024:0.00}MB)";
+        var sizeLog = size == default ? string.Empty : $" SIZE={size} ({size / 1024 / 1024:0.00}MB)";
 
         if (!string.IsNullOrWhiteSpace(ctx.Transaction.From))
             ctx.ResetTransaction();
 
-        ctx.Log($"MAIL FROM:{Address} {sizeLog}");
+        ctx.Log($"MAIL FROM:{Address}{sizeLog}");
         ctx.Transaction.From = Address.ToString();
 
         // check against the server supplied maximum

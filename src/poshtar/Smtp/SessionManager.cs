@@ -37,7 +37,7 @@ public class SessionManager
     static async Task UpgradeAsync(SessionHandle handle, CancellationToken cancellationToken)
     {
         var endpoint = handle.SessionContext.EndpointDefinition;
-        if (endpoint.IsSecure && endpoint.ServerCertificate != null)
+        if (endpoint.ServerCertificate != null)
             await handle.SessionContext.Pipe!.UpgradeAsync(endpoint.ServerCertificate, endpoint.SupportedSslProtocols, cancellationToken).ConfigureAwait(false);
     }
 

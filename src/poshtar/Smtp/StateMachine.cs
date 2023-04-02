@@ -73,7 +73,7 @@ public class StateTable : IEnumerable
                 { RsetCommand.Command },
                 { QuitCommand.Command },
                 { StartTlsCommand.Command, CanAcceptStartTls, StateId.WaitingForMailSecure },
-                { AuthCommand.Command, context => context.EndpointDefinition.AllowUnsecureAuthentication && context.IsAuthenticated == false },
+                // { AuthCommand.Command, context => context.EndpointDefinition.AllowUnsecureAuthentication && context.IsAuthenticated == false },
                 { HeloCommand.Command, StateId.WaitingForMail },
                 { EhloCommand.Command, StateId.WaitingForMail },
                 { MailCommand.Command, StateId.WithinTransaction }

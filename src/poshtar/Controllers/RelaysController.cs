@@ -85,7 +85,6 @@ public class RelaysController : ControllerBase
     [ProducesResponseType(typeof(ValidationError), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> CreateAsync(RelayCM model)
     {
-        model.Name = model.Name.Trim().ToLower();
         model.Host = model.Host.Trim().ToLower();
 
         if (model.IsInvalid(out var errorModel))
@@ -129,7 +128,6 @@ public class RelaysController : ControllerBase
         if (relay == null)
             return NotFound(new PlainError("Not found"));
 
-        model.Name = model.Name.Trim().ToLower();
         model.Host = model.Host.Trim().ToLower();
 
         if (model.IsInvalid(out var errorModel))

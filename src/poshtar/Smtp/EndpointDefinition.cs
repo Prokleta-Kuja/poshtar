@@ -19,19 +19,9 @@ public class EndpointDefinition
     public IPEndPoint Endpoint { get; set; }
 
     /// <summary>
-    /// Indicates whether the endpoint is secure by default.
-    /// </summary>
-    public bool IsSecure { get; set; }
-
-    /// <summary>
     /// Gets a value indicating whether the client must authenticate in order to proceed.
     /// </summary>
     public bool AuthenticationRequired { get; set; }
-
-    /// <summary>
-    /// Gets a value indicating whether authentication should be allowed on an unsecure session.
-    /// </summary>
-    public bool AllowUnsecureAuthentication { get; set; }
 
     /// <summary>
     /// The timeout on each individual buffer read.
