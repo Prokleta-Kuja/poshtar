@@ -22,7 +22,7 @@ public static class DovecotConfiguration
 ssl=required
 ssl_cert = <{C.Paths.CertCrt}
 ssl_key = <{C.Paths.CertKey}
-protocols = imap sieve
+protocols = imap
 mail_home = {C.Paths.MailData}/%Ln
 mail_location = maildir:~/mail
 auth_master_user_separator = *

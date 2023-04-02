@@ -1,5 +1,6 @@
 # TODO
 
+- a way to see dovecot log
 - loading indicator na stranicama
 - Toasts
 
