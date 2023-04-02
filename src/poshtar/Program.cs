@@ -110,6 +110,8 @@ public class Program
                 o.WorkerCount = Math.Max(2, Environment.ProcessorCount / 2);
             });
 
+            builder.Services.AddHttpClient<HibpService>();
+
             var app = builder.Build();
             await Initialize(app.Services);
             await app.UseDovecotAsync();

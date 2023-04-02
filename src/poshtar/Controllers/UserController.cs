@@ -16,13 +16,13 @@ public class UsersController : ControllerBase
 {
     readonly ILogger<UsersController> _logger;
     readonly AppDbContext _db;
-    readonly IDataProtectionProvider _dpp;
+    readonly HibpService _hibp;
 
-    public UsersController(ILogger<UsersController> logger, AppDbContext db, IDataProtectionProvider dpp)
+    public UsersController(ILogger<UsersController> logger, AppDbContext db, HibpService hibp)
     {
         _logger = logger;
         _db = db;
-        _dpp = dpp;
+        _hibp = hibp;
     }
 
     [HttpGet(Name = "GetUsers")]
@@ -105,6 +105,10 @@ public class UsersController : ControllerBase
         if (isDuplicate)
             return BadRequest(new ValidationError(nameof(model.Name), "Already exists"));
 
+        var hibpResult = await _hibp.CheckAsync(model.Password);
+        if (!string.IsNullOrWhiteSpace(hibpResult))
+            return BadRequest(new ValidationError(nameof(model.Password), hibpResult));
+
         var result = DovecotHasher.Hash(model.Password);
         var user = new User
         {
@@ -155,6 +159,10 @@ public class UsersController : ControllerBase
         user.Quota = model.Quota * 1024 * 1024;
         if (!string.IsNullOrWhiteSpace(model.NewPassword))
         {
+            var hibpResult = await _hibp.CheckAsync(model.NewPassword);
+            if (!string.IsNullOrWhiteSpace(hibpResult))
+                return BadRequest(new ValidationError(nameof(model.NewPassword), hibpResult));
+
             var result = DovecotHasher.Hash(model.NewPassword);
             user.Salt = result.Salt;
             user.Hash = result.Hash;

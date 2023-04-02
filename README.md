@@ -1,10 +1,7 @@
 # TODO
 
-- dovecot log has some index errors
 - loading indicator na stranicama
 - Toasts
-- one outgoing smtp for multiple domains
-- password checking and generation https://api.pwnedpasswords.com/ https://haveibeenpwned.com/API/v2
 
 # Important dovecot conf
 

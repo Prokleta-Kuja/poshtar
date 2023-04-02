@@ -33,7 +33,8 @@ RUN set -eux; \
     passwd -l vmail \
     ; \
     update-rc.d dovecot disable && \
-    rm -rf /var/lib/apt/lists /etc/dovecot
+    rm -rf /var/lib/apt/lists /etc/dovecot && \
+    echo "alias ll='ls -hal'" >> ~/.bashrc;
 
 ENV ASPNETCORE_URLS=http://*:5080 \
     LOCALE=en-US \
