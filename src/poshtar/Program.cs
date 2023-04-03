@@ -167,7 +167,7 @@ public class Program
         Directory.CreateDirectory(C.Paths.CertData);
         Directory.CreateDirectory(C.Paths.ConfigData);
         Directory.CreateDirectory(C.Paths.DovecotData);
-        Directory.CreateDirectory(C.Paths.MailData);
+        Directory.CreateDirectory(C.Paths.UserData);
         Directory.CreateDirectory(C.Paths.QueueData);
 
         if (string.IsNullOrWhiteSpace(C.Hostname))

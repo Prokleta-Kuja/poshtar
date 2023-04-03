@@ -55,7 +55,7 @@ public static class C
     }
     public static class Smtp
     {
-        public const int RELAY_PORT = 25;
+        public const int RELAY_PORT = 5025;
         public const int EXPLICIT_SUBMISSION_PORT = 5587;
         public const int IMPLICIT_SUBMISSION_PORT = 5465;
         public static readonly SslProtocols TLS_PROTOCOLS = SslProtocols.Tls13 | SslProtocols.Tls12;
@@ -83,8 +83,8 @@ public static class C
         public static string DovecotDataFor(string file) => Path.Combine(DovecotData, file);
         public static readonly string QueueData = $"{Root}/queue";
         public static string QueueDataFor(string file) => Path.Combine(QueueData, file);
-        public static readonly string MailData = $"{Root}/mail";
-        public static string MailDataFor(string file) => Path.Combine(MailData, file);
+        public static readonly string UserData = $"{Root}/users";
+        public static string UserDataFor(string file) => Path.Combine(UserData, file);
         public static readonly string CertCrt = CertDataFor(CRT_FILE);
         public static readonly string CertKey = CertDataFor(KEY_FILE);
         public static readonly string Sqlite = ConfigDataFor("app.db");

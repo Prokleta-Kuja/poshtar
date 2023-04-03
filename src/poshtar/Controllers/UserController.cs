@@ -192,7 +192,7 @@ public class UsersController : ControllerBase
         _db.Users.Remove(user);
         await _db.SaveChangesAsync();
 
-        var messageDir = C.Paths.MailDataFor(user.Name);
+        var messageDir = C.Paths.UserDataFor(user.Name);
         Directory.Delete(messageDir, true);
 
         await transaction.CommitAsync();
