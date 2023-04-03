@@ -78,7 +78,7 @@ public class AuthController : ControllerBase
         var expires = DateTime.UtcNow.AddHours(1);
         var claims = new List<Claim> { new(ClaimTypes.Name, user.Name), new(ClaimTypes.Sid, user.UserId.ToString()), new(ClaimTypes.Expiration, expires.ToBinary().ToString()) };
         if (user.IsMaster)
-            claims.Add(new Claim(ClaimTypes.Role, "master"));
+            claims.Add(new Claim(ClaimTypes.Role, C.MASTER_ROLE));
 
         var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
         var authProperties = new AuthenticationProperties { AllowRefresh = false, ExpiresUtc = expires, IsPersistent = true };

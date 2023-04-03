@@ -50,6 +50,16 @@ auth.initialize()
             <hr class="d-lg-none text-white-50">
             <ul class="navbar-nav flex-row flex-wrap ms-md-auto">
               <li class="nav-item col-6 col-lg-auto" data-bs-target="#appNavbar" data-bs-dismiss="offcanvas">
+                <a class="nav-link py-2 px-0 px-lg-2" href="/jobs" title="Jobs">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                    class="bi bi-calendar-range-fill" viewBox="0 0 16 16">
+                    <path
+                      d="M4 .5a.5.5 0 0 0-1 0V1H2a2 2 0 0 0-2 2v1h16V3a2 2 0 0 0-2-2h-1V.5a.5.5 0 0 0-1 0V1H4V.5zM16 7V5H0v5h5a1 1 0 1 1 0 2H0v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9h-6a1 1 0 1 1 0-2h6z" />
+                  </svg>
+                </a>
+                <small class="d-lg-none ms-2">Jobs</small>
+              </li>
+              <li class="nav-item col-6 col-lg-auto" data-bs-target="#appNavbar" data-bs-dismiss="offcanvas">
                 <DovecotIndicator />
               </li>
               <li class="nav-item py-2 py-lg-1 col-12 col-lg-auto">

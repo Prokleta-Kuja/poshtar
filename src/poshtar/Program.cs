@@ -131,7 +131,7 @@ public class Program
             app.UseAuthentication();
             app.UseAuthorization();
 
-            app.UseHangfireDashboard();
+            app.UseJobDashboard();
             app.ReregisterRecurringJobs();
 
             app.MapControllers().RequireAuthorization();

@@ -1,5 +1,4 @@
 using System.Globalization;
-using System.Net;
 using System.Security.Authentication;
 using poshtar.Services;
 
@@ -15,6 +14,7 @@ public static class C
     public static readonly int Gid;
     public static readonly string Hostname;
     public static readonly int MaxMessageSize;
+    public const string MASTER_ROLE = "master";
     public static readonly string PostgresConnectionString;
     public static readonly string MysqlConnectionString;
     public static readonly DbContextType DbContextType;
@@ -67,10 +67,6 @@ public static class C
         public const int SECURE_PORT = 5993;
         public static readonly string MasterUser = "master-poshtar";
         public static readonly string MasterPassword = SecretGenerator.Password(24);
-    }
-    public static class CacheKeys
-    {
-        public static string FailedAuthCountFor(IPEndPoint ip) => $"IpFailedAuthCount-{ip.Address}";
     }
     public static class Paths
     {
