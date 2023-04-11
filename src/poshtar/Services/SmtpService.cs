@@ -1,4 +1,5 @@
 using System.Security.Cryptography.X509Certificates;
+using Serilog;
 
 namespace poshtar.Services;
 
@@ -8,6 +9,7 @@ public static class SmtpService
     static Smtp.Server? s_server;
     static CancellationTokenSource s_cts = new();
     static Task? s_serverTask;
+    static readonly TimeSpan s_maxWait = TimeSpan.FromSeconds(5);
     public static void UseSmtp(this WebApplication app)
     {
         s_provider = app.Services;
@@ -36,13 +38,19 @@ public static class SmtpService
         var cert = X509Certificate2.CreateFromPemFile(C.Paths.CertCrt, C.Paths.CertKey);
         s_server = new Smtp.Server(s_provider);
         s_serverTask = s_server.StartAsync(cert, token);
+        Log.Information("SMTP server started");
     }
     static void Stop()
     {
         s_server?.Shutdown();
         try
         {
-            s_server?.ShutdownTask?.Wait();
+            var listenerComplete = s_server?.ShutdownTask?.Wait(s_maxWait);
+            if (!listenerComplete ?? false)
+            {
+                Log.Warning("SMTP server listeners didn't shut down in timely manner");
+                s_cts.Cancel();
+            }
         }
         catch (AggregateException e)
         {
@@ -50,7 +58,12 @@ public static class SmtpService
         }
         try
         {
-            s_serverTask?.Wait();
+            var sessionsComplete = s_serverTask?.Wait(s_maxWait);
+            if (!sessionsComplete ?? false)
+            {
+                Log.Warning("SMTP server sessions didn't shut down in timely manner");
+                s_cts.Cancel();
+            }
         }
         catch (AggregateException e)
         {

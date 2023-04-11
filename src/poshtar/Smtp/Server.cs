@@ -76,7 +76,7 @@ public class Server
             try
             {
                 // wait for a client connection
-                sessionContext.Pipe = await endpointListener.GetPipeAsync(sessionContext, cancellationToken).ConfigureAwait(false);
+                sessionContext.Pipe = await endpointListener.GetPipeAsync(sessionContext, cancellationTokenSource.Token).ConfigureAwait(false);
             }
             catch (OperationCanceledException) { }
             catch (Exception)
@@ -85,7 +85,7 @@ public class Server
             }
 
             if (sessionContext.Pipe != null)
-                _sessions.Run(sessionContext, cancellationTokenSource.Token);
+                _sessions.Run(sessionContext, cancellationToken);
         }
     }
 
