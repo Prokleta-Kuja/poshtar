@@ -4,6 +4,9 @@ public class Transaction
 {
     public int TransactionId { get; set; }
     public Guid ConnectionId { get; set; }
+    public bool Submission { get; set; }
+    public string? IpAddress { get; set; }
+    public string? Country { get; set; }
     public DateTime Start { get; set; }
     public DateTime End { get; set; }
     public string? Client { get; set; }

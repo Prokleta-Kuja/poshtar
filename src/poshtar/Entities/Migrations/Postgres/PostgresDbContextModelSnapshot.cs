@@ -17,7 +17,7 @@ namespace poshtar.Entities.Migrations.Postgres
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "7.0.4")
+                .HasAnnotation("ProductVersion", "7.0.5")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
@@ -279,6 +279,10 @@ namespace poshtar.Entities.Migrations.Postgres
                         .HasColumnType("uuid")
                         .HasColumnName("connection_id");
 
+                    b.Property<string>("Country")
+                        .HasColumnType("text")
+                        .HasColumnName("country");
+
                     b.Property<DateTime>("End")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("end");
@@ -291,6 +295,10 @@ namespace poshtar.Entities.Migrations.Postgres
                         .HasColumnType("integer")
                         .HasColumnName("from_user_id");
 
+                    b.Property<string>("IpAddress")
+                        .HasColumnType("text")
+                        .HasColumnName("ip_address");
+
                     b.Property<bool>("Secure")
                         .HasColumnType("boolean")
                         .HasColumnName("secure");
@@ -298,6 +306,10 @@ namespace poshtar.Entities.Migrations.Postgres
                     b.Property<DateTime>("Start")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("start");
+
+                    b.Property<bool>("Submission")
+                        .HasColumnType("boolean")
+                        .HasColumnName("submission");
 
                     b.HasKey("TransactionId")
                         .HasName("pk_transactions");

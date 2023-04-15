@@ -17,9 +17,6 @@ namespace poshtar;
 
 public class Program
 {
-    public static string CertCrt { get; private set; } = string.Empty;
-    public static string CertKey { get; private set; } = string.Empty;
-
     public static async Task<int> Main(string[] args)
     {
         Log.Logger = new LoggerConfiguration()
@@ -45,7 +42,6 @@ public class Program
                 case DbContextType.SQLite: builder.Services.AddDbContext<AppDbContext, SqliteDbContext>(); break;
             }
 
-            // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen(options =>
             {
@@ -111,6 +107,7 @@ public class Program
             });
 
             builder.Services.AddHttpClient<HibpService>();
+            builder.Services.AddSingleton<IpService>();
 
             var app = builder.Build();
             await Initialize(app.Services);

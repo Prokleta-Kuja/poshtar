@@ -5,6 +5,9 @@
 export type TransactionLM = {
     id: number;
     connectionId: string;
+    submission: boolean;
+    ipAddress?: string | null;
+    country?: string | null;
     start: string;
     end: string;
     client?: string | null;

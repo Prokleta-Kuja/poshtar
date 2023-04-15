@@ -1,5 +1,6 @@
 using System.Net;
 using poshtar.Entities;
+using poshtar.Services;
 
 namespace poshtar.Smtp;
 
@@ -11,6 +12,7 @@ public class SessionContext : IDisposable
     public bool CanRelay;
     public IServiceScope ServiceScope { get; }
     public AppDbContext Db { get; }
+    public IpService IpSvc { get; }
     public EndpointDefinition EndpointDefinition { get; }
     public IPEndPoint? RemoteEndpoint { get; set; }
     public SecurableDuplexPipe? Pipe { get; set; }
@@ -26,21 +28,32 @@ public class SessionContext : IDisposable
         Properties = new();
 
         Db = ServiceScope.ServiceProvider.GetRequiredService<AppDbContext>();
-        Transaction = new() { ConnectionId = ConnectionId, Start = DateTime.MaxValue };
+        Transaction = new() { ConnectionId = ConnectionId, Submission = IsSubmissionPort, Start = DateTime.MaxValue };
         Db.Transactions.Add(Transaction);
+        IpSvc = ServiceScope.ServiceProvider.GetRequiredService<IpService>();
     }
     public void ResetTransaction()
     {
-        Transaction.End = DateTime.UtcNow;
+        FinishCurrentTransaction();
         Transaction = new()
         {
             ConnectionId = ConnectionId,
+            Submission = Transaction.Submission,
+            IpAddress = Transaction.IpAddress,
+            Country = Transaction.Country,
             Start = DateTime.UtcNow,
             Client = Transaction.Client,
             FromUser = Transaction.FromUser,
             FromUserId = Transaction.FromUserId,
+            Secure = Transaction.Secure,
         };
         Db.Transactions.Add(Transaction);
+    }
+    void FinishCurrentTransaction()
+    {
+        Transaction.End = DateTime.UtcNow;
+        if (string.IsNullOrWhiteSpace(Transaction.IpAddress) && RemoteEndpoint != null)
+            Transaction.IpAddress = RemoteEndpoint.Address?.ToString();
     }
     public void Log(string message, object? properties = null) => Transaction.Logs.Add(new(message, properties));
     public void Dispose()
@@ -48,7 +61,7 @@ public class SessionContext : IDisposable
         Pipe?.Dispose();
         if (Db != null)
         {
-            Transaction.End = DateTime.UtcNow;
+            FinishCurrentTransaction();
             if (Db.ChangeTracker.HasChanges())
                 Db.SaveChanges();
             Db.Dispose();

@@ -1,5 +1,3 @@
-using System.Text.Json;
-using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using poshtar.Entities;
@@ -57,6 +55,9 @@ public class TransactionsController : ControllerBase
             {
                 Id = t.TransactionId,
                 ConnectionId = t.ConnectionId,
+                Submission = t.Submission,
+                IpAddress = t.IpAddress,
+                Country = t.Country,
                 Start = t.Start,
                 End = t.End,
                 Client = t.Client,

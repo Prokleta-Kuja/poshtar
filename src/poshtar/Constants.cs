@@ -15,11 +15,13 @@ public static class C
     public static readonly string Hostname;
     public static readonly int MaxMessageSize;
     public const string MASTER_ROLE = "master";
+    public static readonly string MonitoringIp;
     public static readonly string PostgresConnectionString;
     public static readonly string MysqlConnectionString;
     public static readonly DbContextType DbContextType;
     public static readonly TimeZoneInfo TZ;
     public static readonly CultureInfo Locale;
+    public static readonly string[] PrivateIpRanges = new string[] { "192.168.0.0/16", "172.16.0.0/12", "10.0.0.0/8" };
     static C()
     {
         IsDebug = Environment.GetEnvironmentVariable("DEBUG") == "1";
@@ -28,6 +30,7 @@ public static class C
         Gid = int.TryParse(Environment.GetEnvironmentVariable("GID"), out var gid) ? gid : 1000;
         Hostname = Environment.GetEnvironmentVariable("HOSTNAME") ?? string.Empty;
         MaxMessageSize = int.TryParse(Environment.GetEnvironmentVariable("MAX_MESSAGE_SIZE_MB"), out var maxMessageSize) ? maxMessageSize * 1024 * 1024 : 0;
+        MonitoringIp = Environment.GetEnvironmentVariable("MONITORING_IP") ?? string.Empty;
         PostgresConnectionString = Environment.GetEnvironmentVariable("POSTGRES") ?? string.Empty;
         MysqlConnectionString = Environment.GetEnvironmentVariable("MYSQL") ?? string.Empty;
         DbContextType = !string.IsNullOrWhiteSpace(PostgresConnectionString) ? DbContextType.PostgreSQL :
@@ -85,6 +88,7 @@ public static class C
         public static readonly string CertKey = CertDataFor(KEY_FILE);
         public static readonly string Sqlite = ConfigDataFor("app.db");
         public static readonly string Hangfire = ConfigDataFor("queue.db");
+        public static readonly string MaxMindDb = ConfigDataFor("GeoLite2-Country.mmdb");
         public static readonly string AppDbConnectionString = $"Data Source={Sqlite}";
         public static readonly string HangfireConnectionString = $"Data Source={Hangfire}";
     }

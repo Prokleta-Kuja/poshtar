@@ -33,9 +33,11 @@ public class EndpointListener : IDisposable
 
         if (tcpClient.Client.RemoteEndPoint is IPEndPoint ip)
         {
-            context.Transaction.Start = DateTime.UtcNow;
-            context.Log($"Connection established with: {ip.Address}");
             context.RemoteEndpoint = ip;
+            context.Transaction.Start = DateTime.UtcNow;
+            context.Transaction.IpAddress = ip.Address.ToString();
+            context.Transaction.Country = context.IpSvc.GetCountry(context.Transaction.IpAddress);
+            context.Log($"Connection established with: {context.Transaction.IpAddress} ({context.Transaction.Country ?? "UNKNOWN"})");
         }
 
         var stream = tcpClient.GetStream();

@@ -16,7 +16,7 @@ namespace poshtar.Entities.Migrations.Mysql
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "7.0.4")
+                .HasAnnotation("ProductVersion", "7.0.5")
                 .HasAnnotation("Relational:MaxIdentifierLength", 64);
 
             modelBuilder.Entity("AddressUser", b =>
@@ -262,6 +262,10 @@ namespace poshtar.Entities.Migrations.Mysql
                         .HasColumnType("char(36)")
                         .HasColumnName("connection_id");
 
+                    b.Property<string>("Country")
+                        .HasColumnType("longtext")
+                        .HasColumnName("country");
+
                     b.Property<DateTime>("End")
                         .HasColumnType("datetime(6)")
                         .HasColumnName("end");
@@ -274,6 +278,10 @@ namespace poshtar.Entities.Migrations.Mysql
                         .HasColumnType("int")
                         .HasColumnName("from_user_id");
 
+                    b.Property<string>("IpAddress")
+                        .HasColumnType("longtext")
+                        .HasColumnName("ip_address");
+
                     b.Property<bool>("Secure")
                         .HasColumnType("tinyint(1)")
                         .HasColumnName("secure");
@@ -281,6 +289,10 @@ namespace poshtar.Entities.Migrations.Mysql
                     b.Property<DateTime>("Start")
                         .HasColumnType("datetime(6)")
                         .HasColumnName("start");
+
+                    b.Property<bool>("Submission")
+                        .HasColumnType("tinyint(1)")
+                        .HasColumnName("submission");
 
                     b.HasKey("TransactionId")
                         .HasName("pk_transactions");
