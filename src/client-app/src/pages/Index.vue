@@ -6,14 +6,17 @@ import TransactionRecipients from '@/lists/TransactionRecipients.vue';
 import Search from '@/components/form/SearchBox.vue'
 import { Header, Pages, Sizes, type ITableParams, initParams, updateParams } from "@/components/table"
 import { type TransactionLM, TransactionService } from '@/api';
+import CheckBox from '@/components/form/CheckBox.vue';
 
 interface ITransactionParams extends ITableParams {
     searchTerm?: string;
     connectionId?: string;
+    includeMonitor?: boolean;
+    includePrivate?: boolean;
 }
 
 const show = reactive<{ logsId?: number, recipientsId?: number }>({})
-const data = reactive<{ params: ITransactionParams, items: TransactionLM[] }>({ params: { ...initParams(), sortBy: "start" }, items: [] });
+const data = reactive<{ params: ITransactionParams, items: TransactionLM[] }>({ params: { ...initParams(), includePrivate: true, sortBy: "start" }, items: [] });
 const refresh = (params?: ITableParams) => {
     if (params)
         data.params = params;
@@ -69,8 +72,14 @@ refresh();
         <Sizes class="me-3 mb-2" style="max-width:8rem" :params="data.params" :on-change="refresh" />
         <Search autoFocus class="me-3 mb-2" style="max-width:16rem" placeholder="Client, from"
             v-model="data.params.searchTerm" :on-change="refresh" />
-        <Search class="me-3 mb-2" style="max-width:16rem" label="Connection Id" v-model="data.params.connectionId"
-            :on-change="refresh" />
+        <!-- <Search class="me-3 mb-2" style="max-width:16rem" label="Connection Id" v-model="data.params.connectionId" :on-change="refresh" /> -->
+        <div class="me-3 mb-2">
+            <label class="form-label">Include</label>
+            <div class="pt-1">
+                <CheckBox v-model="data.params.includeMonitor" label="Monitor" inline :onChange="refresh" />
+                <CheckBox v-model="data.params.includePrivate" label="Private" inline :onChange="refresh" />
+            </div>
+        </div>
     </div>
     <div class="table-responsive">
         <table class="table table-sm">

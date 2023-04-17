@@ -17,6 +17,8 @@ export class TransactionService {
      */
     public static getTransactions({
         connectionId,
+        includeMonitor,
+        includePrivate,
         size,
         page,
         ascending,
@@ -24,6 +26,8 @@ export class TransactionService {
         searchTerm,
     }: {
         connectionId?: string,
+        includeMonitor?: boolean,
+        includePrivate?: boolean,
         size?: number,
         page?: number,
         ascending?: boolean,
@@ -35,6 +39,8 @@ export class TransactionService {
             url: '/api/transactions',
             query: {
                 'connectionId': connectionId,
+                'includeMonitor': includeMonitor,
+                'includePrivate': includePrivate,
                 'size': size,
                 'page': page,
                 'ascending': ascending,

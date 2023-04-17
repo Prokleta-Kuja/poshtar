@@ -15,6 +15,8 @@ public static class C
     public static readonly string Hostname;
     public static readonly int MaxMessageSize;
     public const string MASTER_ROLE = "master";
+    public const string COUNTRY_CODE_MONITOR = "ZZ";
+    public const string COUNTRY_CODE_PRIVATE = "XX";
     public static readonly string MonitoringIp;
     public static readonly string PostgresConnectionString;
     public static readonly string MysqlConnectionString;

@@ -35,6 +35,12 @@ public class TransactionsController : ControllerBase
         if (req.ConnectionId.HasValue)
             query = query.Where(t => t.ConnectionId == req.ConnectionId);
 
+        if (!req.IncludeMonitor.HasValue || !req.IncludeMonitor.Value)
+            query = query.Where(t => t.CountryCode != C.COUNTRY_CODE_MONITOR);
+
+        if (!req.IncludePrivate.HasValue || !req.IncludePrivate.Value)
+            query = query.Where(t => t.CountryCode != C.COUNTRY_CODE_PRIVATE);
+
         var count = await query.CountAsync();
 
         if (!string.IsNullOrWhiteSpace(req.SortBy) && Enum.TryParse<TransactionsSortBy>(req.SortBy, true, out var sortBy))
@@ -162,6 +168,8 @@ public class TransactionsController : ControllerBase
 public class TransactionQuery : FilterQuery
 {
     public Guid? ConnectionId { get; set; }
+    public bool? IncludeMonitor { get; set; }
+    public bool? IncludePrivate { get; set; }
 }
 
 public enum TransactionsSortBy

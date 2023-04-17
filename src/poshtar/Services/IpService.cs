@@ -8,10 +8,10 @@ public class IpService
     public (string? code, string? name, string? asn) GetInfo(string ipAddress)
     {
         if (!string.IsNullOrWhiteSpace(C.MonitoringIp) && IsInRange(ipAddress, C.MonitoringIp))
-            return (code: "ZZ", name: C.MonitoringIp, asn: "Monitor");
+            return (code: C.COUNTRY_CODE_MONITOR, name: C.MonitoringIp, asn: "Monitor");
 
         if (C.PrivateIpRanges.Any(range => IsInRange(ipAddress, range)))
-            return (code: "XX", name: "Private range", asn: "LAN");
+            return (code: C.COUNTRY_CODE_PRIVATE, name: "Private range", asn: "LAN");
 
         (string? code, string? name, string? asn) result = new();
         if (File.Exists(C.Paths.MaxMindCountryDb))
