@@ -7,7 +7,9 @@ export type TransactionLM = {
     connectionId: string;
     submission: boolean;
     ipAddress?: string | null;
-    country?: string | null;
+    countryCode?: string | null;
+    countryName?: string | null;
+    asn?: string | null;
     start: string;
     end: string;
     client?: string | null;

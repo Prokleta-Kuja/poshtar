@@ -271,6 +271,10 @@ namespace poshtar.Entities.Migrations.Postgres
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("TransactionId"));
 
+                    b.Property<string>("Asn")
+                        .HasColumnType("text")
+                        .HasColumnName("asn");
+
                     b.Property<string>("Client")
                         .HasColumnType("text")
                         .HasColumnName("client");
@@ -279,9 +283,13 @@ namespace poshtar.Entities.Migrations.Postgres
                         .HasColumnType("uuid")
                         .HasColumnName("connection_id");
 
-                    b.Property<string>("Country")
+                    b.Property<string>("CountryCode")
                         .HasColumnType("text")
-                        .HasColumnName("country");
+                        .HasColumnName("country_code");
+
+                    b.Property<string>("CountryName")
+                        .HasColumnType("text")
+                        .HasColumnName("country_name");
 
                     b.Property<DateTime>("End")
                         .HasColumnType("timestamp with time zone")

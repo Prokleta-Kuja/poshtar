@@ -8,7 +8,9 @@ public class TransactionLM
     [Required] public required Guid ConnectionId { get; set; }
     [Required] public required bool Submission { get; set; }
     public string? IpAddress { get; set; }
-    public string? Country { get; set; }
+    public string? CountryCode { get; set; }
+    public string? CountryName { get; set; }
+    public string? Asn { get; set; }
     [Required] public required DateTime Start { get; set; }
     [Required] public required DateTime End { get; set; }
     public string? Client { get; set; }

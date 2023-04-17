@@ -252,6 +252,10 @@ namespace poshtar.Entities.Migrations.Sqlite
                         .HasColumnType("INTEGER")
                         .HasColumnName("transaction_id");
 
+                    b.Property<string>("Asn")
+                        .HasColumnType("TEXT")
+                        .HasColumnName("asn");
+
                     b.Property<string>("Client")
                         .HasColumnType("TEXT")
                         .HasColumnName("client");
@@ -260,9 +264,13 @@ namespace poshtar.Entities.Migrations.Sqlite
                         .HasColumnType("TEXT")
                         .HasColumnName("connection_id");
 
-                    b.Property<string>("Country")
+                    b.Property<string>("CountryCode")
                         .HasColumnType("TEXT")
-                        .HasColumnName("country");
+                        .HasColumnName("country_code");
+
+                    b.Property<string>("CountryName")
+                        .HasColumnType("TEXT")
+                        .HasColumnName("country_name");
 
                     b.Property<long>("End")
                         .HasColumnType("INTEGER")

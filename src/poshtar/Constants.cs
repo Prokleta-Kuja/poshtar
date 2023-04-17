@@ -88,7 +88,8 @@ public static class C
         public static readonly string CertKey = CertDataFor(KEY_FILE);
         public static readonly string Sqlite = ConfigDataFor("app.db");
         public static readonly string Hangfire = ConfigDataFor("queue.db");
-        public static readonly string MaxMindDb = ConfigDataFor("GeoLite2-Country.mmdb");
+        public static readonly string MaxMindAsnDb = ConfigDataFor("GeoLite2-ASN.mmdb");
+        public static readonly string MaxMindCountryDb = ConfigDataFor("GeoLite2-Country.mmdb");
         public static readonly string AppDbConnectionString = $"Data Source={Sqlite}";
         public static readonly string HangfireConnectionString = $"Data Source={Hangfire}";
     }

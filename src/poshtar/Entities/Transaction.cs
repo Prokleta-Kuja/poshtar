@@ -6,7 +6,9 @@ public class Transaction
     public Guid ConnectionId { get; set; }
     public bool Submission { get; set; }
     public string? IpAddress { get; set; }
-    public string? Country { get; set; }
+    public string? CountryCode { get; set; }
+    public string? CountryName { get; set; }
+    public string? Asn { get; set; }
     public DateTime Start { get; set; }
     public DateTime End { get; set; }
     public string? Client { get; set; }

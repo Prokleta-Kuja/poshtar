@@ -5,27 +5,36 @@ namespace poshtar.Services;
 
 public class IpService
 {
-    public string? GetCountry(string ipAddress)
+    public (string? code, string? name, string? asn) GetInfo(string ipAddress)
     {
         if (!string.IsNullOrWhiteSpace(C.MonitoringIp) && IsInRange(ipAddress, C.MonitoringIp))
-            return "ZZ";
+            return (code: "ZZ", name: C.MonitoringIp, asn: "Monitor");
 
         if (C.PrivateIpRanges.Any(range => IsInRange(ipAddress, range)))
-            return "XX";
+            return (code: "XX", name: "Private range", asn: "LAN");
 
-        if (!File.Exists(C.Paths.MaxMindDb))
-            return null;
+        (string? code, string? name, string? asn) result = new();
+        if (File.Exists(C.Paths.MaxMindCountryDb))
+            try
+            {
+                using var reader = new DatabaseReader(C.Paths.MaxMindCountryDb);
+                var response = reader.Country(ipAddress);
+                result.code = response?.Country?.IsoCode;
+                result.name = response?.Country?.Name;
+            }
+            catch (Exception) { }
 
-        try
-        {
-            using var reader = new DatabaseReader(C.Paths.MaxMindDb);
-            var response = reader.Country(ipAddress);
-            return response?.Country?.IsoCode;
-        }
-        catch (Exception)
-        {
-            return null;
-        }
+        var asn = string.Empty;
+        if (File.Exists(C.Paths.MaxMindAsnDb))
+            try
+            {
+                using var reader = new MaxMind.GeoIP2.DatabaseReader(C.Paths.MaxMindAsnDb);
+                var response = reader.Asn(ipAddress);
+                result.asn = response.AutonomousSystemOrganization;
+            }
+            catch (Exception) { }
+
+        return result;
     }
 
     private bool IsInRange(string ipAddress, string CIDRmask)

@@ -41,11 +41,10 @@ public class TransactionsController : ControllerBase
             query = sortBy switch
             {
                 TransactionsSortBy.Start => query.Order(t => t.Start, req.Ascending),
-                TransactionsSortBy.End => query.Order(t => t.End, req.Ascending),
+                TransactionsSortBy.CountryCode => query.Order(t => t.CountryCode, req.Ascending),
+                TransactionsSortBy.Asn => query.Order(t => t.Asn, req.Ascending),
                 TransactionsSortBy.Client => query.Order(t => t.Client, req.Ascending),
-                TransactionsSortBy.Username => query.Order(t => t.FromUser!.Name, req.Ascending),
                 TransactionsSortBy.From => query.Order(t => t.From, req.Ascending),
-                TransactionsSortBy.Secure => query.Order(t => t.Secure, req.Ascending),
                 _ => query
             };
 
@@ -57,7 +56,9 @@ public class TransactionsController : ControllerBase
                 ConnectionId = t.ConnectionId,
                 Submission = t.Submission,
                 IpAddress = t.IpAddress,
-                Country = t.Country,
+                CountryCode = t.CountryCode,
+                CountryName = t.CountryName,
+                Asn = t.Asn,
                 Start = t.Start,
                 End = t.End,
                 Client = t.Client,
@@ -166,11 +167,10 @@ public class TransactionQuery : FilterQuery
 public enum TransactionsSortBy
 {
     Start = 0,
-    End = 1,
-    Client = 2,
-    Username = 3,
+    CountryCode = 1,
+    Asn = 2,
+    Client = 3,
     From = 4,
-    Secure = 5,
 }
 
 public enum LogsSortBy

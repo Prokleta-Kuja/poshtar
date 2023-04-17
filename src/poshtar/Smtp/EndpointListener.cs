@@ -36,8 +36,12 @@ public class EndpointListener : IDisposable
             context.RemoteEndpoint = ip;
             context.Transaction.Start = DateTime.UtcNow;
             context.Transaction.IpAddress = ip.Address.ToString();
-            context.Transaction.Country = context.IpSvc.GetCountry(context.Transaction.IpAddress);
-            context.Log($"Connection established with: {context.Transaction.IpAddress} ({context.Transaction.Country ?? "UNKNOWN"})");
+
+            var info = context.IpSvc.GetInfo(context.Transaction.IpAddress);
+            context.Transaction.CountryCode = info.code;
+            context.Transaction.CountryName = info.name;
+            context.Transaction.Asn = info.asn;
+            context.Log($"Connection established with: {context.Transaction.IpAddress})", info);
         }
 
         var stream = tcpClient.GetStream();
