@@ -6,6 +6,7 @@ import type IModelState from '@/components/form/modelState';
 import TextBox from '@/components/form/TextBox.vue';
 import SpinButton from '@/components/form/SpinButton.vue';
 import { useAuth } from '@/stores/auth.store';
+import IntegerBox from '@/components/form/IntegerBox.vue';
 
 const auth = useAuth();
 const router = useRouter()
@@ -55,6 +56,8 @@ else
                                 required autoFocus />
                             <TextBox class="mb-3" label="Password" type="password" autoComplete="password"
                                 v-model="state.model.password" required />
+                            <IntegerBox class="mb-3" label="One Time Code" autoComplete="one-time-code"
+                                v-model="state.model.totp" />
                             <p v-if="state.error" class="text-danger">{{ state.error.message }}</p>
                             <SpinButton class="btn-primary w-100 mb-3" :loading="state.submitting" text="Sign in"
                                 loadingText="Signing in" isSubmit />

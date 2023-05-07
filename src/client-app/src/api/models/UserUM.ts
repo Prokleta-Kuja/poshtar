@@ -9,5 +9,6 @@ export type UserUM = {
     quota?: number | null;
     newPassword?: string | null;
     disabled?: boolean | null;
+    clearOtpKey?: boolean | null;
 };
 

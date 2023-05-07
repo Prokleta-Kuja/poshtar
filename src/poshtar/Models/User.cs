@@ -65,6 +65,7 @@ public class UserUM
     public int? Quota { get; set; }
     public string? NewPassword { get; set; }
     public bool? Disabled { get; set; }
+    public bool? ClearOtpKey { get; set; }
     public bool IsInvalid(out ValidationError errorModel)
     {
         errorModel = new();

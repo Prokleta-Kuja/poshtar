@@ -6,7 +6,7 @@ export interface ITextBox {
     required?: boolean;
     placeholder?: string;
     type?: "text" | "email" | "tel" | "password";
-    autoComplete?: "off" | "username" | "password";
+    autoComplete?: "off" | "username" | "password" | "one-time-code";
     modelValue?: string | null;
     help?: string;
     error?: string;

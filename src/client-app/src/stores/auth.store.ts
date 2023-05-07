@@ -7,16 +7,19 @@ export const useAuth = defineStore('auth', () => {
   const router = useRouter()
   const initialized = ref(false)
   const isAuthenticated = ref(false)
+  const hasOtp = ref(false)
   const username = ref<string | undefined | null>(undefined)
 
   const setLoginInfo = (info: AuthStatusModel) => {
     isAuthenticated.value = info.authenticated
+    hasOtp.value = info.hasOtp
     username.value = info.username
     setExpire(info.expires)
   }
 
   const clearLoginInfo = () => {
     isAuthenticated.value = false
+    hasOtp.value = false
     username.value = ''
   }
 
@@ -24,6 +27,7 @@ export const useAuth = defineStore('auth', () => {
     AuthService.status()
       .then((r) => {
         isAuthenticated.value = r.authenticated
+        hasOtp.value = r.hasOtp
         username.value = r.username
         setExpire(r.expires)
       })
@@ -42,6 +46,7 @@ export const useAuth = defineStore('auth', () => {
 
   return {
     isAuthenticated,
+    hasOtp,
     username,
     initialized,
     setLoginInfo,

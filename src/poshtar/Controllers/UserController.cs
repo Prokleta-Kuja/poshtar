@@ -1,4 +1,3 @@
-using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using poshtar.Entities;
@@ -170,6 +169,8 @@ public class UsersController : ControllerBase
         }
         if (model.Disabled.HasValue)
             user.Disabled = model.Disabled.Value ? user.Disabled.HasValue ? user.Disabled : DateTime.UtcNow : null;
+        if (model.ClearOtpKey.HasValue && model.ClearOtpKey.Value)
+            user.OtpKey = null;
 
         await _db.SaveChangesAsync();
 

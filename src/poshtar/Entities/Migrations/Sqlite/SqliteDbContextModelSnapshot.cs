@@ -338,6 +338,10 @@ namespace poshtar.Entities.Migrations.Sqlite
                         .HasColumnType("TEXT")
                         .HasColumnName("name");
 
+                    b.Property<byte[]>("OtpKey")
+                        .HasColumnType("BLOB")
+                        .HasColumnName("otp_key");
+
                     b.Property<string>("Password")
                         .IsRequired()
                         .HasColumnType("TEXT")

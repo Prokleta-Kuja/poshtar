@@ -13,6 +13,7 @@ public class User
     public required string Salt { get; set; }
     public required string Hash { get; set; }
     public required string Password { get; set; }
+    public byte[]? OtpKey { get; set; }
     public DateTime? Disabled { get; set; }
 
     public virtual List<Address> Addresses { get; set; } = new();

@@ -5,5 +5,6 @@
 export type LoginModel = {
     username: string;
     password: string;
+    totp?: number | null;
 };
 

@@ -340,6 +340,10 @@ namespace poshtar.Entities.Migrations.Mysql
                         .HasColumnType("longtext")
                         .HasColumnName("name");
 
+                    b.Property<byte[]>("OtpKey")
+                        .HasColumnType("longblob")
+                        .HasColumnName("otp_key");
+
                     b.Property<string>("Password")
                         .IsRequired()
                         .HasColumnType("longtext")

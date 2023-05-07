@@ -4,6 +4,7 @@
 
 export type AuthStatusModel = {
     authenticated: boolean;
+    hasOtp: boolean;
     username?: string | null;
     expires?: string | null;
 };

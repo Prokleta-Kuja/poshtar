@@ -3,6 +3,8 @@
 /* eslint-disable */
 import type { AuthStatusModel } from '../models/AuthStatusModel';
 import type { LoginModel } from '../models/LoginModel';
+import type { TotpCM } from '../models/TotpCM';
+import type { TotpVM } from '../models/TotpVM';
 
 import type { CancelablePromise } from '../core/CancelablePromise';
 import { OpenAPI } from '../core/OpenAPI';
@@ -66,6 +68,34 @@ export class AuthService {
             errors: {
                 404: `Not Found`,
             },
+        });
+    }
+
+    /**
+     * @returns TotpVM Success
+     * @throws ApiError
+     */
+    public static getTotp(): CancelablePromise<TotpVM> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/api/auth/totp',
+        });
+    }
+
+    /**
+     * @returns any Success
+     * @throws ApiError
+     */
+    public static saveTotp({
+        requestBody,
+    }: {
+        requestBody?: TotpCM,
+    }): CancelablePromise<any> {
+        return __request(OpenAPI, {
+            method: 'POST',
+            url: '/api/auth/totp',
+            body: requestBody,
+            mediaType: 'application/json',
         });
     }
 

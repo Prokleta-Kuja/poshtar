@@ -41,7 +41,7 @@ public class EndpointListener : IDisposable
             context.Transaction.CountryCode = info.code;
             context.Transaction.CountryName = info.name;
             context.Transaction.Asn = info.asn;
-            context.Log($"Connection established with: {context.Transaction.IpAddress})", info);
+            context.Log($"Connection established with: {context.Transaction.IpAddress}", info);
         }
 
         var stream = tcpClient.GetStream();

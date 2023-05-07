@@ -33,6 +33,8 @@ export { ServiceName } from './models/ServiceName';
 export type { ServiceRequestModel } from './models/ServiceRequestModel';
 export { ServiceRequestType } from './models/ServiceRequestType';
 export type { ServiceResultModel } from './models/ServiceResultModel';
+export type { TotpCM } from './models/TotpCM';
+export type { TotpVM } from './models/TotpVM';
 export type { TransactionLM } from './models/TransactionLM';
 export type { TransactionLMListResponse } from './models/TransactionLMListResponse';
 export type { UserCM } from './models/UserCM';

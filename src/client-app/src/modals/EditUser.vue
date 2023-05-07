@@ -63,6 +63,8 @@ const submit = () => {
                 <CheckBox class="mb-3" label="Master" v-model="user.model.isMaster" :error="user.error?.errors?.isMaster" />
                 <CheckBox class="mb-3" label="Disabled" v-model="user.model.disabled"
                     :error="user.error?.errors?.disabled" />
+                <CheckBox class="mb-3" label="Clear One Time Code Key" v-model="user.model.clearOtpKey"
+                    :error="user.error?.errors?.clearOtpKey" />
             </form>
         </template>
         <template #footer>

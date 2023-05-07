@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import DovecotIndicator from './components/DovecotIndicator.vue';
+import TotpIndicator from './components/TotpIndicator.vue';
 import { useAuth } from './stores/auth.store';
 
 const auth = useAuth()
@@ -61,6 +62,10 @@ auth.initialize()
               </li>
               <li class="nav-item col-6 col-lg-auto" data-bs-target="#appNavbar" data-bs-dismiss="offcanvas">
                 <DovecotIndicator />
+              </li>
+              <li v-if="!auth.hasOtp" class="nav-item col-6 col-lg-auto" data-bs-target="#appNavbar"
+                data-bs-dismiss="offcanvas">
+                <TotpIndicator />
               </li>
               <li class="nav-item py-2 py-lg-1 col-12 col-lg-auto">
                 <div class="vr d-none d-lg-flex h-100 mx-lg-2 text-white"></div>
