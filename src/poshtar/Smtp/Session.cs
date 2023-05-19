@@ -5,7 +5,6 @@ namespace poshtar.Smtp;
 
 class Session
 {
-    const int MAX_RETRY_COUNT = 5;
     static readonly TimeSpan s_commandTimeOut = TimeSpan.FromMinutes(5);
     readonly StateMachine _stateMachine;
     readonly SessionContext _context;
@@ -45,7 +44,7 @@ class Session
     /// <returns>A task which asynchronously performs the execution.</returns>
     async Task ExecuteAsync(SessionContext context, CancellationToken cancellationToken)
     {
-        var retries = MAX_RETRY_COUNT;
+        var retries = C.Smtp.AntiSpam.ConsecutiveCmdFail;
 
         while (retries-- > 0 && context.IsQuitRequested == false && cancellationToken.IsCancellationRequested == false)
         {
@@ -62,7 +61,7 @@ class Session
                 if (await ExecuteAsync(command, context, cancellationToken).ConfigureAwait(false))
                     _stateMachine.Transition(context);
 
-                retries = MAX_RETRY_COUNT;
+                retries = C.Smtp.AntiSpam.ConsecutiveCmdFail;
             }
             catch (ResponseException responseException) when (responseException.IsQuitRequested)
             {

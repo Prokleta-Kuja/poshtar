@@ -66,11 +66,24 @@ public sealed class RcptCommand : Command
         else
         {
             ctx.Log("Refused recepient");
+            if (ShouldCloseConnection(ctx))
+            {
+                ctx.Log("Consecutive RCPT command failed count over treshold. Closing connection");
+                throw new ResponseException(Response.ServiceClosingTransmissionChannel, true);
+            }
             await ctx.Pipe.Output.WriteReplyAsync(Response.MailboxNameNotAllowed, cancellationToken).ConfigureAwait(false);
             return false;
         }
+
+        ctx.ConsecutiveRcptFail = 0;
         await ctx.Pipe.Output.WriteReplyAsync(Response.Ok, cancellationToken).ConfigureAwait(false);
         return true;
+    }
+
+    bool ShouldCloseConnection(SessionContext ctx)
+    {
+        ctx.ConsecutiveRcptFail++;
+        return ctx.ConsecutiveRcptFail >= C.Smtp.AntiSpam.ConsecutiveRcptFail;
     }
 
     /// <summary>

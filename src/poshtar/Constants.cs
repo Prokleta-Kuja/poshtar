@@ -64,6 +64,11 @@ public static class C
         public const int EXPLICIT_SUBMISSION_PORT = 5587;
         public const int IMPLICIT_SUBMISSION_PORT = 5465;
         public static readonly SslProtocols TLS_PROTOCOLS = SslProtocols.Tls13 | SslProtocols.Tls12;
+        public static class AntiSpam
+        {
+            public const int ConsecutiveCmdFail = 5;
+            public const int ConsecutiveRcptFail = 3;
+        }
     }
     public static class Dovecot
     {

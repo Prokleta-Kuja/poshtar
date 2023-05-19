@@ -17,15 +17,16 @@ public class SessionContext : IDisposable
     public IPEndPoint? RemoteEndpoint { get; set; }
     public SecurableDuplexPipe? Pipe { get; set; }
     public bool IsAuthenticated => Transaction.FromUser != null;
+    // ANTI SPAM
     public bool IsQuitRequested { get; set; }
-    public Dictionary<string, object> Properties { get; }
+    public int ConsecutiveCmdFail { get; set; }
+    public int ConsecutiveRcptFail { get; set; }
     public SessionContext(IServiceProvider serviceProvider, EndpointDefinition endpointDefinition)
     {
         ServiceScope = serviceProvider.CreateScope();
         EndpointDefinition = endpointDefinition;
         IsSubmissionPort = endpointDefinition.Endpoint.Port == C.Smtp.EXPLICIT_SUBMISSION_PORT ||
                            endpointDefinition.Endpoint.Port == C.Smtp.IMPLICIT_SUBMISSION_PORT;
-        Properties = new();
 
         Db = ServiceScope.ServiceProvider.GetRequiredService<AppDbContext>();
         Transaction = new() { ConnectionId = ConnectionId, Submission = IsSubmissionPort, Start = DateTime.MaxValue };
