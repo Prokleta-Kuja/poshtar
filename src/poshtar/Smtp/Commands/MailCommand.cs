@@ -97,7 +97,7 @@ public class MailCommand : Command
                 case SpfQualifier.Neutral:  //SPF neutral is interpreted in DMARC as fail by default
                 case SpfQualifier.TempError:  //the error is used to return a 4xx status code and the SMTP session ends
                 case SpfQualifier.PermError:  //SPF permerror is interpreted in DMARC as fail
-                    ctx.Log($"SPF {ctx.Spf}. Closing connection");
+                    ctx.Log($"SPF {ctx.Spf}. Closing connection.");
                     throw new ResponseException(Response.ServiceClosingTransmissionChannel, true);
             }
         }
