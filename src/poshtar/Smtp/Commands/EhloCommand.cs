@@ -35,27 +35,29 @@ public class EhloCommand : Command
         bool? success = null;
         if (IPAddress.TryParse(ctx.Transaction.IpAddress, out var ip) && DomainName.TryParse(DomainOrAddress, out var domain))
         {
-            var dnsMessage = DnsClient.Default.Resolve(IPAddress.Parse(ctx.Transaction.IpAddress).GetReverseLookupDomain(), RecordType.Ptr);
+            var dnsMessage = DnsClient.Default.Resolve(ip.GetReverseLookupDomain(), RecordType.Ptr);
             if ((dnsMessage == null) || ((dnsMessage.ReturnCode != ReturnCode.NoError) && (dnsMessage.ReturnCode != ReturnCode.NxDomain)))
-                ctx.Log("PTR DNS request failed");
+                success = null;
             else if (dnsMessage.AnswerRecords.Count == 0)
-            {
                 success = false;
-                ctx.Log("No PTR records found. Closing connection.");
-            }
             else
                 foreach (DnsRecordBase dnsRecord in dnsMessage.AnswerRecords)
                     if (dnsRecord is PtrRecord ptrRecord)
                     {
                         success = ptrRecord.PointerDomainName == domain;
                         if (success.Value)
-                            ctx.Log("PTR matches HELO/EHLO");
-                        else
-                            ctx.Log($"PTR {ptrRecord.PointerDomainName} does not match HELO/EHLO. Closing connection.");
+                            break;
                     }
         }
-        if (success.HasValue && !success.Value)
+        if (!success.HasValue)
+            ctx.Log("PTR lookup failed");
+        else if (success.Value)
+            ctx.Log("PTR matches HELO/EHLO");
+        else
+        {
+            ctx.Log("No matching PTR record found. Closing connection.");
             throw new ResponseException(Response.ServiceClosingTransmissionChannel, true);
+        }
 
         var output = new[] { GetGreeting(ctx) }.Union(GetExtensions(ctx)).ToArray();
 
