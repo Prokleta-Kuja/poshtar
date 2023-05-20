@@ -1,4 +1,5 @@
 using System.Net;
+using ARSoft.Tools.Net.Spf;
 using poshtar.Entities;
 using poshtar.Services;
 
@@ -17,10 +18,12 @@ public class SessionContext : IDisposable
     public IPEndPoint? RemoteEndpoint { get; set; }
     public SecurableDuplexPipe? Pipe { get; set; }
     public bool IsAuthenticated => Transaction.FromUser != null;
-    // ANTI SPAM
     public bool IsQuitRequested { get; set; }
+    // ANTI SPAM
     public int ConsecutiveCmdFail { get; set; }
     public int ConsecutiveRcptFail { get; set; }
+    public SpfQualifier Spf { get; set; } = SpfQualifier.None;
+
     public SessionContext(IServiceProvider serviceProvider, EndpointDefinition endpointDefinition)
     {
         ServiceScope = serviceProvider.CreateScope();
