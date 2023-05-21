@@ -32,25 +32,23 @@ class Session
             return;
 
         await OutputGreetingAsync(cancellationToken).ConfigureAwait(false);
-        // TODO: RBL check
         await ExecuteAsync(_context, cancellationToken).ConfigureAwait(false);
     }
 
     /// <summary>
     /// Execute the command handler against the specified session context.
     /// </summary>
-    /// <param name="context">The session context to execute the command handler against.</param>
+    /// <param name="ctx">The session context to execute the command handler against.</param>
     /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>A task which asynchronously performs the execution.</returns>
-    async Task ExecuteAsync(SessionContext context, CancellationToken cancellationToken)
+    async Task ExecuteAsync(SessionContext ctx, CancellationToken cancellationToken)
     {
-        var retries = C.Smtp.AntiSpam.ConsecutiveCmdFail;
-
-        while (retries-- > 0 && context.IsQuitRequested == false && cancellationToken.IsCancellationRequested == false)
+        while (ctx.IsQuitRequested == false && cancellationToken.IsCancellationRequested == false)
         {
             try
             {
-                var command = await ReadCommandAsync(context, cancellationToken).ConfigureAwait(false);
+                AntiSpam.CmdTry(ctx);
+                var command = await ReadCommandAsync(ctx, cancellationToken).ConfigureAwait(false);
 
                 if (command == null)
                     return;
@@ -58,29 +56,29 @@ class Session
                 if (_stateMachine.TryAccept(command, out var errorResponse) == false)
                     throw new ResponseException(errorResponse!);
 
-                if (await ExecuteAsync(command, context, cancellationToken).ConfigureAwait(false))
-                    _stateMachine.Transition(context);
+                if (await ExecuteAsync(command, ctx, cancellationToken).ConfigureAwait(false))
+                    _stateMachine.Transition(ctx);
 
-                retries = C.Smtp.AntiSpam.ConsecutiveCmdFail;
+                AntiSpam.CmdAccepted(ctx);
             }
             catch (ResponseException responseException) when (responseException.IsQuitRequested)
             {
-                if (context.Pipe != null)
-                    await context.Pipe.Output.WriteReplyAsync(responseException.Response, cancellationToken).ConfigureAwait(false);
+                if (ctx.Pipe != null)
+                    await ctx.Pipe.Output.WriteReplyAsync(responseException.Response, cancellationToken).ConfigureAwait(false);
 
-                context.IsQuitRequested = true;
+                ctx.IsQuitRequested = true;
             }
             catch (ResponseException responseException)
             {
-                var response = CreateErrorResponse(responseException.Response, retries);
+                var response = CreateErrorResponse(responseException.Response, ctx.ConsecutiveCmdFail);
 
-                if (context.Pipe != null)
-                    await context.Pipe.Output.WriteReplyAsync(response, cancellationToken).ConfigureAwait(false);
+                if (ctx.Pipe != null)
+                    await ctx.Pipe.Output.WriteReplyAsync(response, cancellationToken).ConfigureAwait(false);
             }
             catch (OperationCanceledException)
             {
-                if (context.Pipe != null)
-                    await context.Pipe.Output.WriteReplyAsync(new Response(ReplyCode.ServiceClosingTransmissionChannel, "The session has be cancelled."), CancellationToken.None).ConfigureAwait(false);
+                if (ctx.Pipe != null)
+                    await ctx.Pipe.Output.WriteReplyAsync(new Response(ReplyCode.ServiceClosingTransmissionChannel, "The session has be cancelled."), CancellationToken.None).ConfigureAwait(false);
             }
         }
     }
@@ -128,9 +126,9 @@ class Session
     /// <param name="response">The original response to wrap with the error message information.</param>
     /// <param name="retries">The number of retries remaining before the session is terminated.</param>
     /// <returns>The response that wraps the original response with the additional error information.</returns>
-    static Response CreateErrorResponse(Response response, int retries)
+    static Response CreateErrorResponse(Response response, int failCount)
     {
-        return new Response(response.ReplyCode, $"{response.Message}, {retries} retry(ies) remaining.");
+        return new Response(response.ReplyCode, $"{response.Message}, fail count: {failCount}");
     }
 
     /// <summary>

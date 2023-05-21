@@ -1,7 +1,3 @@
-using System.Net;
-using ARSoft.Tools.Net;
-using ARSoft.Tools.Net.Dns;
-
 namespace poshtar.Smtp.Commands;
 
 public class HeloCommand : Command
@@ -32,32 +28,8 @@ public class HeloCommand : Command
         ctx.Log($"HELO {DomainOrAddress}");
         ctx.Transaction.Client = DomainOrAddress;
 
-        bool? success = null;
-        if (IPAddress.TryParse(ctx.Transaction.IpAddress, out var ip) && DomainName.TryParse(DomainOrAddress, out var domain))
-        {
-            var dnsMessage = DnsClient.Default.Resolve(ip.GetReverseLookupDomain(), RecordType.Ptr);
-            if ((dnsMessage == null) || ((dnsMessage.ReturnCode != ReturnCode.NoError) && (dnsMessage.ReturnCode != ReturnCode.NxDomain)))
-                success = null;
-            else if (dnsMessage.AnswerRecords.Count == 0)
-                success = false;
-            else
-                foreach (DnsRecordBase dnsRecord in dnsMessage.AnswerRecords)
-                    if (dnsRecord is PtrRecord ptrRecord)
-                    {
-                        success = ptrRecord.PointerDomainName == domain;
-                        if (success.Value)
-                            break;
-                    }
-        }
-        if (!success.HasValue)
-            ctx.Log("PTR lookup failed");
-        else if (success.Value)
-            ctx.Log("PTR matches HELO/EHLO");
-        else
-        {
-            ctx.Log("No matching PTR record found. Closing connection.");
-            throw new ResponseException(Response.ServiceClosingTransmissionChannel, true);
-        }
+        await ctx.CheckHeloEhloAsync();
+        await ctx.CheckRblAsync();
 
         var response = new Response(ReplyCode.Ok, GetGreeting(ctx));
         await ctx.Pipe.Output.WriteReplyAsync(response, cancellationToken).ConfigureAwait(false);

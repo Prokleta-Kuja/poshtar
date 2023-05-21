@@ -1,6 +1,3 @@
-using System.Net;
-using ARSoft.Tools.Net;
-using ARSoft.Tools.Net.Spf;
 using Microsoft.EntityFrameworkCore;
 
 namespace poshtar.Smtp.Commands;
@@ -80,27 +77,7 @@ public class MailCommand : Command
             ctx.CanRelay = senderDomain?.RelayId.HasValue ?? false;
         }
         else
-        {
-            if (IPAddress.TryParse(ctx.Transaction.IpAddress, out var ip) && DomainName.TryParse(Address.Host, out var domain))
-            {
-                var validator = new SpfValidator();
-                ctx.Spf = validator.CheckHost(ip, domain!, string.Empty).Result;
-            }
-            switch (ctx.Spf)
-            {
-                case SpfQualifier.Pass:
-                    ctx.Log($"SPF {ctx.Spf}");
-                    break;
-                case SpfQualifier.Fail:
-                case SpfQualifier.SoftFail:  //SPF softfail is interpreted in DMARC as fail by default
-                case SpfQualifier.None:  //SPF none is treated as fail in DMARC
-                case SpfQualifier.Neutral:  //SPF neutral is interpreted in DMARC as fail by default
-                case SpfQualifier.TempError:  //the error is used to return a 4xx status code and the SMTP session ends
-                case SpfQualifier.PermError:  //SPF permerror is interpreted in DMARC as fail
-                    ctx.Log($"SPF {ctx.Spf}. Closing connection.");
-                    throw new ResponseException(Response.ServiceClosingTransmissionChannel, true);
-            }
-        }
+            await ctx.CheckSpfAsync(Address.Host);
 
         await ctx.Pipe.Output.WriteReplyAsync(Response.Ok, cancellationToken).ConfigureAwait(false);
         return true;
