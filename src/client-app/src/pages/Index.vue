@@ -51,7 +51,7 @@ refresh();
 </script>
 <template>
     <h1 class="display-6 me-3">Transactions</h1>
-    <Modal title="Logs" width="lg" :shown="show.logsId !== undefined" :onClose="hideLogs">
+    <Modal v-if="show.logsId" title="Logs" width="lg" shown :onClose="hideLogs">
         <template #body>
             <TransactionLogs v-if="show.logsId" :transactionId="show.logsId" />
         </template>
@@ -59,7 +59,7 @@ refresh();
             <button class="btn btn-outline-danger" @click="hideLogs">Close</button>
         </template>
     </Modal>
-    <Modal title="Recipients" width="lg" :shown="show.recipientsId !== undefined" :onClose="hideRecipients">
+    <Modal v-if="show.recipientsId" title="Recipients" width="lg" :onClose="hideRecipients">
         <template #body>
             <TransactionRecipients v-if="show.recipientsId" :transactionId="show.recipientsId" />
         </template>

@@ -105,7 +105,7 @@ public class TransactionsController : ControllerBase
                 Id = l.LogEntryId,
                 Timestamp = l.Timestamp,
                 Message = l.Message,
-                Propertires = l.Properties,
+                Properties = l.Properties,
             })
             .ToListAsync();
 

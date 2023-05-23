@@ -25,7 +25,7 @@ public class LogEntryLM
     [Required] public int Id { get; set; }
     [Required] public DateTime Timestamp { get; set; }
     [Required] public required string Message { get; set; }
-    public string? Propertires { get; set; }
+    public string? Properties { get; set; }
 }
 
 public class RecipientLM

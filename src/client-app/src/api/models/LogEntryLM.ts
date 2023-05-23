@@ -6,6 +6,6 @@ export type LogEntryLM = {
     id: number;
     timestamp: string;
     message: string;
-    propertires?: string | null;
+    properties?: string | null;
 };
 
