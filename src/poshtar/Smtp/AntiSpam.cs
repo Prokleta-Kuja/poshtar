@@ -5,38 +5,22 @@ using ARSoft.Tools.Net.Spf;
 
 namespace poshtar.Smtp;
 
+public class AntiSpamSettings
+{
+    public int ConsecutiveCmdFail { get; set; } = 5;
+    public int ConsecutiveRcptFail { get; set; } = 3;
+    public bool? EnforceForwardDns { get; set; }
+    public bool? EnforceReverseDns { get; set; }
+    public bool? EnforceDnsBlockList { get; set; }
+    public bool? EnforceSpf { get; set; }
+}
 public static class AntiSpam
 {
-    public static async Task CheckRblAsync(this SessionContext ctx)
-    {
-        if (ctx.Transaction.Secure || C.IsDebug)
-            return;
-        if (ctx.Transaction.IpAddress == null)
-        {
-            ctx.Log("No IP specified, closing connection");
-            throw new ResponseException(new Response(ReplyCode.TransactionFailed, "Invalid IP"), true);
-        }
-
-        var revIp = BlockList.ReverseIp(ctx.Transaction.IpAddress);
-
-        var checks = await Task.WhenAll(BlockList.DefaultLists.Select(l => l.CheckAsync(revIp)));
-
-        (int listed, int notListed, int failed) result = new();
-        foreach (var check in checks)
-            if (!check.Listed.HasValue)
-                result.failed++;
-            else if (check.Listed.Value)
-                result.listed++;
-            else
-                result.notListed++;
-
-        ctx.Log($"RBL listed: {result.listed}, not listed: {result.notListed}, failed: {result.failed}", checks);
-    }
     public static void CmdAccepted(this SessionContext ctx) => ctx.ConsecutiveCmdFail = 0;
     public static void CmdTry(this SessionContext ctx)
     {
         ctx.ConsecutiveCmdFail++;
-        if (ctx.ConsecutiveCmdFail > C.Smtp.AntiSpam.ConsecutiveCmdFail)
+        if (ctx.ConsecutiveCmdFail > C.Smtp.AntiSpamSettings.ConsecutiveCmdFail)
         {
             ctx.Log("Command failed count over treshold, closing connection");
             throw new ResponseException(new Response(ReplyCode.TransactionFailed), true);
@@ -46,27 +30,23 @@ public static class AntiSpam
     {
         if (ctx.Transaction.Secure || C.IsDebug)
             return;
-        if (ctx.Transaction.IpAddress == null)
+        if (!C.Smtp.AntiSpamSettings.EnforceForwardDns.HasValue && !C.Smtp.AntiSpamSettings.EnforceReverseDns.HasValue)
+            return;
+        if (ctx.Transaction.IpAddress == null || !IPAddress.TryParse(ctx.Transaction.IpAddress, out var ip))
         {
             ctx.Log("No IP specified, closing connection");
             throw new ResponseException(new Response(ReplyCode.TransactionFailed, "Invalid IP"), true);
         }
-        if (string.IsNullOrWhiteSpace(ctx.Transaction.Client))
+        if (string.IsNullOrWhiteSpace(ctx.Transaction.Client) || !DomainName.TryParse(ctx.Transaction.Client, out var domain))
         {
             ctx.Log("No HELO/EHLO specified, closing connection");
             throw new ResponseException(new Response(ReplyCode.TransactionFailed, "Invalid HELO/EHLO"), true);
         }
 
-        bool? forwardSuccess = null;
-        bool? reverseSuccess = null;
-        if (IPAddress.TryParse(ctx.Transaction.IpAddress, out var ip) && DomainName.TryParse(ctx.Transaction.Client, out var domain))
+        if (C.Smtp.AntiSpamSettings.EnforceForwardDns.HasValue)
         {
-            var fwdTask = DnsClient.Default.ResolveAsync(domain!);
-            var rvsTask = DnsClient.Default.ResolveAsync(ip.GetReverseLookupDomain(), RecordType.Ptr);
-            await Task.WhenAll(fwdTask, rvsTask);
-            var fwdMessage = fwdTask.Result;
-            var rvsMessage = rvsTask.Result;
-
+            bool? forwardSuccess = null;
+            var fwdMessage = await DnsClient.Default.ResolveAsync(domain!);
             if (fwdMessage == null || (fwdMessage.ReturnCode != ReturnCode.NoError && fwdMessage.ReturnCode != ReturnCode.NxDomain))
                 forwardSuccess = null;
             else if (fwdMessage.AnswerRecords.Count == 0)
@@ -80,6 +60,23 @@ public static class AntiSpam
                             break;
                     }
 
+            if (!forwardSuccess.HasValue)
+                ctx.Log("Forward DNS lookup failed");
+            else if (forwardSuccess.Value)
+                ctx.Log("Forward DNS lookup matches IP");
+            else if (!C.Smtp.AntiSpamSettings.EnforceForwardDns.Value)
+                ctx.Log("No forward DNS matches, continuing");
+            else
+            {
+                ctx.Log("No forward DNS matches, closing connection");
+                throw new ResponseException(new Response(ReplyCode.TransactionFailed, "Forward DNS lookup didn't match the IP"), true);
+            }
+        }
+
+        if (C.Smtp.AntiSpamSettings.EnforceReverseDns.HasValue)
+        {
+            bool? reverseSuccess = null;
+            var rvsMessage = await DnsClient.Default.ResolveAsync(ip.GetReverseLookupDomain(), RecordType.Ptr);
             if (rvsMessage == null || (rvsMessage.ReturnCode != ReturnCode.NoError && rvsMessage.ReturnCode != ReturnCode.NxDomain))
                 reverseSuccess = null;
             else if (rvsMessage.AnswerRecords.Count == 0)
@@ -92,46 +89,71 @@ public static class AntiSpam
                         if (reverseSuccess.Value)
                             break;
                     }
-        }
-        if (!forwardSuccess.HasValue)
-            ctx.Log("Forward DNS lookup failed");
-        else if (forwardSuccess.Value)
-            ctx.Log("Forward DNS lookup matches IP");
-        else
-        {
-            ctx.Log("No forward DNS matches, closing connection");
-            throw new ResponseException(new Response(ReplyCode.TransactionFailed, "Forward DNS lookup didn't match the IP"), true);
-        }
-        if (!reverseSuccess.HasValue)
-            ctx.Log("Reverse DNS lookup failed");
-        else if (reverseSuccess.Value)
-            ctx.Log("Reverse DNS lookup matches HELO/EHLO");
-        else
-        {
-            ctx.Log("No reverse DNS matches, closing connection");
-            throw new ResponseException(new Response(ReplyCode.TransactionFailed, "Reverse DNS lookup didn't match the HELO/EHLO"), true);
+
+            if (!reverseSuccess.HasValue)
+                ctx.Log("Reverse DNS lookup failed");
+            else if (reverseSuccess.Value)
+                ctx.Log("Reverse DNS lookup matches HELO/EHLO");
+            else if (!C.Smtp.AntiSpamSettings.EnforceReverseDns.Value)
+                ctx.Log("No reverse DNS matches, continuing");
+            else
+            {
+                ctx.Log("No reverse DNS matches, closing connection");
+                throw new ResponseException(new Response(ReplyCode.TransactionFailed, "Reverse DNS lookup didn't match the HELO/EHLO"), true);
+            }
         }
     }
-    public static async Task CheckSpfAsync(this SessionContext ctx, string senderDomain)
+    public static async Task CheckRblAsync(this SessionContext ctx)
     {
-        if (C.IsDebug)
+        if (ctx.Transaction.Secure || C.IsDebug || !C.Smtp.AntiSpamSettings.EnforceDnsBlockList.HasValue)
             return;
         if (ctx.Transaction.IpAddress == null)
         {
             ctx.Log("No IP specified, closing connection");
             throw new ResponseException(new Response(ReplyCode.TransactionFailed, "Invalid IP"), true);
         }
-        if (string.IsNullOrWhiteSpace(senderDomain))
+
+        var revIp = BlockList.ReverseIp(ctx.Transaction.IpAddress);
+
+        var checks = await Task.WhenAll(BlockList.DefaultLists.Select(l => l.CheckAsync(revIp)));
+
+        List<string> listed = new(checks.Length), notListed = new(checks.Length), failed = new(checks.Length);
+        foreach (var check in checks)
+            if (!check.Listed.HasValue)
+                failed.Add(check.Zone);
+            else if (check.Listed.Value)
+                listed.Add(check.Zone);
+            else
+                notListed.Add(check.Zone);
+
+        if (listed.Count > notListed.Count && C.Smtp.AntiSpamSettings.EnforceDnsBlockList.Value)
+        {
+            var list = $"Listed at {string.Join(", ", listed)}";
+            ctx.Log($"{list}, closing connection", new { listed, notListed, failed });
+            throw new ResponseException(new Response(ReplyCode.TransactionFailed, list), true);
+        }
+        else
+            ctx.Log($"RBL listed: {listed.Count}, not listed: {notListed.Count}, failed: {failed.Count}", new { listed, notListed, failed });
+    }
+    public static async Task CheckSpfAsync(this SessionContext ctx, string senderDomain)
+    {
+        if (C.IsDebug || !C.Smtp.AntiSpamSettings.EnforceSpf.HasValue)
+            return;
+        if (ctx.Transaction.IpAddress == null || !IPAddress.TryParse(ctx.Transaction.IpAddress, out var ip))
+        {
+            ctx.Log("No IP specified, closing connection");
+            throw new ResponseException(new Response(ReplyCode.TransactionFailed, "Invalid IP"), true);
+        }
+        if (string.IsNullOrWhiteSpace(senderDomain) || !DomainName.TryParse(senderDomain, out var domain))
         {
             ctx.Log("Invalid MAIL FROM, closing connection");
             throw new ResponseException(new Response(ReplyCode.TransactionFailed, "Invalid sender"), true);
         }
-        if (IPAddress.TryParse(ctx.Transaction.IpAddress, out var ip) && DomainName.TryParse(senderDomain, out var domain))
-        {
-            var validator = new SpfValidator();
-            var result = await validator.CheckHostAsync(ip, domain!, string.Empty);
-            ctx.Spf = result.Result;
-        }
+
+        var validator = new SpfValidator();
+        var result = await validator.CheckHostAsync(ip, domain!, string.Empty);
+        ctx.Spf = result.Result;
+
         switch (ctx.Spf)
         {
             case SpfQualifier.Pass:
@@ -143,15 +165,21 @@ public static class AntiSpam
             case SpfQualifier.Neutral:  //SPF neutral is interpreted in DMARC as fail by default
             case SpfQualifier.TempError:  //the error is used to return a 4xx status code and the SMTP session ends
             case SpfQualifier.PermError:  //SPF permerror is interpreted in DMARC as fail
-                ctx.Log($"SPF {ctx.Spf}. Closing connection.");
-                throw new ResponseException(new Response(ReplyCode.TransactionFailed, $"SPF {ctx.Spf}"), true);
+                if (!C.Smtp.AntiSpamSettings.EnforceSpf.Value)
+                    ctx.Log($"SPF {ctx.Spf}, continuing");
+                else
+                {
+                    ctx.Log($"SPF {ctx.Spf}, closing connection");
+                    throw new ResponseException(new Response(ReplyCode.TransactionFailed, $"SPF {ctx.Spf}"), true);
+                }
+                break;
         }
     }
     public static void LocalRecipientResolved(this SessionContext ctx) => ctx.ConsecutiveRcptFail = 0;
     public static void LocalRecipientNotResolved(this SessionContext ctx)
     {
         ctx.ConsecutiveRcptFail++;
-        if (ctx.ConsecutiveRcptFail >= C.Smtp.AntiSpam.ConsecutiveRcptFail)
+        if (ctx.ConsecutiveRcptFail >= C.Smtp.AntiSpamSettings.ConsecutiveRcptFail)
         {
             ctx.Log("Consecutive RCPT command failed count over treshold, closing connection");
             throw new ResponseException(new Response(ReplyCode.TransactionFailed), true);

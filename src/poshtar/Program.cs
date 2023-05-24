@@ -173,6 +173,7 @@ public class Program
         if (!File.Exists(C.Paths.CertCrt) || !File.Exists(C.Paths.CertKey))
             throw new Exception($"Could not load certs from {C.Paths.CertData}");
 
+        await C.Settings.LoadAsync();
         DovecotConfiguration.Generate();
 
         using var scope = provider.CreateScope();
@@ -182,7 +183,6 @@ public class Program
         else
             await db.Database.EnsureCreatedAsync();
 
-        // Demo data
         if (C.IsDebug && !db.Domains.Any())
         {
             var dpProvider = scope.ServiceProvider.GetRequiredService<IDataProtectionProvider>();

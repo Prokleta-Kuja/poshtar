@@ -1,6 +1,8 @@
 using System.Globalization;
 using System.Security.Authentication;
+using System.Text.Json;
 using poshtar.Services;
+using poshtar.Smtp;
 
 namespace poshtar;
 
@@ -64,11 +66,7 @@ public static class C
         public const int EXPLICIT_SUBMISSION_PORT = 5587;
         public const int IMPLICIT_SUBMISSION_PORT = 5465;
         public static readonly SslProtocols TLS_PROTOCOLS = SslProtocols.Tls13 | SslProtocols.Tls12;
-        public static class AntiSpam
-        {
-            public const int ConsecutiveCmdFail = 5;
-            public const int ConsecutiveRcptFail = 3;
-        }
+        public static AntiSpamSettings AntiSpamSettings = new();
     }
     public static class Dovecot
     {
@@ -97,8 +95,36 @@ public static class C
         public static readonly string Hangfire = ConfigDataFor("queue.db");
         public static readonly string MaxMindAsnDb = ConfigDataFor("GeoLite2-ASN.mmdb");
         public static readonly string MaxMindCountryDb = ConfigDataFor("GeoLite2-Country.mmdb");
+        public static readonly string AntiSpam = ConfigDataFor("AntiSpam.json");
         public static readonly string AppDbConnectionString = $"Data Source={Sqlite}";
         public static readonly string HangfireConnectionString = $"Data Source={Hangfire}";
+    }
+    public static class Settings
+    {
+        static readonly FileInfo s_antiSpamFile = new(C.Paths.AntiSpam);
+        static readonly JsonSerializerOptions serializerOptions = new()
+        {
+            WriteIndented = true,
+            IgnoreReadOnlyProperties = true,
+        };
+        public static async ValueTask LoadAsync()
+        {
+            if (s_antiSpamFile.Exists)
+                Smtp.AntiSpamSettings = await ReadAntiSpamAsync();
+            else
+                await WriteAntiSpamAsync(Smtp.AntiSpamSettings);
+        }
+        public static async Task<AntiSpamSettings> ReadAntiSpamAsync()
+        {
+            var contents = await File.ReadAllTextAsync(s_antiSpamFile.FullName);
+            var antispam = JsonSerializer.Deserialize<AntiSpamSettings>(contents) ?? throw new JsonException("Could not load antispam file");
+            return antispam;
+        }
+        public static async ValueTask WriteAntiSpamAsync(AntiSpamSettings antispam)
+        {
+            var contents = JsonSerializer.Serialize(antispam, serializerOptions);
+            await File.WriteAllTextAsync(s_antiSpamFile.FullName, contents);
+        }
     }
 }
 
