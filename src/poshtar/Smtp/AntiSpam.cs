@@ -10,6 +10,7 @@ public class AntiSpamSettings
 {
     public int ConsecutiveCmdFail { get; set; } = 5;
     public int ConsecutiveRcptFail { get; set; } = 3;
+    public bool EnableFCrDNSWorkarounds { get; set; }
     public bool? EnforceForwardDns { get; set; }
     public bool? EnforceReverseDns { get; set; }
     public bool? EnforceDnsBlockList { get; set; }
@@ -45,7 +46,7 @@ public static class AntiSpam
         }
 
         // Microsoft workaround since they don't care their servers can't complete FCrDNS
-        if (ctx.Transaction.Client.EndsWith(".outbound.protection.outlook.com"))
+        if (C.Smtp.AntiSpamSettings.EnableFCrDNSWorkarounds && ctx.Transaction.Client.EndsWith(".outbound.protection.outlook.com"))
         {
             // Their SPF record should list all IP addresses their servers use
             var outlookDomain = DomainName.Parse("spf.protection.outlook.com");
