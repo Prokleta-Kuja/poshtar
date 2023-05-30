@@ -37,17 +37,33 @@ public class IpService
         return result;
     }
 
-    private bool IsInRange(string ipAddress, string CIDRmask)
+    public static bool IsInRange(string ipAddress, string CIDRmask)
     {
         try
         {
             string[] parts = CIDRmask.Split('/');
+            var CIDRAddress = parts[0];
+            var CIDRMask = int.Parse(parts[1]);
 
+            return IsInRange(ipAddress, CIDRAddress, CIDRMask);
+        }
+        catch (Exception)
+        {
+            return false;
+        }
+    }
+    public static bool IsInRange(string ipAddress, string? CIDRAddress, int? CIDRMask)
+    {
+        if (string.IsNullOrWhiteSpace(CIDRAddress) || !CIDRMask.HasValue)
+            return false;
+
+        try
+        {
             int IP_addr = BitConverter.ToInt32(IPAddress.Parse(ipAddress).GetAddressBytes(), 0);
-            int CIDR_addr = BitConverter.ToInt32(IPAddress.Parse(parts[0]).GetAddressBytes(), 0);
-            int CIDR_mask = IPAddress.HostToNetworkOrder(-1 << (32 - int.Parse(parts[1])));
+            int CIDR_addr = BitConverter.ToInt32(IPAddress.Parse(CIDRAddress).GetAddressBytes(), 0);
+            int CIDR_mask = IPAddress.HostToNetworkOrder(-1 << (32 - CIDRMask.Value));
 
-            return ((IP_addr & CIDR_mask) == (CIDR_addr & CIDR_mask));
+            return (IP_addr & CIDR_mask) == (CIDR_addr & CIDR_mask);
         }
         catch (Exception)
         {

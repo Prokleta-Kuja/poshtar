@@ -2,6 +2,7 @@ using System.Net;
 using ARSoft.Tools.Net;
 using ARSoft.Tools.Net.Dns;
 using ARSoft.Tools.Net.Spf;
+using poshtar.Services;
 
 namespace poshtar.Smtp;
 
@@ -41,6 +42,24 @@ public static class AntiSpam
         {
             ctx.Log("No HELO/EHLO specified, closing connection");
             throw new ResponseException(new Response(ReplyCode.TransactionFailed, "Invalid HELO/EHLO"), true);
+        }
+
+        // Microsoft workaround since they don't care their servers can't complete FCrDNS
+        if (ctx.Transaction.Client.EndsWith(".outbound.protection.outlook.com"))
+        {
+            // Their SPF record should list all IP addresses their servers use
+            var outlookDomain = DomainName.Parse("spf.protection.outlook.com");
+            var dnsMessage = DnsClient.Default.Resolve(outlookDomain, RecordType.Txt);
+            if (dnsMessage != null && dnsMessage.AnswerRecords.Count > 0 && (dnsMessage.ReturnCode == ReturnCode.NoError || dnsMessage.ReturnCode == ReturnCode.NxDomain))
+                foreach (DnsRecordBase dnsRecord in dnsMessage.AnswerRecords)
+                    if (dnsRecord is TxtRecord txtRecord && ARSoft.Tools.Net.Spf.SpfRecord.TryParse(txtRecord.TextData, out var spfRecord))
+                        foreach (var term in spfRecord!.Terms)
+                            if (term is SpfMechanism spf && spf.Qualifier == SpfQualifier.Pass && spf.Type == SpfMechanismType.Ip4)
+                                if (IpService.IsInRange(ctx.Transaction.IpAddress, spf.Domain, spf.Prefix))
+                                {
+                                    ctx.Log("Outlook workaround succedded, skipping lookups");
+                                    return;
+                                }
         }
 
         if (C.Smtp.AntiSpamSettings.EnforceForwardDns.HasValue)
