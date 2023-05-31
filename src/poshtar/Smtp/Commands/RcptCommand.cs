@@ -12,7 +12,7 @@ public sealed class RcptCommand : Command
     /// <param name="address">The address.</param>
     public RcptCommand(EmailAddress address) : base(Command)
     {
-        Address = address;
+        Address = new(address.User.ToLower(), address.Host.ToLower());
     }
 
     /// <summary>

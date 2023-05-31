@@ -13,7 +13,7 @@ public class MailCommand : Command
     /// <param name="parameters">The list of extended (ESMTP) parameters.</param>
     public MailCommand(EmailAddress address, IReadOnlyDictionary<string, string> parameters) : base(Command)
     {
-        Address = address;
+        Address = new(address.User.ToLower(), address.Host.ToLower());
         Parameters = parameters;
     }
 
