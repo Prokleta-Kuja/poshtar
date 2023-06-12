@@ -59,7 +59,7 @@ refresh();
             <button class="btn btn-outline-danger" @click="hideLogs">Close</button>
         </template>
     </Modal>
-    <Modal v-if="show.recipientsId" title="Recipients" width="lg" :onClose="hideRecipients">
+    <Modal v-if="show.recipientsId" title="Recipients" width="lg" shown :onClose="hideRecipients">
         <template #body>
             <TransactionRecipients v-if="show.recipientsId" :transactionId="show.recipientsId" />
         </template>
