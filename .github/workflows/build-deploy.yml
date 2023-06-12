@@ -39,7 +39,7 @@ jobs:
         with:
           node-version: 18
           cache: "npm"
-          cache-dependency-path: package-lock.json
+          cache-dependency-path: src/client-app/package-lock.json
       - name: Install npm dependencies
         working-directory: src/client-app
         run: npm ci
