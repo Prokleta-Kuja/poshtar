@@ -165,6 +165,7 @@ public class Program
         Directory.CreateDirectory(C.Paths.ConfigData);
         Directory.CreateDirectory(C.Paths.DovecotData);
         Directory.CreateDirectory(C.Paths.UserData);
+        Directory.CreateDirectory(C.Paths.EventData);
         Directory.CreateDirectory(C.Paths.QueueData);
 
         if (string.IsNullOrWhiteSpace(C.Hostname))
@@ -178,7 +179,7 @@ public class Program
 
         using var scope = provider.CreateScope();
         using var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-        if (db.Database.GetMigrations().Any())
+        if (db.Database.GetMigrations().Any() && !C.IsDebug)
             await db.Database.MigrateAsync();
         else
             await db.Database.EnsureCreatedAsync();
