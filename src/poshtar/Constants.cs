@@ -1,6 +1,7 @@
 using System.Globalization;
 using System.Security.Authentication;
 using System.Text.Json;
+using System.Xml.Linq;
 using poshtar.Services;
 using poshtar.Smtp;
 
@@ -129,7 +130,16 @@ public static class C
         }
     }
 }
-
+public static class X
+{
+    public const string PRODID = "-//pk/iCal//poshtar v1.0//EN";
+    public static readonly XNamespace nsDav = XNamespace.Get("DAV:");
+    public static readonly XNamespace nsCalDav = XNamespace.Get("urn:ietf:params:xml:ns:caldav");
+    public static readonly XNamespace nsCardDav = XNamespace.Get("urn:ietf:params:xml:ns:carddav");
+    public static readonly XNamespace nsCalSrv = XNamespace.Get("http://calendarserver.org/ns/");
+    public static XElement Element(this XNamespace ns, string name, params object[] inner) => new XElement(ns.GetName(name), inner);
+    public static XElement Element(this XName name, params object[] inner) => new XElement(name, inner);
+}
 public enum DbContextType
 {
     SQLite,
