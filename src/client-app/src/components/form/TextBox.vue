@@ -2,6 +2,7 @@
 import { onMounted, reactive, ref } from 'vue';
 export interface ITextBox {
     label?: string;
+    name?: string;
     autoFocus?: boolean;
     required?: boolean;
     placeholder?: string;
@@ -30,7 +31,7 @@ onMounted(() => {
     <div>
         <label v-if="label" :for="state.id" class="form-label">{{ label }} <span v-if="required">*</span></label>
         <input ref="el" class="form-control" :id="state.id" :class="{ 'is-invalid': error }" :placeholder="placeholder"
-            :value="modelValue" @input="update" :required="required" :type="type" :autocomplete="autoComplete">
+            :value="modelValue" @input="update" :required="required" :type="type" :autocomplete="autoComplete" :name="name">
         <div v-if="error" class="invalid-feedback">{{ error }}</div>
         <div v-else-if="help" class="form-text">{{ help }}</div>
     </div>

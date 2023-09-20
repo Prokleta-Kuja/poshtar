@@ -5,6 +5,7 @@ export interface KV {
 }
 export interface ITypeaheadBox {
     label: string;
+    name?: string;
     autoFocus?: boolean;
     required?: boolean;
     modelValue?: number | null;
@@ -57,7 +58,7 @@ onMounted(() => {
     <div>
         <label :for="state.id" class="form-label">{{ props.label }}</label>
         <template v-if="!modelValue">
-            <input ref="el" type="text" @input="search" class="form-control" :id="state.id" @focus="show" @blur="hide">
+            <input ref="el" type="text" @input="search" class="form-control" :id="state.id" @focus="show" @blur="hide" :name="name">
             <ul v-if="results.length" class="dropdown-menu mt-1" :class="{ show: state.shown }">
                 <li v-for="item in results" :key="item.value">
                     <button class="dropdown-item" type="button" @click="select(item)">
@@ -68,7 +69,7 @@ onMounted(() => {
         </template>
         <template v-else>
             <div class="input-group">
-                <input class="form-control" :value="state.selectedText" disabled>
+                <input class="form-control" :value="state.selectedText" :name="name" disabled>
                 <button class="btn btn-outline-danger" type="button" @click.prevent="clearSelection">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-x-lg"
                         viewBox="0 0 16 16">

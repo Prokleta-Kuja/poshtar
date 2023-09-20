@@ -2,6 +2,7 @@
 import { onMounted, reactive, ref } from 'vue';
 export interface ISelectBox {
     label: string;
+    name?: string;
     autoFocus?: boolean;
     required?: boolean;
     modelValue?: number | null;
@@ -36,7 +37,7 @@ onMounted(() => {
     <div>
         <label class="form-label" :for="state.id">{{ props.label }} <span v-if="required">*</span></label>
         <select class="form-select" :class="{ 'is-invalid': error }" :id="state.id" :required="required" @input="update"
-            :value="modelValue">
+            :value="modelValue" :name="name">
             <option v-if="props.undefinedLabel" value="">{{ props.undefinedLabel }}</option>
             <option v-for="option in props.options" :key="option.value" :value="option.value">
                 {{ option.label }}

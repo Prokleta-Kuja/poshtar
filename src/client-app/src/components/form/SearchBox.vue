@@ -2,6 +2,7 @@
 import { onMounted, ref } from 'vue';
 export interface ISearch {
     label?: string;
+    name?: string;
     autoFocus?: boolean;
     placeholder?: string;
     modelValue?: string;
@@ -30,7 +31,7 @@ onMounted(() => {
         </label>
         <div class="input-group">
             <input ref="el" class="form-control" id="search" :placeholder="placeholder" :value="props.modelValue"
-                @keyup.enter="search" type="search">
+                @keyup.enter="search" type="search" :name="name">
             <button v-if="props.modelValue" class="btn btn-outline-danger" type="button" @click.prevent="clear">
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-x-lg"
                     viewBox="0 0 16 16">

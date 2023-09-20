@@ -2,6 +2,7 @@
 import { onMounted, reactive, ref } from 'vue';
 export interface IIntegerBox {
     label?: string;
+    name?: string;
     autoFocus?: boolean;
     required?: boolean;
     placeholder?: string;
@@ -39,7 +40,7 @@ onMounted(() => {
     <div>
         <label v-if="label" :for="state.id" class="form-label">{{ label }} <span v-if="required">*</span></label>
         <input ref="el" class="form-control" :class="{ 'is-invalid': error }" :id="state.id" :placeholder="placeholder"
-            :value="modelValue" @blur="update" @keydown.enter="update" :required="required" type="text"
+            :value="modelValue" @blur="update" @keydown.enter="update" :required="required" type="text" :name="name"
             :autocomplete="autoComplete">
         <div v-if="error" class="invalid-feedback">{{ error }}</div>
         <div v-else-if="help" class="form-text">{{ help }}</div>
