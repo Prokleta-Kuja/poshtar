@@ -53,11 +53,11 @@ else
                         </div>
                         <form @submit.prevent="login">
                             <TextBox class="mb-3" label="Username" autoComplete="username" v-model="state.model.username"
-                                required autoFocus />
+                                required name="username" autoFocus />
                             <TextBox class="mb-3" label="Password" type="password" autoComplete="password"
-                                v-model="state.model.password" required />
+                                v-model="state.model.password" name="password" required />
                             <IntegerBox class="mb-3" label="One Time Code" autoComplete="one-time-code"
-                                v-model="state.model.totp" />
+                                v-model="state.model.totp" name="totp" />
                             <p v-if="state.error" class="text-danger">{{ state.error.message }}</p>
                             <SpinButton class="btn-primary w-100 mb-3" :loading="state.submitting" text="Sign in"
                                 loadingText="Signing in" isSubmit />
