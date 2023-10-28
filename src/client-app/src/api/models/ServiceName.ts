@@ -3,6 +3,6 @@
 /* eslint-disable */
 
 export enum ServiceName {
-    None = 0,
-    Dovecot = 1,
+  None = 0,
+  Dovecot = 1
 }

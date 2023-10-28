@@ -3,10 +3,9 @@
 /* eslint-disable */
 
 export type UserCM = {
-    name: string;
-    description?: string | null;
-    isMaster: boolean;
-    quota?: number | null;
-    password: string;
-};
-
+  name: string
+  description?: string | null
+  isMaster: boolean
+  quota?: number | null
+  password: string
+}

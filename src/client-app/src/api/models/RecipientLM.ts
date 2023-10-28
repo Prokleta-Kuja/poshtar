@@ -3,8 +3,7 @@
 /* eslint-disable */
 
 export type RecipientLM = {
-    id: number;
-    userId?: number | null;
-    data: string;
-};
-
+  id: number
+  userId?: number | null
+  data: string
+}

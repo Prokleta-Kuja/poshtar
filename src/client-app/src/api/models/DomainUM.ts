@@ -3,8 +3,7 @@
 /* eslint-disable */
 
 export type DomainUM = {
-    name: string;
-    relayId?: number | null;
-    disabled?: boolean | null;
-};
-
+  name: string
+  relayId?: number | null
+  disabled?: boolean | null
+}

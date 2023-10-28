@@ -3,12 +3,11 @@
 /* eslint-disable */
 
 export type UserUM = {
-    name: string;
-    description?: string | null;
-    isMaster: boolean;
-    quota?: number | null;
-    newPassword?: string | null;
-    disabled?: boolean | null;
-    clearOtpKey?: boolean | null;
-};
-
+  name: string
+  description?: string | null
+  isMaster: boolean
+  quota?: number | null
+  newPassword?: string | null
+  disabled?: boolean | null
+  clearOtpKey?: boolean | null
+}

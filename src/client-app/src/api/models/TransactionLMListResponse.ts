@@ -2,14 +2,13 @@
 /* tslint:disable */
 /* eslint-disable */
 
-import type { TransactionLM } from './TransactionLM';
+import type { TransactionLM } from './TransactionLM'
 
 export type TransactionLMListResponse = {
-    items: Array<TransactionLM>;
-    size: number;
-    page: number;
-    total: number;
-    ascending: boolean;
-    sortBy?: string | null;
-};
-
+  items: Array<TransactionLM>
+  size: number
+  page: number
+  total: number
+  ascending: boolean
+  sortBy?: string | null
+}
