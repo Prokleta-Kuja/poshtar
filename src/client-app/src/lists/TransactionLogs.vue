@@ -8,21 +8,17 @@ import {
   Sizes,
   type ITableParams,
   initParams,
-  updateParams,
-  getQuery
+  updateParams
 } from '@/components/table'
 import JsonViewer from '@/components/JsonViewer.vue'
-import { useRoute, useRouter } from 'vue-router'
 
 interface ITransactionLogsParams extends ITableParams {
   searchTerm?: string
 }
 
-const route = useRoute()
-const router = useRouter()
 const props = defineProps<{ queryPrefix?: string; transactionId: number }>()
 const data = reactive<{ params: ITransactionLogsParams; items: LogEntryLM[] }>({
-  params: initParams(route.query, props.queryPrefix),
+  params: initParams(),
   items: []
 })
 data.params.sortBy = 'timestamp'
@@ -30,9 +26,6 @@ data.params.ascending = true
 
 const refresh = (params?: ITableParams) => {
   if (params) data.params = params
-
-  const query = { ...route.query, ...getQuery(data.params, props.queryPrefix) }
-  router.replace({ query })
 
   TransactionService.getLogs({ ...data.params, transactionId: props.transactionId }).then((r) => {
     data.items = r.items
@@ -51,13 +44,8 @@ refresh()
 <template>
   <div class="d-flex flex-wrap">
     <Sizes class="me-3 mb-2" style="max-width: 8rem" :params="data.params" :on-change="refresh" />
-    <Search
-      class="me-3 mb-2"
-      style="max-width: 16rem"
-      placeholder="Message, data"
-      v-model="data.params.searchTerm"
-      :on-change="refresh"
-    />
+    <Search class="me-3 mb-2" style="max-width: 16rem" placeholder="Message, data" v-model="data.params.searchTerm"
+      :on-change="refresh" />
   </div>
   <div class="table-responsive">
     <table class="table table-sm">
