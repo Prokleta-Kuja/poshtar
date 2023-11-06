@@ -42,6 +42,7 @@ public class Program
                 case DbContextType.SQLite: builder.Services.AddDbContext<AppDbContext, SqliteDbContext>(); break;
             }
 
+            builder.Services.AddMemoryCache();
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen(options =>
             {
