@@ -159,7 +159,11 @@ auth.initialize()
       </nav>
     </header>
     <div class="container mt-4">
-      <RouterView />
+      <RouterView v-slot="{ Component }">
+        <Transition name="fade" mode="out-in">
+          <component :is="Component" />
+        </Transition>
+      </RouterView>
     </div>
   </template>
   <template v-else>
