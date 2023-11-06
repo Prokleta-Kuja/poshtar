@@ -28,6 +28,7 @@ public class EhloCommand : Command
         ctx.Log($"EHLO {DomainOrAddress}");
         ctx.Transaction.Client = DomainOrAddress;
 
+        await ctx.CheckClientBlacklistAsync();
         await ctx.CheckHeloEhloAsync();
         await ctx.CheckRblAsync();
 

@@ -42,6 +42,7 @@ public class EndpointListener : IDisposable
             context.Transaction.CountryName = info.name;
             context.Transaction.Asn = info.asn;
             context.Log($"Connection established with: {context.Transaction.IpAddress}");
+            await AntiSpam.CheckAsnBlacklistAsync(context);
         }
 
         var stream = tcpClient.GetStream();

@@ -15,6 +15,8 @@ public class AntiSpamSettings
     public bool? EnforceReverseDns { get; set; }
     public bool? EnforceDnsBlockList { get; set; }
     public bool? EnforceSpf { get; set; }
+    public string[]? AsnBlacklist { get; set; }
+    public string[]? ClientBlacklist { get; set; }
 }
 public static class AntiSpam
 {
@@ -27,6 +29,64 @@ public static class AntiSpam
             ctx.Log("Command failed count over treshold, closing connection");
             throw new ResponseException(new Response(ReplyCode.TransactionFailed), true);
         }
+    }
+    public static async Task CheckAsnBlacklistAsync(this SessionContext ctx)
+    {
+        if (C.Smtp.AntiSpamSettings.AsnBlacklist is null || C.Smtp.AntiSpamSettings.AsnBlacklist.Length == 0 || ctx.Transaction.Asn is null)
+            return;
+        var result = false;
+        var asnUp = ctx.Transaction.Asn.ToUpper();
+        foreach (var asn in C.Smtp.AntiSpamSettings.AsnBlacklist)
+            if (result)
+                break;
+            else if (asn.StartsWith('*'))
+            {
+                var asnEnd = asn.TrimStart('*').ToUpper();
+                result = asnUp.EndsWith(asnEnd);
+            }
+            else if (asn.EndsWith('*'))
+            {
+                var asnStart = asn.TrimEnd('*').ToUpper();
+                result = asnUp.StartsWith(asnStart);
+            }
+            else
+                result = asnUp == asn.ToUpper();
+
+        if (!result)
+            return;
+
+        ctx.Log("Matches ASN blacklist, tarpit for 90 seconds then closing connection");
+        await Task.Delay(TimeSpan.FromSeconds(90));
+        throw new ResponseException(new Response(ReplyCode.TransactionFailed), true);
+    }
+    public static async Task CheckClientBlacklistAsync(this SessionContext ctx)
+    {
+        if (C.Smtp.AntiSpamSettings.ClientBlacklist is null || C.Smtp.AntiSpamSettings.ClientBlacklist.Length == 0 || ctx.Transaction.Client is null)
+            return;
+        var result = false;
+        var clientUp = ctx.Transaction.Client.ToUpper();
+        foreach (var client in C.Smtp.AntiSpamSettings.ClientBlacklist)
+            if (result)
+                break;
+            else if (client.StartsWith('*'))
+            {
+                var asnEnd = client.TrimStart('*').ToUpper();
+                result = clientUp.EndsWith(asnEnd);
+            }
+            else if (client.EndsWith('*'))
+            {
+                var asnStart = client.TrimEnd('*').ToUpper();
+                result = clientUp.StartsWith(asnStart);
+            }
+            else
+                result = clientUp == client.ToUpper();
+
+        if (!result)
+            return;
+
+        ctx.Log("Matches Client blacklist, tarpit for 90 seconds then closing connection");
+        await Task.Delay(TimeSpan.FromSeconds(90));
+        throw new ResponseException(new Response(ReplyCode.TransactionFailed), true);
     }
     public static async Task CheckHeloEhloAsync(this SessionContext ctx)
     {

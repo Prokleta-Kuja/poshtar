@@ -3,7 +3,6 @@
 /* eslint-disable */
 
 export type TotpVM = {
-    qr: string;
-    chunkedSecret: string;
-};
-
+  qr: string
+  chunkedSecret: string
+}

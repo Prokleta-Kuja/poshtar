@@ -3,7 +3,6 @@
 /* eslint-disable */
 
 export type TotpCM = {
-    chunkedSecret: string;
-    code?: number | null;
-};
-
+  chunkedSecret: string
+  code?: number | null
+}

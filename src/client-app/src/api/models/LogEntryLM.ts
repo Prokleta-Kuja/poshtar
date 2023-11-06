@@ -3,9 +3,8 @@
 /* eslint-disable */
 
 export type LogEntryLM = {
-    id: number;
-    timestamp: string;
-    message: string;
-    properties?: string | null;
-};
-
+  id: number
+  timestamp: string
+  message: string
+  properties?: string | null
+}

@@ -3,8 +3,7 @@
 /* eslint-disable */
 
 export type ServiceResultModel = {
-    success: boolean;
-    output?: string | null;
-    error?: string | null;
-};
-
+  success: boolean
+  output?: string | null
+  error?: string | null
+}

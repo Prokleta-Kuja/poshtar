@@ -3,6 +3,5 @@
 /* eslint-disable */
 
 export type PlainError = {
-    message: string;
-};
-
+  message: string
+}

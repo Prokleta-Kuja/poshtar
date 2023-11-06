@@ -3,8 +3,7 @@
 /* eslint-disable */
 
 export type LoginModel = {
-    username: string;
-    password: string;
-    totp?: number | null;
-};
-
+  username: string
+  password: string
+  totp?: number | null
+}
