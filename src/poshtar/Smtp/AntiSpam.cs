@@ -61,10 +61,10 @@ public static class AntiSpam
     }
     public static async Task CheckClientBlacklistAsync(this SessionContext ctx)
     {
-        if (C.Smtp.AntiSpamSettings.ClientBlacklist is null || C.Smtp.AntiSpamSettings.ClientBlacklist.Length == 0 || ctx.Transaction.Asn is null)
+        if (C.Smtp.AntiSpamSettings.ClientBlacklist is null || C.Smtp.AntiSpamSettings.ClientBlacklist.Length == 0 || ctx.Transaction.Client is null)
             return;
         var result = false;
-        var clientUp = ctx.Transaction.Asn.ToUpper();
+        var clientUp = ctx.Transaction.Client.ToUpper();
         foreach (var client in C.Smtp.AntiSpamSettings.ClientBlacklist)
             if (result)
                 break;
