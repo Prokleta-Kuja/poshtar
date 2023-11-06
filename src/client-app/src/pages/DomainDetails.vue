@@ -20,20 +20,22 @@ RelayService.getRelays({}).then((r) =>
 )
 </script>
 <template>
-  <div class="d-flex align-items-center flex-wrap">
-    <h1 class="display-6 me-3">
-      <span v-if="!domain.value">Domain</span>
-      <span v-else>{{ domain.value.name }}</span>
-      details
-    </h1>
-    <button class="btn btn-sm btn-secondary me-3" @click="$router.back()">Back</button>
+  <main>
+    <div class="d-flex align-items-center flex-wrap">
+      <h1 class="display-6 me-3">
+        <span v-if="!domain.value">Domain</span>
+        <span v-else>{{ domain.value.name }}</span>
+        details
+      </h1>
+      <button class="btn btn-sm btn-secondary me-3" @click="$router.back()">Back</button>
+      <template v-if="domain.value">
+        <AddDomainAddress :domain-id="props.id" @added="updateAddresses" />
+      </template>
+    </div>
     <template v-if="domain.value">
-      <AddDomainAddress :domain-id="props.id" @added="updateAddresses" />
+      <AddressList :domain-id="props.id" :last-change="addressChange" />
     </template>
-  </div>
-  <template v-if="domain.value">
-    <AddressList :domain-id="props.id" :last-change="addressChange" />
-  </template>
-  <p v-else-if="domain.error" class="text-danger">{{ domain.error.message }}</p>
-  <p v-else>Loading...</p>
+    <p v-else-if="domain.error" class="text-danger">{{ domain.error.message }}</p>
+    <p v-else>Loading...</p>
+  </main>
 </template>
