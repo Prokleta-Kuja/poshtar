@@ -16,6 +16,7 @@ public class AntiSpamSettings
     public bool? EnforceReverseDns { get; set; }
     public bool? EnforceDnsBlockList { get; set; }
     public bool? EnforceSpf { get; set; }
+    public int BanMinutes { get; set; } = 60;
     public int TarpitSeconds { get; set; } = 60;
     public string[]? AsnBlacklist { get; set; }
     public string[]? ClientBlacklist { get; set; }
@@ -30,10 +31,10 @@ public static class AntiSpam
             return false;
 
         var key = GetBannedIpKey(ctx.Transaction.IpAddress);
-        using var cache = ctx.ServiceScope.ServiceProvider.GetRequiredService<IMemoryCache>();
+        var cache = ctx.ServiceScope.ServiceProvider.GetRequiredService<IMemoryCache>();
         if (cache.TryGetValue<string>(key, out var bannedReason))
         {
-            ctx.Log($"{ctx.Transaction.IpAddress} banned: {bannedReason}, terminating connection");
+            ctx.Log($"{ctx.Transaction.IpAddress} banned {bannedReason}, terminating connection");
             return true;
         }
 
@@ -74,12 +75,12 @@ public static class AntiSpam
         if (!result)
             return;
 
-        // if (!string.IsNullOrWhiteSpace(ctx.Transaction.IpAddress))
-        // {
-        //     var key = GetBannedIpKey(ctx.Transaction.IpAddress);
-        //     using var cache = ctx.ServiceScope.ServiceProvider.GetRequiredService<IMemoryCache>();
-        //     cache.Set(key, "ASN blacklist");
-        // }
+        if (!string.IsNullOrWhiteSpace(ctx.Transaction.IpAddress))
+        {
+            var key = GetBannedIpKey(ctx.Transaction.IpAddress);
+            var cache = ctx.ServiceScope.ServiceProvider.GetRequiredService<IMemoryCache>();
+            cache.Set(key, "ASN blacklist", TimeSpan.FromMinutes(C.Smtp.AntiSpamSettings.BanMinutes));
+        }
 
         ctx.Log($"Matches ASN blacklist, tarpit for {C.Smtp.AntiSpamSettings.TarpitSeconds} seconds then closing connection");
         await Task.Delay(TimeSpan.FromSeconds(C.Smtp.AntiSpamSettings.TarpitSeconds));
@@ -110,12 +111,12 @@ public static class AntiSpam
         if (!result)
             return;
 
-        // if (!string.IsNullOrWhiteSpace(ctx.Transaction.IpAddress))
-        // {
-        //     var key = GetBannedIpKey(ctx.Transaction.IpAddress);
-        //     using var cache = ctx.ServiceScope.ServiceProvider.GetRequiredService<IMemoryCache>();
-        //     cache.Set(key, "Client blacklist");
-        // }
+        if (!string.IsNullOrWhiteSpace(ctx.Transaction.IpAddress))
+        {
+            var key = GetBannedIpKey(ctx.Transaction.IpAddress);
+            var cache = ctx.ServiceScope.ServiceProvider.GetRequiredService<IMemoryCache>();
+            cache.Set(key, "Client blacklist", TimeSpan.FromMinutes(C.Smtp.AntiSpamSettings.BanMinutes));
+        }
 
         ctx.Log($"Matches Client blacklist, tarpit for {C.Smtp.AntiSpamSettings.TarpitSeconds} seconds then closing connection");
         await Task.Delay(TimeSpan.FromSeconds(C.Smtp.AntiSpamSettings.TarpitSeconds));
