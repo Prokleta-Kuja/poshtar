@@ -1,3 +1,4 @@
+using System.Buffers;
 using System.IO.Pipelines;
 using poshtar.Smtp.Commands;
 
@@ -98,7 +99,19 @@ class Session
                     {
                         var parser = new Parser(_commandFactory);
                         if (parser.TryMake(ref buffer, out command, out var errorResponse) == false)
-                            throw new ResponseException(errorResponse!);
+                        {
+                            try
+                            {
+                                var bytes = buffer.ToArray();
+                                var text = System.Text.Encoding.ASCII.GetString(bytes);
+                                context.Log($"Unrecognized command: {text}");
+                            }
+                            catch (Exception) { }
+                            finally
+                            {
+                                throw new ResponseException(errorResponse!);
+                            }
+                        }
 
                         return Task.CompletedTask;
                     },
