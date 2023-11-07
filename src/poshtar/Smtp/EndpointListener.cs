@@ -26,7 +26,7 @@ public class EndpointListener : IDisposable
     /// <param name="context">The session context that the pipe is being created for.</param>
     /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>The securable pipe from the endpoint.</returns>
-    public async Task<SecurableDuplexPipe> GetPipeAsync(SessionContext context, CancellationToken cancellationToken)
+    public async Task<SecurableDuplexPipe?> GetPipeAsync(SessionContext context, CancellationToken cancellationToken)
     {
         var tcpClient = await _tcpListener.AcceptTcpClientAsync(cancellationToken).ConfigureAwait(false);
         cancellationToken.ThrowIfCancellationRequested();
@@ -36,6 +36,14 @@ public class EndpointListener : IDisposable
             context.RemoteEndpoint = ip;
             context.Transaction.Start = DateTime.UtcNow;
             context.Transaction.IpAddress = ip.Address.ToString();
+            if (AntiSpam.IsBannedIp(context))
+            {
+                context.IsQuitRequested = true;
+                tcpClient.Client.Close();
+                tcpClient.Close();
+                tcpClient.Dispose();
+                return null;
+            }
 
             var info = context.IpSvc.GetInfo(context.Transaction.IpAddress);
             context.Transaction.CountryCode = info.code;

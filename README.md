@@ -64,6 +64,8 @@ npx openapi-typescript-codegen --useOptions --input http://localhost:5080/swagge
 
 ## SMTP test
 
+`nc -Cv localhost 5025`
+
 ```
 From: Sender <sender@example.com>
 Date: Wed, 22 Mar 2023 07:15:35 +0100
