@@ -25,6 +25,7 @@ public static class AntiSpam
     static string GetBannedIpKey(string ip) => $"ipban.{ip}";
     public static bool IsBannedIp(this SessionContext ctx)
     {
+        // TODO: fix
         if (string.IsNullOrWhiteSpace(ctx.Transaction.IpAddress))
             return false;
 
@@ -73,12 +74,12 @@ public static class AntiSpam
         if (!result)
             return;
 
-        if (!string.IsNullOrWhiteSpace(ctx.Transaction.IpAddress))
-        {
-            var key = GetBannedIpKey(ctx.Transaction.IpAddress);
-            using var cache = ctx.ServiceScope.ServiceProvider.GetRequiredService<IMemoryCache>();
-            cache.Set(key, "ASN blacklist");
-        }
+        // if (!string.IsNullOrWhiteSpace(ctx.Transaction.IpAddress))
+        // {
+        //     var key = GetBannedIpKey(ctx.Transaction.IpAddress);
+        //     using var cache = ctx.ServiceScope.ServiceProvider.GetRequiredService<IMemoryCache>();
+        //     cache.Set(key, "ASN blacklist");
+        // }
 
         ctx.Log($"Matches ASN blacklist, tarpit for {C.Smtp.AntiSpamSettings.TarpitSeconds} seconds then closing connection");
         await Task.Delay(TimeSpan.FromSeconds(C.Smtp.AntiSpamSettings.TarpitSeconds));
@@ -109,12 +110,12 @@ public static class AntiSpam
         if (!result)
             return;
 
-        if (!string.IsNullOrWhiteSpace(ctx.Transaction.IpAddress))
-        {
-            var key = GetBannedIpKey(ctx.Transaction.IpAddress);
-            using var cache = ctx.ServiceScope.ServiceProvider.GetRequiredService<IMemoryCache>();
-            cache.Set(key, "Client blacklist");
-        }
+        // if (!string.IsNullOrWhiteSpace(ctx.Transaction.IpAddress))
+        // {
+        //     var key = GetBannedIpKey(ctx.Transaction.IpAddress);
+        //     using var cache = ctx.ServiceScope.ServiceProvider.GetRequiredService<IMemoryCache>();
+        //     cache.Set(key, "Client blacklist");
+        // }
 
         ctx.Log($"Matches Client blacklist, tarpit for {C.Smtp.AntiSpamSettings.TarpitSeconds} seconds then closing connection");
         await Task.Delay(TimeSpan.FromSeconds(C.Smtp.AntiSpamSettings.TarpitSeconds));
