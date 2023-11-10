@@ -48,7 +48,7 @@ class Session
         {
             try
             {
-                AntiSpam.CmdTry(ctx);
+                await AntiSpam.CmdTryAsync(ctx);
                 var command = await ReadCommandAsync(ctx, cancellationToken).ConfigureAwait(false);
 
                 if (command == null)
