@@ -12,5 +12,5 @@ module.exports = {
   parserOptions: {
     ecmaVersion: 'latest'
   },
-  ignorePatterns: ["src/api/*", "src/assets/*"]
+  ignorePatterns: ["src/api/*", "src/assets/*"],
 }

@@ -21,13 +21,15 @@ public class AntiSpamSettings
     public bool BanConsecutiveRcptFail { get; set; }
     public bool TarpitConsecutiveRcptFail { get; set; }
 
-    public string[] AsnBlacklist { get; set; } = Array.Empty<string>();
-    public bool BanAsnBlacklist { get; set; }
-    public bool TarpitAsnBlacklist { get; set; }
+    public string[] AsnBlocklist { get; set; } = Array.Empty<string>();
+    public bool EnforceAsnBlocklist { get; set; }
+    public bool BanAsnBlocklist { get; set; }
+    public bool TarpitAsnBlocklist { get; set; }
 
-    public string[] ClientBlacklist { get; set; } = Array.Empty<string>();
-    public bool BanClientBlacklist { get; set; }
-    public bool TarpitClientBlacklist { get; set; }
+    public string[] ClientBlocklist { get; set; } = Array.Empty<string>();
+    public bool EnforceClientBlocklist { get; set; }
+    public bool BanClientBlocklist { get; set; }
+    public bool TarpitClientBlocklist { get; set; }
 
     public bool EnforceForwardDns { get; set; }
     public bool BanForwardDns { get; set; }
@@ -110,12 +112,12 @@ public static class AntiSpam
     }
     public static async Task CheckAsnBlacklistAsync(this SessionContext ctx)
     {
-        if (C.Smtp.AntiSpamSettings.AsnBlacklist.Length == 0 || ctx.Transaction.Asn is null)
+        if (C.Smtp.AntiSpamSettings.AsnBlocklist.Length == 0 || ctx.Transaction.Asn is null)
             return;
 
         var result = false;
         var asnUp = ctx.Transaction.Asn.ToUpper();
-        foreach (var asn in C.Smtp.AntiSpamSettings.AsnBlacklist)
+        foreach (var asn in C.Smtp.AntiSpamSettings.AsnBlocklist)
             if (result)
                 break;
             else if (asn.StartsWith('*'))
@@ -135,9 +137,12 @@ public static class AntiSpam
             return;
 
         ctx.Log("Matches ASN blacklist");
-        if (C.Smtp.AntiSpamSettings.BanAsnBlacklist)
+        if (!C.Smtp.AntiSpamSettings.EnforceAsnBlocklist)
+            return;
+
+        if (C.Smtp.AntiSpamSettings.BanAsnBlocklist)
             BanIp(ctx, "ASN blacklist");
-        if (C.Smtp.AntiSpamSettings.TarpitAsnBlacklist)
+        if (C.Smtp.AntiSpamSettings.TarpitAsnBlocklist)
             await TarpitAsync(ctx);
 
         ctx.Log("Closing connection");
@@ -145,12 +150,12 @@ public static class AntiSpam
     }
     public static async Task CheckClientBlacklistAsync(this SessionContext ctx)
     {
-        if (C.Smtp.AntiSpamSettings.ClientBlacklist.Length == 0 || ctx.Transaction.Client is null)
+        if (C.Smtp.AntiSpamSettings.ClientBlocklist.Length == 0 || ctx.Transaction.Client is null)
             return;
 
         var result = false;
         var clientUp = ctx.Transaction.Client.ToUpper();
-        foreach (var client in C.Smtp.AntiSpamSettings.ClientBlacklist)
+        foreach (var client in C.Smtp.AntiSpamSettings.ClientBlocklist)
             if (result)
                 break;
             else if (client.StartsWith('*'))
@@ -170,9 +175,12 @@ public static class AntiSpam
             return;
 
         ctx.Log("Matches Client blacklist");
-        if (C.Smtp.AntiSpamSettings.BanClientBlacklist)
+        if (!C.Smtp.AntiSpamSettings.EnforceAsnBlocklist)
+            return;
+
+        if (C.Smtp.AntiSpamSettings.BanClientBlocklist)
             BanIp(ctx, "Client blacklist");
-        if (C.Smtp.AntiSpamSettings.TarpitClientBlacklist)
+        if (C.Smtp.AntiSpamSettings.TarpitClientBlocklist)
             await TarpitAsync(ctx);
 
         ctx.Log("Closing connection");
