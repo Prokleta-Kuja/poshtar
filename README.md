@@ -57,6 +57,8 @@ CREATE DATABASE dev_poshtar
 
 ## OpenAPI
 
+To clear cache and use latest run `rm -rf ~/.npm/_npx`
+
 ```
 cd src/web
 npx openapi-typescript-codegen --useOptions --input http://localhost:5080/swagger/v1/swagger.json --output ./src/api

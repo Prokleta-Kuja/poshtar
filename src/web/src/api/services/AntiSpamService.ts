@@ -22,14 +22,14 @@ export class AntiSpamService {
     }
 
     /**
-     * @returns any Success
+     * @returns AntiSpamSettings Success
      * @throws ApiError
      */
     public static updateAntiSpam({
         requestBody,
     }: {
         requestBody?: AntiSpamSettings,
-    }): CancelablePromise<any> {
+    }): CancelablePromise<AntiSpamSettings> {
         return __request(OpenAPI, {
             method: 'PUT',
             url: '/api/antispam',

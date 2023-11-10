@@ -2,6 +2,7 @@
 import { AntiSpamService, type AntiSpamSettings } from '@/api'
 import CheckBox from '@/components/form/CheckBox.vue'
 import IntegerBox from '@/components/form/IntegerBox.vue'
+import AreaBox from '@/components/form/AreaBox.vue'
 import SpinButton from '@/components/form/SpinButton.vue'
 import type IModelState from '@/components/form/modelState'
 import { reactive } from 'vue'
@@ -12,14 +13,16 @@ const lists = reactive<{ asn: string; clients: string; dns: string }>({
   clients: '',
   dns: ''
 })
+
+const fillModel = (response: AntiSpamSettings) => {
+  settings.model = response
+  lists.asn = response.asnBlocklist?.join('\n') || ''
+  lists.clients = response.clientBlocklist?.join('\n') || ''
+  // TODO: lists.dns =
+}
 const load = () => {
   AntiSpamService.getAntiSpam()
-    .then((r) => {
-      settings.model = r
-      lists.asn = r.asnBlocklist.join('\n')
-      lists.clients = r.clientBlocklist.join('\n')
-      // TODO: lists.dns =
-    })
+    .then(fillModel)
     .catch(() => {
       /* TODO: show error */
     })
@@ -28,10 +31,11 @@ const load = () => {
 const submit = () => {
   settings.submitting = true
   settings.error = undefined
-  settings.model.asnBlocklist = lists.asn.split('\n')
-  settings.model.clientBlocklist = lists.clients.split('\n')
+  settings.model.asnBlocklist = lists.asn.split('\n').filter((s) => s)
+  settings.model.clientBlocklist = lists.clients.split('\n').filter((s) => s)
   // TODO:settings.model.dnsBlocklist = lists.dns.split('\n')
   AntiSpamService.updateAntiSpam({ requestBody: settings.model })
+    .then(fillModel)
     .catch((r) => (settings.error = r.body))
     .finally(() => (settings.submitting = false))
 }
@@ -120,7 +124,77 @@ load()
             />
           </fieldset>
         </div>
-        <div class="col-4"></div>
+        <div class="col-4">
+          <fieldset>
+            <legend>ASN block list check</legend>
+            <AreaBox
+              class="mb-3"
+              label="Consecutive fail count"
+              v-model="lists.asn"
+              :error="settings.error?.errors?.asnBlocklist"
+              :disabled="!lists.asn"
+            />
+            <CheckBox
+              class="mb-3"
+              inline
+              label="Enforce"
+              v-model="settings.model.enforceAsnBlocklist"
+              :error="settings.error?.errors?.enforceAsnBlocklist"
+            />
+            <CheckBox
+              class="mb-3"
+              inline
+              label="Tarpit"
+              v-model="settings.model.tarpitAsnBlocklist"
+              :error="settings.error?.errors?.tarpitAsnBlocklist"
+              :disabled="!lists.asn"
+            />
+            <CheckBox
+              class="mb-3"
+              inline
+              label="Ban"
+              v-model="settings.model.banAsnBlocklist"
+              :error="settings.error?.errors?.banAsnBlocklist"
+              :disabled="!lists.asn"
+            />
+          </fieldset>
+          <fieldset>
+            <legend>Client block list check</legend>
+            <AreaBox
+              class="mb-3"
+              label="Consecutive fail count"
+              v-model="lists.clients"
+              :error="settings.error?.errors?.clientBlocklist"
+            />
+            <CheckBox
+              class="mb-3"
+              inline
+              label="Enforce"
+              v-model="settings.model.enforceClientBlocklist"
+              :error="settings.error?.errors?.enforceClientBlocklist"
+              :disabled="!lists.clients"
+            />
+            <CheckBox
+              class="mb-3"
+              inline
+              label="Tarpit"
+              v-model="settings.model.tarpitClientBlocklist"
+              :error="settings.error?.errors?.tarpitClientBlocklist"
+              :disabled="!lists.clients"
+            />
+            <CheckBox
+              class="mb-3"
+              inline
+              label="Ban"
+              v-model="settings.model.banClientBlocklist"
+              :error="settings.error?.errors?.banClientBlocklist"
+              :disabled="!lists.clients"
+            />
+          </fieldset>
+          <fieldset>
+            <legend>TODO: DNS block list check</legend>
+          </fieldset>
+        </div>
         <div class="col-4">
           <fieldset>
             <legend>Forward DNS check</legend>
@@ -173,63 +247,6 @@ load()
               :error="settings.error?.errors?.banReverseDns"
               :disabled="!settings.model.enforceReverseDns"
             />
-          </fieldset>
-          <fieldset>
-            <legend>ASN block list check</legend>
-            TODO: textarea
-            <CheckBox
-              class="mb-3"
-              inline
-              label="Enforce"
-              v-model="settings.model.enforceAsnBlocklist"
-              :error="settings.error?.errors?.enforceAsnBlocklist"
-            />
-            <CheckBox
-              class="mb-3"
-              inline
-              label="Tarpit"
-              v-model="settings.model.tarpitAsnBlocklist"
-              :error="settings.error?.errors?.tarpitAsnBlocklist"
-              :disabled="!settings.model.enforceAsnBlocklist"
-            />
-            <CheckBox
-              class="mb-3"
-              inline
-              label="Ban"
-              v-model="settings.model.banAsnBlocklist"
-              :error="settings.error?.errors?.banAsnBlocklist"
-              :disabled="!settings.model.enforceAsnBlocklist"
-            />
-          </fieldset>
-          <fieldset>
-            <legend>Client block list check</legend>
-            TODO: textarea
-            <CheckBox
-              class="mb-3"
-              inline
-              label="Enforce"
-              v-model="settings.model.enforceClientBlocklist"
-              :error="settings.error?.errors?.enforceClientBlocklist"
-            />
-            <CheckBox
-              class="mb-3"
-              inline
-              label="Tarpit"
-              v-model="settings.model.tarpitClientBlocklist"
-              :error="settings.error?.errors?.tarpitClientBlocklist"
-              :disabled="!settings.model.enforceClientBlocklist"
-            />
-            <CheckBox
-              class="mb-3"
-              inline
-              label="Ban"
-              v-model="settings.model.banClientBlocklist"
-              :error="settings.error?.errors?.banClientBlocklist"
-              :disabled="!settings.model.enforceClientBlocklist"
-            />
-          </fieldset>
-          <fieldset>
-            <legend>TODO: DNS block list check</legend>
           </fieldset>
           <fieldset>
             <legend>SPF check</legend>

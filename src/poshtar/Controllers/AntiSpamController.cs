@@ -25,7 +25,7 @@ public class AntiSpamController : ControllerBase
     }
 
     [HttpPut(Name = "UpdateAntiSpam")]
-    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(AntiSpamSettings), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ValidationError), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> PutAsync(AntiSpamSettings model)
     {
@@ -44,6 +44,6 @@ public class AntiSpamController : ControllerBase
         C.Smtp.AntiSpamSettings = model;
         await C.Settings.WriteAntiSpamAsync(C.Smtp.AntiSpamSettings);
 
-        return Ok();
+        return Ok(C.Smtp.AntiSpamSettings);
     }
 }
