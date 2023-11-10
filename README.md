@@ -58,7 +58,7 @@ CREATE DATABASE dev_poshtar
 ## OpenAPI
 
 ```
-cd src/client-app
+cd src/web
 npx openapi-typescript-codegen --useOptions --input http://localhost:5080/swagger/v1/swagger.json --output ./src/api
 ```
 
