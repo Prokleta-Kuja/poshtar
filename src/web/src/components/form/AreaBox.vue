@@ -8,7 +8,7 @@ export interface IAreaBox {
   placeholder?: string
   rows?: number
   autoComplete?: 'off' | 'username' | 'password' | 'one-time-code'
-  modelValue?: string | null
+  modelValue?: string
   help?: string
   error?: string
 }
@@ -31,7 +31,6 @@ onMounted(() => {
     <label v-if="label" :for="state.id" class="form-label"
       >{{ label }} <span v-if="required">*</span></label
     >
-
     <textarea
       ref="el"
       class="form-control"
