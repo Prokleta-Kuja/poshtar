@@ -8,6 +8,7 @@ export interface ICheckBox {
   modelValue?: boolean | null
   help?: string
   error?: string
+  disabled?: boolean
   inline?: boolean
   onChange?: () => void
 }
@@ -38,6 +39,7 @@ onMounted(() => {
       :id="state.id"
       :required="required"
       :name="name"
+      :disabled="disabled"
     />
     <label class="form-check-label" :for="state.id"
       >{{ label }}<span v-if="required">*</span></label

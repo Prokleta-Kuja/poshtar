@@ -82,6 +82,15 @@ auth.initialize()
                   >Domains</RouterLink
                 >
               </li>
+              <li
+                class="nav-item col-6 col-lg-auto"
+                data-bs-target="#appNavbar"
+                data-bs-dismiss="offcanvas"
+              >
+                <RouterLink class="nav-link py-2 px-0 px-lg-2" :to="{ name: 'route.antispam' }"
+                  >Antispam</RouterLink
+                >
+              </li>
             </ul>
             <hr class="d-lg-none text-white-50" />
             <ul class="navbar-nav flex-row flex-wrap ms-md-auto">
@@ -176,7 +185,9 @@ auth.initialize()
 .bd-navbar {
   padding: 0.75rem 0;
   background-color: transparent;
-  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15), inset 0 -1px 0 rgba(255, 255, 255, 0.15);
+  box-shadow:
+    0 0.5rem 1rem rgba(0, 0, 0, 0.15),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.15);
 }
 
 .bd-gutter {

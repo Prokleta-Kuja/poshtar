@@ -8,6 +8,7 @@ import Users from './pages/Users.vue'
 import UserDetails from './pages/UserDetails.vue'
 import Domains from './pages/Domains.vue'
 import DomainDetails from './pages/DomainDetails.vue'
+import AntiSpam from './pages/AntiSpam.vue'
 import { createPinia } from 'pinia'
 import { useAuth } from './stores/auth.store'
 
@@ -73,6 +74,11 @@ const router = createRouter({
       name: 'route.domainDetails',
       component: DomainDetails,
       props: parseId
+    },
+    {
+      path: '/anti-spam',
+      name: 'route.antispam',
+      component: AntiSpam
     },
     { path: '/:pathMatch(.*)*', name: 'NotFound', component: Index } // NotFound
   ]

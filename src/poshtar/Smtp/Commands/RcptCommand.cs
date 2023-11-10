@@ -66,7 +66,7 @@ public sealed class RcptCommand : Command
         else
         {
             ctx.Log("Refused recepient");
-            ctx.LocalRecipientNotResolved();
+            await ctx.LocalRecipientNotResolvedAsnyc();
             await ctx.Pipe.Output.WriteReplyAsync(Response.MailboxNameNotAllowed, cancellationToken).ConfigureAwait(false);
             return false;
         }
