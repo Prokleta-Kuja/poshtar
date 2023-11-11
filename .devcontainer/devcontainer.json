@@ -60,7 +60,7 @@
 		}
 	},
 	// Use 'postCreateCommand' to run commands after the container is created.
-	"postCreateCommand": "dotnet restore src;dotnet tool restore;dotnet dev-certs https -q;echo \"alias ll='ls -hal'\" >> ~/.bashrc;sudo ./dev.sh",
+	"postCreateCommand": "dotnet restore src/api;dotnet tool restore;dotnet dev-certs https -q;echo \"alias ll='ls -hal'\" >> ~/.bashrc;sudo ./dev.sh",
 	"customizations": {
 		"vscode": {
 			"extensions": [

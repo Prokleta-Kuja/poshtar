@@ -26,13 +26,13 @@ jobs:
         with:
           dotnet-version: 7.0.x
       - name: Restore dependencies
-        working-directory: src/poshtar
+        working-directory: src/api
         run: dotnet restore
       - name: Build
-        working-directory: src/poshtar
+        working-directory: src/api
         run: dotnet build --no-restore
       - name: Publish
-        working-directory: src/poshtar
+        working-directory: src/api
         run: dotnet publish /p:Version=${{ env.VERSION }} -c Release --no-restore -o out
       - name: Setup node
         uses: actions/setup-node@v3

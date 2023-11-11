@@ -1,6 +1,6 @@
 FROM mcr.microsoft.com/dotnet/aspnet:7.0 AS runtime
 WORKDIR /app
-COPY ./src/poshtar/out ./
+COPY ./src/api/out ./
 COPY ./src/web/dist ./web
 
 ENV LC_ALL C
