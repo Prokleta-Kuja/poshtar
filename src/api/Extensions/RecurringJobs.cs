@@ -24,6 +24,13 @@ public static class RecurringJobs
            "0 4 * * *", // Every day @ 4
            defaultOpt);
 
+        activeJobIds.Add(nameof(CleanupCalendarObjects));
+        RecurringJob.AddOrUpdate<CleanupCalendarObjects>(
+           nameof(CleanupCalendarObjects),
+           j => j.Run(null, CancellationToken.None),
+           "0 3 * * *", // Every day @ 4
+           defaultOpt);
+
         activeJobIds.Add(nameof(CertReload));
         RecurringJob.AddOrUpdate<CertReload>(
             nameof(CertReload),

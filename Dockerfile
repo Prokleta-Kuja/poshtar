@@ -27,6 +27,6 @@ ENV ASPNETCORE_URLS=http://*:5080 \
     LOCALE=en-US \
     TZ=America/Chicago
 
-VOLUME ["/data/certs", "/data/config", "/data/logs", "/data/mail"]
+VOLUME ["/data/certs", "/data/config", "/data/logs", "/data/mail", "/data/calendar_items"]
 EXPOSE 5025/TCP 5587/TCP 5993/TCP 5080/TCP
 ENTRYPOINT ["dotnet", "poshtar.dll"]

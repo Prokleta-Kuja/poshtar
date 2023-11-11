@@ -70,6 +70,15 @@ auth.initialize()
                 data-bs-target="#appNavbar"
                 data-bs-dismiss="offcanvas"
               >
+                <RouterLink class="nav-link py-2 px-0 px-lg-2" :to="{ name: 'route.calendars' }"
+                  >Calendars</RouterLink
+                >
+              </li>
+              <li
+                class="nav-item col-6 col-lg-auto"
+                data-bs-target="#appNavbar"
+                data-bs-dismiss="offcanvas"
+              >
                 <RouterLink class="nav-link py-2 px-0 px-lg-2" :to="{ name: 'route.domains' }"
                   >Domains</RouterLink
                 >

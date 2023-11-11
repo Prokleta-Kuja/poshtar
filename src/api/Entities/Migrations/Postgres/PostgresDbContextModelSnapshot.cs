@@ -17,7 +17,7 @@ namespace poshtar.Entities.Migrations.Postgres
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "7.0.5")
+                .HasAnnotation("ProductVersion", "7.0.13")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
@@ -107,6 +107,96 @@ namespace poshtar.Entities.Migrations.Postgres
                         .HasDatabaseName("ix_addresses_domain_id");
 
                     b.ToTable("addresses", (string)null);
+                });
+
+            modelBuilder.Entity("poshtar.Entities.Calendar", b =>
+                {
+                    b.Property<int>("CalendarId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasColumnName("calendar_id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("CalendarId"));
+
+                    b.Property<string>("DisplayName")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("display_name");
+
+                    b.HasKey("CalendarId")
+                        .HasName("pk_calendars");
+
+                    b.ToTable("calendars", (string)null);
+                });
+
+            modelBuilder.Entity("poshtar.Entities.CalendarObject", b =>
+                {
+                    b.Property<int>("CalendarObjectId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasColumnName("calendar_object_id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("CalendarObjectId"));
+
+                    b.Property<int>("CalendarId")
+                        .HasColumnType("integer")
+                        .HasColumnName("calendar_id");
+
+                    b.Property<DateTime?>("Deleted")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("deleted");
+
+                    b.Property<string>("FileName")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("file_name");
+
+                    b.Property<DateTime?>("FirstOccurence")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("first_occurence");
+
+                    b.Property<DateTime?>("LastOccurence")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("last_occurence");
+
+                    b.Property<DateTime>("Modified")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("modified");
+
+                    b.Property<int>("Type")
+                        .HasColumnType("integer")
+                        .HasColumnName("type");
+
+                    b.HasKey("CalendarObjectId")
+                        .HasName("pk_calendar_objects");
+
+                    b.HasIndex("CalendarId")
+                        .HasDatabaseName("ix_calendar_objects_calendar_id");
+
+                    b.ToTable("calendar_objects", (string)null);
+                });
+
+            modelBuilder.Entity("poshtar.Entities.CalendarUser", b =>
+                {
+                    b.Property<int>("CalendarId")
+                        .HasColumnType("integer")
+                        .HasColumnName("calendar_id");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("integer")
+                        .HasColumnName("user_id");
+
+                    b.Property<bool>("CanWrite")
+                        .HasColumnType("boolean")
+                        .HasColumnName("can_write");
+
+                    b.HasKey("CalendarId", "UserId")
+                        .HasName("pk_calendar_users");
+
+                    b.HasIndex("UserId")
+                        .HasDatabaseName("ix_calendar_users_user_id");
+
+                    b.ToTable("calendar_users", (string)null);
                 });
 
             modelBuilder.Entity("poshtar.Entities.Domain", b =>
@@ -412,6 +502,39 @@ namespace poshtar.Entities.Migrations.Postgres
                     b.Navigation("Domain");
                 });
 
+            modelBuilder.Entity("poshtar.Entities.CalendarObject", b =>
+                {
+                    b.HasOne("poshtar.Entities.Calendar", "Calendar")
+                        .WithMany("CalendarObjects")
+                        .HasForeignKey("CalendarId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_calendar_objects_calendars_calendar_id");
+
+                    b.Navigation("Calendar");
+                });
+
+            modelBuilder.Entity("poshtar.Entities.CalendarUser", b =>
+                {
+                    b.HasOne("poshtar.Entities.Calendar", "Calendar")
+                        .WithMany("CalendarUsers")
+                        .HasForeignKey("CalendarId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_calendar_users_calendars_calendar_id");
+
+                    b.HasOne("poshtar.Entities.User", "User")
+                        .WithMany("CalendarUsers")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_calendar_users_users_user_id");
+
+                    b.Navigation("Calendar");
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("poshtar.Entities.Domain", b =>
                 {
                     b.HasOne("poshtar.Entities.Relay", "Relay")
@@ -465,6 +588,13 @@ namespace poshtar.Entities.Migrations.Postgres
                     b.Navigation("FromUser");
                 });
 
+            modelBuilder.Entity("poshtar.Entities.Calendar", b =>
+                {
+                    b.Navigation("CalendarObjects");
+
+                    b.Navigation("CalendarUsers");
+                });
+
             modelBuilder.Entity("poshtar.Entities.Domain", b =>
                 {
                     b.Navigation("Addresses");
@@ -484,6 +614,8 @@ namespace poshtar.Entities.Migrations.Postgres
 
             modelBuilder.Entity("poshtar.Entities.User", b =>
                 {
+                    b.Navigation("CalendarUsers");
+
                     b.Navigation("Transactions");
                 });
 #pragma warning restore 612, 618

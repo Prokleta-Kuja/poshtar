@@ -10,12 +10,12 @@
 	},
 	// Use 'forwardPorts' to make a list of ports inside the container available locally.
 	"forwardPorts": [
-		3000,
-		5080,
-		5443
+		3000
 	],
 	"appPort": [
 		"0.0.0.0:5025:5025",
+		"0.0.0.0:5080:5080",
+		"0.0.0.0:5443:5443",
 		"0.0.0.0:5465:5465",
 		"0.0.0.0:5587:5587",
 		"0.0.0.0:5143:5143",
@@ -60,7 +60,7 @@
 		}
 	},
 	// Use 'postCreateCommand' to run commands after the container is created.
-	"postCreateCommand": "dotnet restore src/api;dotnet tool restore;dotnet dev-certs https -q;echo \"alias ll='ls -hal'\" >> ~/.bashrc;sudo ./dev.sh",
+	"postCreateCommand": "dotnet restore src/api;dotnet tool restore;dotnet dev-certs https -q;npm i --prefix src/web/;echo \"alias ll='ls -hal'\" >> ~/.bashrc;sudo ./dev.sh",
 	"customizations": {
 		"vscode": {
 			"extensions": [

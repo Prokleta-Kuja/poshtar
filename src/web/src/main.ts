@@ -9,6 +9,7 @@ import UserDetailsView from './views/UserDetailsView.vue'
 import DomainsView from './views/DomainsView.vue'
 import DomainDetailsView from './views/DomainDetailsView.vue'
 import AntiSpamView from './views/AntiSpamView.vue'
+import CalendarsView from './views/CalendarsView.vue'
 import { createPinia } from 'pinia'
 import { useAuth } from './stores/auth.store'
 
@@ -79,6 +80,11 @@ const router = createRouter({
       path: '/anti-spam',
       name: 'route.antispam',
       component: AntiSpamView
+    },
+    {
+      path: '/calendars',
+      name: 'route.calendars',
+      component: CalendarsView
     },
     { path: '/:pathMatch(.*)*', name: 'NotFound', component: IndexView } // NotFound
   ]

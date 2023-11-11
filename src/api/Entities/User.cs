@@ -18,4 +18,5 @@ public class User
 
     public virtual List<Address> Addresses { get; set; } = new();
     public virtual List<Transaction> Transactions { get; set; } = new();
+    public virtual List<CalendarUser> CalendarUsers { get; set; } = new();
 }

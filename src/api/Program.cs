@@ -134,7 +134,8 @@ public class Program
 
             app.MapControllers().RequireAuthorization();
 
-            app.MapWhen(x => !x.Request.Path.Value!.StartsWith("/api/"), builder =>
+            var nonSpaPrefixes = new string[] { "/.well-known/", "/dav", "/api/" };
+            app.MapWhen(x => !nonSpaPrefixes.Any(prefix => x.Request.Path.Value!.StartsWith(prefix)), builder =>
             {
                 builder.UseSpa(spa =>
                 {
@@ -166,6 +167,7 @@ public class Program
         Directory.CreateDirectory(C.Paths.ConfigData);
         Directory.CreateDirectory(C.Paths.DovecotData);
         Directory.CreateDirectory(C.Paths.UserData);
+        Directory.CreateDirectory(C.Paths.CalendarObjectsData);
         Directory.CreateDirectory(C.Paths.QueueData);
 
         if (string.IsNullOrWhiteSpace(C.Hostname))
@@ -179,7 +181,7 @@ public class Program
 
         using var scope = provider.CreateScope();
         using var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-        if (db.Database.GetMigrations().Any())
+        if (!C.IsDebug && db.Database.GetMigrations().Any())
             await db.Database.MigrateAsync();
         else
             await db.Database.EnsureCreatedAsync();

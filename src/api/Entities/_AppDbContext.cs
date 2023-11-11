@@ -38,6 +38,9 @@ public partial class AppDbContext : DbContext, IDataProtectionKeyContext
     public DbSet<Transaction> Transactions => Set<Transaction>();
     public DbSet<LogEntry> Logs => Set<LogEntry>();
     public DbSet<Recipient> Recipients => Set<Recipient>();
+    public DbSet<Calendar> Calendars => Set<Calendar>();
+    public DbSet<CalendarObject> CalendarObjects => Set<CalendarObject>();
+    public DbSet<CalendarUser> CalendarUsers => Set<CalendarUser>();
 
     protected void AdditionalConfiguration(DbContextOptionsBuilder options)
     {
@@ -97,6 +100,24 @@ public partial class AppDbContext : DbContext, IDataProtectionKeyContext
         {
             e.HasKey(e => e.RecipientId);
             e.HasOne(e => e.User).WithMany().OnDelete(DeleteBehavior.Cascade);
+        });
+
+        builder.Entity<Calendar>(e =>
+        {
+            e.HasKey(e => e.CalendarId);
+        });
+
+        builder.Entity<CalendarObject>(e =>
+        {
+            e.HasKey(e => e.CalendarObjectId);
+            e.HasOne(e => e.Calendar).WithMany(e => e.CalendarObjects).OnDelete(DeleteBehavior.Cascade);
+        });
+
+        builder.Entity<CalendarUser>(e =>
+        {
+            e.HasKey(e => new { e.CalendarId, e.UserId });
+            e.HasOne(e => e.Calendar).WithMany(e => e.CalendarUsers).OnDelete(DeleteBehavior.Cascade);
+            e.HasOne(e => e.User).WithMany(e => e.CalendarUsers).OnDelete(DeleteBehavior.Cascade);
         });
 
         // SQLite conversions
@@ -167,6 +188,23 @@ public partial class AppDbContext : DbContext, IDataProtectionKeyContext
         nanAdmin.Addresses.Add(nanMailAdmin);
         icaUser.Addresses.Add(icaMailUser); icaUser.Addresses.Add(icaMailPrefix); icaUser.Addresses.Add(icaMailSuffix);
         nanUser.Addresses.Add(nanMailUser); nanUser.Addresses.Add(nanMailPrefix); nanUser.Addresses.Add(nanMailSuffix);
+
+        await SaveChangesAsync();
+
+        var icaAdminCalendar = new Calendar { DisplayName = "ICA Admin Calendar" };
+        var icaUserCalendar = new Calendar { DisplayName = "ICA User Calendar" };
+        var nanAdminCalendar = new Calendar { DisplayName = "NaN Admin Calendar" };
+        var nanUserCalendar = new Calendar { DisplayName = "NaN User Calendar" };
+        Calendars.AddRange(icaAdminCalendar, icaUserCalendar, nanAdminCalendar, nanUserCalendar);
+
+        await SaveChangesAsync();
+
+        CalendarUsers.Add(new() { Calendar = icaAdminCalendar, User = icaAdmin, CanWrite = true });
+        CalendarUsers.Add(new() { Calendar = icaUserCalendar, User = icaAdmin });
+        CalendarUsers.Add(new() { Calendar = icaUserCalendar, User = icaUser, CanWrite = true });
+        CalendarUsers.Add(new() { Calendar = nanAdminCalendar, User = nanAdmin, CanWrite = true });
+        CalendarUsers.Add(new() { Calendar = nanUserCalendar, User = nanAdmin });
+        CalendarUsers.Add(new() { Calendar = nanUserCalendar, User = nanUser, CanWrite = true });
 
         await SaveChangesAsync();
     }
