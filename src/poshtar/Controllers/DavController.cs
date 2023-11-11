@@ -1,5 +1,6 @@
 using System.Net.Http.Headers;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Xml.Linq;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -21,6 +22,8 @@ namespace poshtar.Controllers;
 public class DavController : ControllerBase
 {
     static readonly SaveOptions xmlSaveOpt = SaveOptions.None; // Change in prod to SaveOptions.DisableFormatting
+    static Regex rxDate = new Regex(@"(?<year>\d{4})(?<month>\d{2})(?<day>\d{2})T?(?<hour>\d{2}?)(?<min>\d{2}?)(?<sec>\d{2}?)(Z?)", RegexOptions.IgnoreCase | RegexOptions.Compiled);
+
     const string DT_FORMAT = "o";
     const string DAV_PREFIX = "/dav/";
     const string WELL_KNOWN_PREFIX = "/.well-known/caldav/";
@@ -257,30 +260,68 @@ public class DavController : ControllerBase
         var query = _db.Calendars.Where(c => c.CalendarId == calendarId && c.CalendarUsers.Any(cu => cu.UserId == userId.Value));
 
         var operation = xReq.Root!.Name;
-        if (operation == X.nsCalDav.GetName("calendar-multiget"))
-            query = query.Include(c => c.CalendarItems.Where(e => hrefs.Contains(e.FileName)));
+        if (operation == X.nsCalDav.GetName("calendar-query"))
+        {
+            var filterElms = xReq.Descendants(X.nsCalDav.GetName("comp-filter"));
+            var rangeElm = filterElms?.Elements(X.nsCalDav.GetName("time-range")).FirstOrDefault();
+            var start = rangeElm?.Attribute("start")?.Value;
+            var end = rangeElm?.Attribute("end")?.Value;
+
+            if (!string.IsNullOrWhiteSpace(start))
+            {
+                var startMatch = rxDate.Match(start);
+                if (startMatch.Success &&
+                    int.TryParse(startMatch.Groups["year"].Value, out var year) &&
+                    int.TryParse(startMatch.Groups["month"].Value, out var month) &&
+                    int.TryParse(startMatch.Groups["day"].Value, out var day) &&
+                    int.TryParse(startMatch.Groups["hour"].Value, out var hour) &&
+                    int.TryParse(startMatch.Groups["min"].Value, out var min) &&
+                    int.TryParse(startMatch.Groups["sec"].Value, out var sec))
+                {
+                    var startDt = new DateTime(year, month, day, hour, min, sec, startMatch.Groups[startMatch.Groups.Count - 1].Value.Equals("Z") ? DateTimeKind.Utc : DateTimeKind.Unspecified);
+                    query = query.Include(c => c.CalendarObjects.Where(e => e.LastOccurence >= startDt));
+                }
+            }
+            if (!string.IsNullOrWhiteSpace(end))
+            {
+                var endMatch = rxDate.Match(end);
+                if (endMatch.Success &&
+                    int.TryParse(endMatch.Groups["year"].Value, out var year) &&
+                    int.TryParse(endMatch.Groups["month"].Value, out var month) &&
+                    int.TryParse(endMatch.Groups["day"].Value, out var day) &&
+                    int.TryParse(endMatch.Groups["hour"].Value, out var hour) &&
+                    int.TryParse(endMatch.Groups["min"].Value, out var min) &&
+                    int.TryParse(endMatch.Groups["sec"].Value, out var sec))
+                {
+                    var endDt = new DateTime(year, month, day, hour, min, sec, endMatch.Groups[endMatch.Groups.Count - 1].Value.Equals("Z") ? DateTimeKind.Utc : DateTimeKind.Unspecified);
+                    query = query.Include(c => c.CalendarObjects.Where(e => e.FirstOccurence >= endDt));
+                }
+            }
+        }
         else if (operation == X.nsDav.GetName("sync-collection"))
         {
             lastModified = await _db.Calendars
                 .Where(c => c.CalendarId == calendarId && c.CalendarUsers.Any(cu => cu.UserId == userId.Value))
-                .Select(c => c.CalendarItems.Max(e => e.Modified))
+                .Select(c => c.CalendarObjects.Max(e => e.Modified))
                 .SingleAsync();
 
             var token = xReq.Root.Descendants(X.nsDav.GetName("sync-token")).FirstOrDefault()?.Value;
             if (!string.IsNullOrWhiteSpace(token) && DateTime.TryParse(token, out var since))
-                query = query.Include(c => c.CalendarItems.Where(e => e.Modified > since.ToUniversalTime()));
+                query = query.Include(c => c.CalendarObjects.Where(e => e.Modified > since.ToUniversalTime()));
             else
-                query = query.Include(c => c.CalendarItems);
+                query = query.Include(c => c.CalendarObjects);
         }
+        else if (operation == X.nsCalDav.GetName("calendar-multiget"))
+            query = query.Include(c => c.CalendarObjects.Where(e => hrefs.Contains(e.FileName)));
         var userCalendar = await query.SingleAsync();
         var xRes = X.nsDav.Element("multistatus",
-            userCalendar.CalendarItems.Select(r =>
+            userCalendar.CalendarObjects.Select(r =>
                 X.nsDav.Element("response",
                     X.nsDav.Element("href", GetCalendarItemUri(calendarId, r.FileName)),
                     X.nsDav.Element("propstat",
                         X.nsDav.Element("prop",
                             getetag == null ? null! : getetagName.Element(r.Modified.ToString(DT_FORMAT)),
-                            getContentType == null ? null! : getContentTypeName.Element("text/calendar; component=vevent"), //vtodo
+                            getContentType == null ? null! : getContentTypeName.Element("text/calendar; component=vevent"), //vtodo ili VCALENDAR?
                             calendarData == null ? null! : calendarDataName.Element(GetCalendarItemDataFromFile(r.FileName))
                         ),
                         X.nsDav.Element("status", "HTTP/1.1 200 OK")
@@ -352,7 +393,7 @@ public class DavController : ControllerBase
             .Where(c => c.CalendarId == calendarId && c.CalendarUsers.Any(cu => cu.UserId == userId.Value));
 
         if (depth > 0)
-            query = query.Include(c => c.CalendarItems);
+            query = query.Include(c => c.CalendarObjects);
 
         var calendar = await query.SingleAsync();
 
@@ -381,7 +422,7 @@ public class DavController : ControllerBase
         XElement syncToken = null!;
         if (allprop || (props.Any(x => x.Name == getctagName) || props.Any(x => x.Name == syncTokenName)))
         {
-            var lastModified = await _db.CalendarItems.Where(ci => ci.CalendarId == calendarId).MaxAsync(ci => ci.Modified);
+            var lastModified = await _db.CalendarObjects.Where(ci => ci.CalendarId == calendarId).MaxAsync(ci => ci.Modified);
             getctag = getctagName.Element(lastModified.ToString(DT_FORMAT));
             syncToken = syncTokenName.Element(lastModified.ToString(DT_FORMAT));
         }
@@ -433,7 +474,7 @@ public class DavController : ControllerBase
                 ),
                 prop404.Elements().Any() ? propStat404 : null!
             ),
-            calendar.CalendarItems.Select(e =>
+            calendar.CalendarObjects.Select(e =>
                 X.nsDav.Element("response",
                     X.nsDav.Element("href", GetCalendarItemUri(e.CalendarId, e.FileName)),
                     X.nsDav.Element("propstat",
@@ -469,14 +510,14 @@ public class DavController : ControllerBase
         _logger.LogDebug("GET 200");
         var calendar = await _db.Calendars
             .Where(c => c.CalendarId == calendarId && c.CalendarUsers.Any(cu => cu.UserId == userId.Value))
-            .Include(c => c.CalendarItems.Where(ce => ce.FileName == itemFileName))
+            .Include(c => c.CalendarObjects.Where(ce => ce.FileName == itemFileName))
             .SingleAsync();
 
-        var calendarItem = calendar.CalendarItems.FirstOrDefault();
+        var calendarItem = calendar.CalendarObjects.FirstOrDefault();
         if (calendarItem == null)
             return NotFound();
 
-        var path = C.Paths.CalendarItemsDataFor(calendarItem.FileName);
+        var path = C.Paths.CalendarObjectsDataFor(calendarItem.FileName);
         if (!System.IO.File.Exists(path))
             return NotFound();
 
@@ -505,25 +546,33 @@ public class DavController : ControllerBase
         if (string.IsNullOrWhiteSpace(data))
             return BadRequest();
 
+        var info = GetCalendarInfo(data);
         var calendar = await _db.Calendars
             .Where(c => c.CalendarId == calendarId && c.CalendarUsers.Any(cu => cu.UserId == userId.Value))
-            .Include(c => c.CalendarItems.Where(ce => ce.FileName == itemFileName))
+            .Include(c => c.CalendarObjects.Where(ce => ce.FileName == itemFileName))
             .SingleAsync();
 
-        var existing = calendar.CalendarItems.FirstOrDefault();
+        var existing = calendar.CalendarObjects.FirstOrDefault();
         var now = DateTime.UtcNow;
         var isNew = existing == null;
         if (isNew)
-            calendar.CalendarItems.Add(new()
+            calendar.CalendarObjects.Add(new()
             {
-                Type = CalendarItemType.Unknown, // TODO
+                Type = info.Type,
                 FileName = itemFileName,
+                FirstOccurence = info.FirstOccurence,
+                LastOccurence = info.LastOccurence,
                 Modified = now,
             });
         else
+        {
+            existing!.Type = info.Type;
+            existing!.FirstOccurence = info.FirstOccurence;
+            existing!.LastOccurence = info.LastOccurence;
             existing!.Modified = now;
+        }
 
-        await System.IO.File.WriteAllTextAsync(C.Paths.CalendarItemsDataFor(itemFileName), data);
+        await System.IO.File.WriteAllTextAsync(C.Paths.CalendarObjectsDataFor(itemFileName), data);
         await _db.SaveChangesAsync();
 
         Response.Headers.ETag = now.ToString(DT_FORMAT);
@@ -543,21 +592,19 @@ public class DavController : ControllerBase
         _logger.LogDebug("DELETE 200");
         var calendar = await _db.Calendars
             .Where(c => c.CalendarId == calendarId && c.CalendarUsers.Any(cu => cu.UserId == userId.Value))
-            .Include(c => c.CalendarItems.Where(ce => ce.FileName == itemFileName))
+            .Include(c => c.CalendarObjects.Where(ce => ce.FileName == itemFileName))
             .SingleAsync();
 
-        var existing = calendar.CalendarItems.FirstOrDefault();
+        var existing = calendar.CalendarObjects.FirstOrDefault();
         if (existing == null)
             return StatusCode(StatusCodes.Status404NotFound);
 
-        _db.CalendarItems.Remove(existing);
-        System.IO.File.Delete(C.Paths.CalendarItemsDataFor(itemFileName));
+        _db.CalendarObjects.Remove(existing);
+        System.IO.File.Delete(C.Paths.CalendarObjectsDataFor(itemFileName));
         await _db.SaveChangesAsync();
         return StatusCode(StatusCodes.Status204NoContent);
     }
-
-
-    // Helpers
+    ///////////////////////
     string GetCalendarUri(int calendarId) => $"{CALENDARS_URI}{calendarId}/";
     string GetCalendarItemUri(int calendarId, string itemFileName) => $"{CALENDARS_URI}{calendarId}/{itemFileName}";
     async Task<int?> Authenticate()
@@ -613,8 +660,53 @@ public class DavController : ControllerBase
     }
     string GetCalendarItemDataFromFile(string fileName)
     {
-        var path = C.Paths.CalendarItemsDataFor(fileName);
+        var path = C.Paths.CalendarObjectsDataFor(fileName);
         var contents = System.IO.File.ReadAllText(path);
         return contents;
+    }
+    (CalendarObjectType Type, DateTime? FirstOccurence, DateTime? LastOccurence) GetCalendarInfo(string calendarData)
+    {
+        var typeSet = false;
+        var type = CalendarObjectType.Unknown;
+        var calendar = Ical.Net.Calendar.Load(calendarData);
+        if (calendar.Events.Count > 0)
+        {
+            typeSet = true;
+            type = CalendarObjectType.Event;
+        }
+
+        if (calendar.Todos.Count > 0)
+            if (typeSet)
+                type = CalendarObjectType.Unknown;
+            else
+            {
+                typeSet = true;
+                type = CalendarObjectType.Todo;
+            }
+        if (calendar.Journals.Count > 0)
+            if (typeSet)
+                type = CalendarObjectType.Unknown;
+            else
+            {
+                typeSet = true;
+                type = CalendarObjectType.Journal;
+            }
+        if (calendar.FreeBusy.Count > 0)
+            if (typeSet)
+                type = CalendarObjectType.Unknown;
+            else
+            {
+                typeSet = true;
+                type = CalendarObjectType.FreeBusy;
+            }
+
+        var occurences = calendar.GetOccurrences(DateTime.UtcNow.AddMonths(-3), DateTime.UtcNow.AddYears(15));
+        var firstPeriod = occurences.FirstOrDefault();
+        var lastPeriod = occurences.LastOrDefault();
+
+        var first = firstPeriod?.Period.StartTime?.AsUtc;
+        var last = lastPeriod?.Period.EndTime?.AsUtc ?? lastPeriod?.Period.StartTime.AsUtc;
+
+        return (Type: type, FirstOccurence: first, LastOccurence: last);
     }
 }

@@ -90,8 +90,8 @@ public static class C
         public static string QueueDataFor(string file) => Path.Combine(QueueData, file);
         public static readonly string UserData = $"{Root}/users";
         public static string UserDataFor(string file) => Path.Combine(UserData, file);
-        public static readonly string CalendarItemsData = $"{Root}/calendar_items";
-        public static string CalendarItemsDataFor(string file) => Path.Combine(CalendarItemsData, file);
+        public static readonly string CalendarObjectsData = $"{Root}/calendar_items";
+        public static string CalendarObjectsDataFor(string file) => Path.Combine(CalendarObjectsData, file);
         public static readonly string CertCrt = CertDataFor(CRT_FILE);
         public static readonly string CertKey = CertDataFor(KEY_FILE);
         public static readonly string Sqlite = ConfigDataFor("app.db");

@@ -39,7 +39,7 @@ public partial class AppDbContext : DbContext, IDataProtectionKeyContext
     public DbSet<LogEntry> Logs => Set<LogEntry>();
     public DbSet<Recipient> Recipients => Set<Recipient>();
     public DbSet<Calendar> Calendars => Set<Calendar>();
-    public DbSet<CalendarItem> CalendarItems => Set<CalendarItem>();
+    public DbSet<CalendarObject> CalendarObjects => Set<CalendarObject>();
     public DbSet<CalendarUser> CalendarUsers => Set<CalendarUser>();
 
     protected void AdditionalConfiguration(DbContextOptionsBuilder options)
@@ -107,10 +107,10 @@ public partial class AppDbContext : DbContext, IDataProtectionKeyContext
             e.HasKey(e => e.CalendarId);
         });
 
-        builder.Entity<CalendarItem>(e =>
+        builder.Entity<CalendarObject>(e =>
         {
-            e.HasKey(e => e.CalendarItemId);
-            e.HasOne(e => e.Calendar).WithMany(e => e.CalendarItems).OnDelete(DeleteBehavior.Cascade);
+            e.HasKey(e => e.CalendarObjectId);
+            e.HasOne(e => e.Calendar).WithMany(e => e.CalendarObjects).OnDelete(DeleteBehavior.Cascade);
         });
 
         builder.Entity<CalendarUser>(e =>

@@ -124,8 +124,8 @@ public class Program
                 app.UseForwardedHeaders();
 
             app.UseSpaStaticFiles();
-            if (C.IsDebug) // Reverse proxy will handle the redirection
-                app.UseHttpsRedirection();
+            // if (C.IsDebug) // Reverse proxy will handle the redirection
+            //     app.UseHttpsRedirection();
             app.UseAuthentication();
             app.UseAuthorization();
 
@@ -134,14 +134,20 @@ public class Program
 
             app.MapControllers().RequireAuthorization();
 
-            app.MapWhen(x => !x.Request.Path.Value!.StartsWith("/api/"), builder =>
+            var nonSpaPrefixes = new string[] { "/.well-known/", "/dav", "/api/" };
+            app.MapWhen(x => !nonSpaPrefixes.Any(prefix => x.Request.Path.Value!.StartsWith(prefix)), builder =>
             {
-                builder.UseSpa(spa =>
+                builder.Run(async ctx =>
                 {
-                    spa.Options.SourcePath = "../client-app";
-                    if (app.Environment.IsDevelopment())
-                        spa.UseProxyToSpaDevelopmentServer("http://localhost:3000");
+                    await Task.CompletedTask;
+                    Console.WriteLine($"{ctx.Request.Method}: {ctx.Request.Path}");
                 });
+                // builder.UseSpa(spa =>
+                // {
+                //     spa.Options.SourcePath = "../client-app";
+                //     if (app.Environment.IsDevelopment())
+                //         spa.UseProxyToSpaDevelopmentServer("http://localhost:3000");
+                // });
             });
 
             Log.Information("App started");
@@ -166,7 +172,7 @@ public class Program
         Directory.CreateDirectory(C.Paths.ConfigData);
         Directory.CreateDirectory(C.Paths.DovecotData);
         Directory.CreateDirectory(C.Paths.UserData);
-        Directory.CreateDirectory(C.Paths.EventData);
+        Directory.CreateDirectory(C.Paths.CalendarObjectsData);
         Directory.CreateDirectory(C.Paths.QueueData);
 
         if (string.IsNullOrWhiteSpace(C.Hostname))
