@@ -82,7 +82,15 @@ refresh()
 <template>
   <main>
     <h1 class="display-6 me-3">Transactions</h1>
-    <GeneralModal v-if="show.logsId" title="Logs" width="lg" shown :onClose="hideLogs">
+    <GeneralModal
+      v-if="show.logsId"
+      title="Logs"
+      width="lg"
+      shown
+      :onClose="hideLogs"
+      autoFocus
+      closeOnBackdrop
+    >
       <template #body>
         <TransactionLogs v-if="show.logsId" :transactionId="show.logsId" query-prefix="l" />
       </template>
@@ -96,6 +104,8 @@ refresh()
       width="lg"
       shown
       :onClose="hideRecipients"
+      autofocus
+      closeOnBackdrop
     >
       <template #body>
         <TransactionRecipients v-if="show.recipientsId" :transactionId="show.recipientsId" />
