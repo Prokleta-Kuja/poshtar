@@ -2,7 +2,7 @@
 import { reactive } from 'vue'
 import { type DomainUM, DomainService, type DomainVM } from '@/api'
 import type IModelState from '@/components/form/modelState'
-import Modal from '@/components/Modal.vue'
+import GeneralModal from '@/components/GeneralModal.vue'
 import SpinButton from '@/components/form/SpinButton.vue'
 import Text from '@/components/form/TextBox.vue'
 import CheckBox from '@/components/form/CheckBox.vue'
@@ -34,7 +34,7 @@ const submit = () => {
 }
 </script>
 <template>
-  <Modal v-if="domain.model" title="Edit domain" shown :onClose="toggle">
+  <GeneralModal v-if="domain.model" title="Edit domain" shown :onClose="toggle">
     <template #body>
       <form @submit.prevent="submit">
         <Text
@@ -72,5 +72,5 @@ const submit = () => {
         @click="submit"
       />
     </template>
-  </Modal>
+  </GeneralModal>
 </template>

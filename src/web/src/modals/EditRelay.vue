@@ -2,7 +2,7 @@
 import { reactive } from 'vue'
 import { type RelayUM, RelayService, type RelayVM } from '@/api'
 import type IModelState from '@/components/form/modelState'
-import Modal from '@/components/Modal.vue'
+import GeneralModal from '@/components/GeneralModal.vue'
 import SpinButton from '@/components/form/SpinButton.vue'
 import IntegerBox from '@/components/form/IntegerBox.vue'
 import Text from '@/components/form/TextBox.vue'
@@ -34,7 +34,7 @@ const submit = () => {
 }
 </script>
 <template>
-  <Modal v-if="relay.model" title="Edit relay" shown :onClose="close">
+  <GeneralModal v-if="relay.model" title="Edit relay" shown :onClose="close">
     <template #body>
       <form @submit.prevent="submit">
         <Text
@@ -95,5 +95,5 @@ const submit = () => {
         @click="submit"
       />
     </template>
-  </Modal>
+  </GeneralModal>
 </template>

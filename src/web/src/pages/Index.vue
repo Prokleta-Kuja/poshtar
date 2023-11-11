@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { reactive } from 'vue'
-import Modal from '@/components/Modal.vue'
+import GeneralModal from '@/components/GeneralModal.vue'
 import TransactionLogs from '@/lists/TransactionLogs.vue'
 import TransactionRecipients from '@/lists/TransactionRecipients.vue'
 import Search from '@/components/form/SearchBox.vue'
@@ -73,22 +73,28 @@ refresh()
 <template>
   <main>
     <h1 class="display-6 me-3">Transactions</h1>
-    <Modal v-if="show.logsId" title="Logs" width="lg" shown :onClose="hideLogs">
+    <GeneralModal v-if="show.logsId" title="Logs" width="lg" shown :onClose="hideLogs">
       <template #body>
         <TransactionLogs v-if="show.logsId" :transactionId="show.logsId" query-prefix="l" />
       </template>
       <template #footer>
         <button class="btn btn-outline-danger" @click="hideLogs">Close</button>
       </template>
-    </Modal>
-    <Modal v-if="show.recipientsId" title="Recipients" width="lg" shown :onClose="hideRecipients">
+    </GeneralModal>
+    <GeneralModal
+      v-if="show.recipientsId"
+      title="Recipients"
+      width="lg"
+      shown
+      :onClose="hideRecipients"
+    >
       <template #body>
         <TransactionRecipients v-if="show.recipientsId" :transactionId="show.recipientsId" />
       </template>
       <template #footer>
         <button class="btn btn-outline-danger" @click="hideRecipients">Close</button>
       </template>
-    </Modal>
+    </GeneralModal>
 
     <div class="d-flex flex-wrap">
       <Sizes class="me-3 mb-2" style="max-width: 8rem" :params="data.params" :on-change="refresh" />

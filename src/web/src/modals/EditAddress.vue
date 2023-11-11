@@ -2,7 +2,7 @@
 import { reactive, ref, watch } from 'vue'
 import { type AddressUM, AddressService, type AddressVM, AddressType } from '@/api'
 import type IModelState from '@/components/form/modelState'
-import Modal from '@/components/Modal.vue'
+import GeneralModal from '@/components/GeneralModal.vue'
 import SpinButton from '@/components/form/SpinButton.vue'
 import Text from '@/components/form/TextBox.vue'
 import SelectBox from '@/components/form/SelectBox.vue'
@@ -56,7 +56,7 @@ const submit = () => {
 }
 </script>
 <template>
-  <Modal v-if="props.model" title="Edit address" shown :onClose="close">
+  <GeneralModal v-if="props.model" title="Edit address" shown :onClose="close">
     <template #body>
       <form @submit.prevent="submit">
         <SelectBox
@@ -101,5 +101,5 @@ const submit = () => {
         @click="submit"
       />
     </template>
-  </Modal>
+  </GeneralModal>
 </template>

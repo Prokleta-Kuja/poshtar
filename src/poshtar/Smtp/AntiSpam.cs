@@ -39,9 +39,10 @@ public class AntiSpamSettings
     public bool BanReverseDns { get; set; }
     public bool TarpitReverseDns { get; set; }
 
-    public bool EnforceDnsBlockList { get; set; }
-    public bool BanDnsBlockList { get; set; }
-    public bool TarpitDnsBlockList { get; set; }
+    public string[] DnsBlocklist { get; set; } = Array.Empty<string>();
+    public bool EnforceDnsBlocklist { get; set; }
+    public bool BanDnsBlocklist { get; set; }
+    public bool TarpitDnsBlocklist { get; set; }
 
     public bool EnforceSpf { get; set; }
     public bool BanSpf { get; set; }
@@ -112,7 +113,7 @@ public static class AntiSpam
     }
     public static async Task CheckAsnBlacklistAsync(this SessionContext ctx)
     {
-        if (C.Smtp.AntiSpamSettings.AsnBlocklist.Length == 0 || ctx.Transaction.Asn is null)
+        if (ctx.Transaction.Secure || C.IsDebug || C.Smtp.AntiSpamSettings.AsnBlocklist.Length == 0 || ctx.Transaction.Asn is null)
             return;
 
         var result = false;
@@ -150,7 +151,7 @@ public static class AntiSpam
     }
     public static async Task CheckClientBlacklistAsync(this SessionContext ctx)
     {
-        if (C.Smtp.AntiSpamSettings.ClientBlocklist.Length == 0 || ctx.Transaction.Client is null)
+        if (ctx.Transaction.Secure || C.IsDebug || C.Smtp.AntiSpamSettings.ClientBlocklist.Length == 0 || ctx.Transaction.Client is null)
             return;
 
         var result = false;
@@ -175,7 +176,7 @@ public static class AntiSpam
             return;
 
         ctx.Log("Matches Client blacklist");
-        if (!C.Smtp.AntiSpamSettings.EnforceAsnBlocklist)
+        if (!C.Smtp.AntiSpamSettings.EnforceClientBlocklist)
             return;
 
         if (C.Smtp.AntiSpamSettings.BanClientBlocklist)
@@ -291,7 +292,7 @@ public static class AntiSpam
     }
     public static async Task CheckRblAsync(this SessionContext ctx)
     {
-        if (ctx.Transaction.Secure || C.IsDebug)
+        if (ctx.Transaction.Secure || C.IsDebug || C.Smtp.AntiSpamSettings.DnsBlocklist.Length == 0)
             return;
         if (ctx.Transaction.IpAddress == null)
         {
@@ -300,7 +301,7 @@ public static class AntiSpam
         }
 
         var revIp = BlockList.ReverseIp(ctx.Transaction.IpAddress);
-        var checks = await Task.WhenAll(BlockList.DefaultLists.Select(l => l.CheckAsync(revIp)));
+        var checks = await Task.WhenAll(C.Smtp.AntiSpamSettings.DnsBlocklist.Select(l => BlockList.CheckAsync(l, revIp)));
 
         List<string> listed = new(checks.Length), notListed = new(checks.Length), failed = new(checks.Length);
         foreach (var check in checks)
@@ -311,15 +312,20 @@ public static class AntiSpam
             else
                 notListed.Add(check.Zone);
 
-        if (listed.Count > notListed.Count && C.Smtp.AntiSpamSettings.EnforceDnsBlockList)
+        ctx.Log($"RBL listed: {listed.Count}, not listed: {notListed.Count}, failed: {failed.Count}", new { listed, notListed, failed });
+        double totalSuccess = C.Smtp.AntiSpamSettings.DnsBlocklist.Length - failed.Count;
+        var treshold = totalSuccess / 2;
+        if (listed.Count > treshold && C.Smtp.AntiSpamSettings.EnforceDnsBlocklist)
         {
-            // TODO: figure out priority and then ban & tarpit
-            var list = $"Listed at {string.Join(", ", listed)}";
-            ctx.Log($"{list}, closing connection", new { listed, notListed, failed });
-            throw new ResponseException(new Response(ReplyCode.TransactionFailed, list), true);
+            ctx.Log($"DNS threshold {treshold:0.####} reached {listed.Count}");
+            if (C.Smtp.AntiSpamSettings.BanDnsBlocklist)
+                BanIp(ctx, "DNS threshold reached");
+            if (C.Smtp.AntiSpamSettings.TarpitDnsBlocklist)
+                await TarpitAsync(ctx);
+
+            ctx.Log("Closing connection");
+            throw new ResponseException(new Response(ReplyCode.TransactionFailed, $"Listed at {string.Join(", ", listed)}"), true);
         }
-        else
-            ctx.Log($"RBL listed: {listed.Count}, not listed: {notListed.Count}, failed: {failed.Count}", new { listed, notListed, failed });
     }
     public static async Task CheckSpfAsync(this SessionContext ctx, string senderDomain)
     {
@@ -413,18 +419,13 @@ public static class AntiSpam
         }
     }
 }
-public class BlockList
+public static class BlockList
 {
-    public string Zone { get; set; }
-    public BlockList(string zone)
-    {
-        Zone = zone;
-    }
     public static string ReverseIp(string ip) => string.Join('.', ip.Split('.').Reverse());
-    public async Task<BlockListResult> CheckAsync(string reversedIp)
+    public static async Task<BlockListResult> CheckAsync(string zone, string reversedIp)
     {
-        var q = $"{reversedIp}.{Zone}";
-        var result = new BlockListResult { Zone = Zone };
+        var q = $"{reversedIp}.{zone}";
+        var result = new BlockListResult { Zone = zone };
 
         if (!DomainName.TryParse(q, out var query))
             return result;
@@ -439,13 +440,6 @@ public class BlockList
 
         return result;
     }
-    public static List<BlockList> DefaultLists { get; set; } = new List<BlockList>
-    {
-        new ("bl.mxrbl.com"),
-        new ("b.barracudacentral.org"),
-        new ("dnsbl.justspam.org"),
-        //new ("zen.spamhaus.org"),
-    };
 }
 public class BlockListResult
 {

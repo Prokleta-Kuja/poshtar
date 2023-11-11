@@ -2,10 +2,11 @@
 import { reactive, ref } from 'vue'
 import { type AddressCM, AddressService, AddressType } from '@/api'
 import type IModelState from '@/components/form/modelState'
-import Modal from '@/components/Modal.vue'
+import GeneralModal from '@/components/GeneralModal.vue'
 import SelectBox from '@/components/form/SelectBox.vue'
 import SpinButton from '@/components/form/SpinButton.vue'
 import Text from '@/components/form/TextBox.vue'
+import PlusLgIcon from '@/components/icons/PlusLgIcon.vue'
 
 const props = defineProps<{ domainId: number; onAdded?: () => void }>()
 const blank = (): AddressCM => ({ domainId: props.domainId, pattern: '', type: AddressType.Exact })
@@ -26,7 +27,7 @@ const submit = () => {
   address.error = undefined
   if (address.model.type === AddressType.CatchAll) address.model.pattern = '*'
   AddressService.createAddress({ requestBody: address.model })
-    .then((r) => {
+    .then(() => {
       address.model = blank()
       if (props.onAdded) props.onAdded()
       shown.value = false
@@ -37,22 +38,10 @@ const submit = () => {
 </script>
 <template>
   <button class="btn btn-success" @click="toggle">
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      width="16"
-      height="16"
-      fill="currentColor"
-      class="bi bi-plus-lg"
-      viewBox="0 0 16 16"
-    >
-      <path
-        fill-rule="evenodd"
-        d="M8 2a.5.5 0 0 1 .5.5v5h5a.5.5 0 0 1 0 1h-5v5a.5.5 0 0 1-1 0v-5h-5a.5.5 0 0 1 0-1h5v-5A.5.5 0 0 1 8 2Z"
-      />
-    </svg>
+    <PlusLgIcon />
     Address
   </button>
-  <Modal title="Add domain address" :shown="shown" :onClose="toggle">
+  <GeneralModal title="Add domain address" :shown="shown" :onClose="toggle">
     <template #body>
       <form @submit.prevent="submit">
         <SelectBox
@@ -91,5 +80,5 @@ const submit = () => {
         @click="submit"
       />
     </template>
-  </Modal>
+  </GeneralModal>
 </template>

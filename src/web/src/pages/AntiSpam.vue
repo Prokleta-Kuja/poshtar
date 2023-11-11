@@ -18,7 +18,7 @@ const fillModel = (response: AntiSpamSettings) => {
   settings.model = response
   lists.asn = response.asnBlocklist?.join('\n') || ''
   lists.clients = response.clientBlocklist?.join('\n') || ''
-  // TODO: lists.dns =
+  lists.dns = response.dnsBlocklist?.join('\n') || ''
 }
 const load = () => {
   AntiSpamService.getAntiSpam()
@@ -33,7 +33,7 @@ const submit = () => {
   settings.error = undefined
   settings.model.asnBlocklist = lists.asn.split('\n').filter((s) => s)
   settings.model.clientBlocklist = lists.clients.split('\n').filter((s) => s)
-  // TODO:settings.model.dnsBlocklist = lists.dns.split('\n')
+  settings.model.dnsBlocklist = lists.dns.split('\n').filter((s) => s)
   AntiSpamService.updateAntiSpam({ requestBody: settings.model })
     .then(fillModel)
     .catch((r) => (settings.error = r.body))
@@ -47,7 +47,7 @@ load()
     <h1>Antispam Settings</h1>
     <form @submit.prevent="submit">
       <div class="row">
-        <div class="col-4">
+        <div class="col-lg-4 col-md-6 col-sm-12">
           <fieldset>
             <legend>General</legend>
             <IntegerBox
@@ -63,12 +63,6 @@ load()
               v-model="settings.model.banMinutes"
               required
               :error="settings.error?.errors?.banMinutes"
-            />
-            <CheckBox
-              class="mb-3"
-              label="Forward-confirmed reverse DNS Workarounds"
-              v-model="settings.model.enableFCrDNSWorkarounds"
-              :error="settings.error?.errors?.enableFCrDNSWorkarounds"
             />
           </fieldset>
           <fieldset>
@@ -124,12 +118,11 @@ load()
             />
           </fieldset>
         </div>
-        <div class="col-4">
+        <div class="col-lg-4 col-md-6 col-sm-12">
           <fieldset>
             <legend>ASN block list check</legend>
             <AreaBox
               class="mb-3"
-              label="Consecutive fail count"
               v-model="lists.asn"
               :error="settings.error?.errors?.asnBlocklist"
               :disabled="!lists.asn"
@@ -162,7 +155,6 @@ load()
             <legend>Client block list check</legend>
             <AreaBox
               class="mb-3"
-              label="Consecutive fail count"
               v-model="lists.clients"
               :error="settings.error?.errors?.clientBlocklist"
             />
@@ -192,10 +184,39 @@ load()
             />
           </fieldset>
           <fieldset>
-            <legend>TODO: DNS block list check</legend>
+            <legend>DNS block list check</legend>
+            <AreaBox
+              class="mb-3"
+              v-model="lists.dns"
+              :error="settings.error?.errors?.dnsBlocklist"
+            />
+            <CheckBox
+              class="mb-3"
+              inline
+              label="Enforce"
+              v-model="settings.model.enforceDnsBlocklist"
+              :error="settings.error?.errors?.enforceDnsBlocklist"
+              :disabled="!lists.dns"
+            />
+            <CheckBox
+              class="mb-3"
+              inline
+              label="Tarpit"
+              v-model="settings.model.tarpitDnsBlocklist"
+              :error="settings.error?.errors?.tarpitDnsBlocklist"
+              :disabled="!lists.dns"
+            />
+            <CheckBox
+              class="mb-3"
+              inline
+              label="Ban"
+              v-model="settings.model.banDnsBlocklist"
+              :error="settings.error?.errors?.banDnsBlocklist"
+              :disabled="!lists.dns"
+            />
           </fieldset>
         </div>
-        <div class="col-4">
+        <div class="col-lg-4 col-md-12">
           <fieldset>
             <legend>Forward DNS check</legend>
             <CheckBox
@@ -246,6 +267,15 @@ load()
               v-model="settings.model.banReverseDns"
               :error="settings.error?.errors?.banReverseDns"
               :disabled="!settings.model.enforceReverseDns"
+            />
+          </fieldset>
+          <fieldset>
+            <legend>Forward-confirmed reverse DNS</legend>
+            <CheckBox
+              class="mb-3"
+              label="Workarounds"
+              v-model="settings.model.enableFCrDNSWorkarounds"
+              :error="settings.error?.errors?.enableFCrDNSWorkarounds"
             />
           </fieldset>
           <fieldset>

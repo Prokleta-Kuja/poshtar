@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import { reactive, ref } from 'vue'
 import { ServiceName, ServiceRequestType, ServicesService, type ServiceResultModel } from '@/api'
-import Modal from './Modal.vue'
+import GeneralModal from './GeneralModal.vue'
+import CircleFillIcon from './icons/CircleFillIcon.vue'
 
 const shown = ref(false)
 const color = reactive({
@@ -38,20 +39,10 @@ exec(ServiceRequestType.Status)
 </script>
 <template>
   <div class="nav-link py-2 px-0 px-lg-2 pointer" title="Dovecot status" @click="toggle">
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      width="16"
-      height="16"
-      fill="currentColor"
-      class="bi bi-circle-fill"
-      :class="color"
-      viewBox="0 0 16 16"
-    >
-      <circle cx="8" cy="8" r="8" />
-    </svg>
+    <CircleFillIcon :class="color" />
     <small class="d-lg-none ms-2">Dovecot status</small>
   </div>
-  <Modal title="Dovecot" width="sm" :onClose="toggle" :shown="shown">
+  <GeneralModal title="Dovecot" width="sm" :onClose="toggle" :shown="shown">
     <template #body>
       <div class="d-flex justify-content-center mb-4">
         <div class="btn-group" role="group">
@@ -71,21 +62,11 @@ exec(ServiceRequestType.Status)
     </template>
     <template #footer>
       <div class="me-auto">
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          width="16"
-          height="16"
-          fill="currentColor"
-          class="bi bi-circle-fill"
-          :class="color"
-          viewBox="0 0 16 16"
-        >
-          <circle cx="8" cy="8" r="8" />
-        </svg>
+        <CircleFillIcon :class="color" />
         <small v-if="statusResult.success" class="ms-2">Running</small>
         <small v-else class="ms-2">Not Running</small>
       </div>
       <button class="btn btn-outline-danger" @click="toggle">Close</button>
     </template>
-  </Modal>
+  </GeneralModal>
 </template>

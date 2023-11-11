@@ -27,9 +27,10 @@ export type AntiSpamSettings = {
     enforceReverseDns?: boolean;
     banReverseDns?: boolean;
     tarpitReverseDns?: boolean;
-    enforceDnsBlockList?: boolean;
-    banDnsBlockList?: boolean;
-    tarpitDnsBlockList?: boolean;
+    dnsBlocklist?: Array<string>;
+    enforceDnsBlocklist?: boolean;
+    banDnsBlocklist?: boolean;
+    tarpitDnsBlocklist?: boolean;
     enforceSpf?: boolean;
     banSpf?: boolean;
     tarpitSpf?: boolean;
