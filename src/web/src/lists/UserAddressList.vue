@@ -13,6 +13,8 @@ import {
 } from '@/components/table'
 import ConfirmationModal from '@/components/ConfirmationModal.vue'
 import XLgIcon from '@/components/icons/XLgIcon.vue'
+import PlusLgIcon from '@/components/icons/PlusLgIcon.vue'
+import LinkIcon from '@/components/icons/LinkIcon.vue'
 
 interface IAddressParams extends ITableParams {
   searchTerm?: string

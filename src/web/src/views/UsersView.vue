@@ -12,6 +12,9 @@ import {
 } from '@/components/table'
 import AddUser from '@/modals/AddUser.vue'
 import ConfirmationModal from '@/components/ConfirmationModal.vue'
+import XLgIcon from '@/components/icons/XLgIcon.vue'
+import InfinityIcon from '@/components/icons/InfinityIcon.vue'
+import CheckLgIcon from '@/components/icons/CheckLgIcon.vue'
 
 interface IUserParams extends ITableParams {
   searchTerm?: string
@@ -101,66 +104,19 @@ refresh()
             </td>
             <td>{{ item.description }}</td>
             <td>
-              <svg
-                v-if="item.isMaster"
-                xmlns="http://www.w3.org/2000/svg"
-                width="16"
-                height="16"
-                fill="currentColor"
-                class="bi bi-check-lg text-success"
-                viewBox="0 0 16 16"
-              >
-                <path
-                  d="M12.736 3.97a.733.733 0 0 1 1.047 0c.286.289.29.756.01 1.05L7.88 12.01a.733.733 0 0 1-1.065.02L3.217 8.384a.757.757 0 0 1 0-1.06.733.733 0 0 1 1.047 0l3.052 3.093 5.4-6.425a.247.247 0 0 1 .02-.022Z"
-                />
-              </svg>
-              <svg
-                v-else
-                xmlns="http://www.w3.org/2000/svg"
-                width="16"
-                height="16"
-                fill="currentColor"
-                class="bi bi-x-lg text-danger"
-                viewBox="0 0 16 16"
-              >
-                <path
-                  d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8 2.146 2.854Z"
-                />
-              </svg>
+              <CheckLgIcon v-if="item.isMaster" />
+              <XLgIcon v-else class="text-danger" />
             </td>
             <td>
               <span v-if="item.quotaMegaBytes">{{ item.quotaMegaBytes }} MB</span>
-              <svg
-                v-else
-                xmlns="http://www.w3.org/2000/svg"
-                width="16"
-                height="16"
-                fill="currentColor"
-                class="bi bi-infinity"
-                viewBox="0 0 16 16"
-              >
-                <path
-                  d="M5.68 5.792 7.345 7.75 5.681 9.708a2.75 2.75 0 1 1 0-3.916ZM8 6.978 6.416 5.113l-.014-.015a3.75 3.75 0 1 0 0 5.304l.014-.015L8 8.522l1.584 1.865.014.015a3.75 3.75 0 1 0 0-5.304l-.014.015L8 6.978Zm.656.772 1.663-1.958a2.75 2.75 0 1 1 0 3.916L8.656 7.75Z"
-                />
-              </svg>
+              <InfinityIcon v-else />
             </td>
             <td>{{ item.addressCount }}</td>
             <td>{{ disabledText(item.disabled) }}</td>
             <td class="text-end p-1">
               <div class="btn-group" role="group">
                 <button class="btn btn-sm btn-danger" title="Delete" @click="showDelete(item)">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="16"
-                    height="16"
-                    fill="currentColor"
-                    class="bi bi-x-lg"
-                    viewBox="0 0 16 16"
-                  >
-                    <path
-                      d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8 2.146 2.854Z"
-                    />
-                  </svg>
+                  <XLgIcon />
                 </button>
               </div>
             </td>

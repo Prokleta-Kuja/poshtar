@@ -13,6 +13,7 @@ import {
 import EditAddress from '@/modals/EditAddress.vue'
 import ConfirmationModal from '@/components/ConfirmationModal.vue'
 import XLgIcon from '@/components/icons/XLgIcon.vue'
+import PencilSquareIcon from '@/components/icons/PencilSquareIcon.vue'
 
 interface IAddressParams extends ITableParams {
   searchTerm?: string

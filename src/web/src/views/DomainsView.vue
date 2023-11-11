@@ -52,7 +52,7 @@ const refreshRelays = (params?: ITableParams) => {
 
   RelayService.getRelays({ ...relayData.params }).then((r) => {
     relayData.items = r.items
-    updateParams(domainData.params, r)
+    updateParams(relayData.params, r)
     relayKv.value = []
     r.items.forEach((e) => relayKv.value.push({ value: e.id, label: e.name }))
   })

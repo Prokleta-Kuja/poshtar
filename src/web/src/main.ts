@@ -1,14 +1,14 @@
 import { createApp } from 'vue'
 import { createRouter, createWebHistory, type RouteLocationNormalized } from 'vue-router'
 import App from './App.vue'
-import Index from './pages/Index.vue'
-import Login from './pages/Login.vue'
-import Logout from './pages/Logout.vue'
-import Users from './pages/Users.vue'
-import UserDetails from './pages/UserDetails.vue'
-import Domains from './pages/Domains.vue'
-import DomainDetails from './pages/DomainDetails.vue'
-import AntiSpam from './pages/AntiSpam.vue'
+import IndexView from './views/IndexView.vue'
+import LoginView from './views/LoginView.vue'
+import LogoutView from './views/LogoutView.vue'
+import UsersView from './views/UsersView.vue'
+import UserDetailsView from './views/UserDetailsView.vue'
+import DomainsView from './views/DomainsView.vue'
+import DomainDetailsView from './views/DomainDetailsView.vue'
+import AntiSpamView from './views/AntiSpamView.vue'
 import { createPinia } from 'pinia'
 import { useAuth } from './stores/auth.store'
 
@@ -41,46 +41,46 @@ const router = createRouter({
     {
       path: '/',
       name: 'route.root',
-      component: Index
+      component: IndexView
     },
     {
       path: '/login',
       name: 'route.login',
-      component: Login
+      component: LoginView
     },
     {
       path: '/logout',
       name: 'route.logout',
-      component: Logout
+      component: LogoutView
     },
     {
       path: '/users',
       name: 'route.users',
-      component: Users
+      component: UsersView
     },
     {
       path: '/users/:id(\\d+)',
       name: 'route.userDetails',
-      component: UserDetails,
+      component: UserDetailsView,
       props: parseId
     },
     {
       path: '/domains',
       name: 'route.domains',
-      component: Domains
+      component: DomainsView
     },
     {
       path: '/domains/:id(\\d+)',
       name: 'route.domainDetails',
-      component: DomainDetails,
+      component: DomainDetailsView,
       props: parseId
     },
     {
       path: '/anti-spam',
       name: 'route.antispam',
-      component: AntiSpam
+      component: AntiSpamView
     },
-    { path: '/:pathMatch(.*)*', name: 'NotFound', component: Index } // NotFound
+    { path: '/:pathMatch(.*)*', name: 'NotFound', component: IndexView } // NotFound
   ]
 })
 
