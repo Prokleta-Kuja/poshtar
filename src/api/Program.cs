@@ -17,6 +17,7 @@ namespace poshtar;
 
 public class Program
 {
+    static readonly string[] nonSpaPrefixes = new string[] { "/.well-known/", "/dav", "/api/" };
     public static async Task<int> Main(string[] args)
     {
         Log.Logger = new LoggerConfiguration()
@@ -134,7 +135,6 @@ public class Program
 
             app.MapControllers().RequireAuthorization();
 
-            var nonSpaPrefixes = new string[] { "/.well-known/", "/dav", "/api/" };
             app.MapWhen(x => !nonSpaPrefixes.Any(prefix => x.Request.Path.Value!.StartsWith(prefix)), builder =>
             {
                 builder.UseSpa(spa =>

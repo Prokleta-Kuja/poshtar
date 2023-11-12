@@ -23,7 +23,7 @@ namespace poshtar.Controllers;
 public class DavController : ControllerBase
 {
     static readonly SaveOptions xmlSaveOpt = C.IsDebug ? SaveOptions.None : SaveOptions.DisableFormatting;
-    static Regex rxDate = new Regex(@"(?<year>\d{4})(?<month>\d{2})(?<day>\d{2})T?(?<hour>\d{2}?)(?<min>\d{2}?)(?<sec>\d{2}?)(Z?)", RegexOptions.IgnoreCase | RegexOptions.Compiled);
+    static Regex rxDate = new Regex(@"(?<year>\d{4})(?<month>\d{2})(?<day>\d{2})T?(?<hour>\d{2}?)(?<min>\d{2}?)(?<sec>\d{2}?)(?<utc>Z?)", RegexOptions.IgnoreCase | RegexOptions.Compiled);
 
     const string DT_FORMAT = "o";
     const string DAV_PREFIX = "/dav/";
@@ -283,7 +283,7 @@ public class DavController : ControllerBase
                     int.TryParse(startMatch.Groups["min"].Value, out var min) &&
                     int.TryParse(startMatch.Groups["sec"].Value, out var sec))
                 {
-                    var startDt = new DateTime(year, month, day, hour, min, sec, startMatch.Groups[startMatch.Groups.Count - 1].Value.Equals("Z") ? DateTimeKind.Utc : DateTimeKind.Unspecified);
+                    var startDt = new DateTime(year, month, day, hour, min, sec, startMatch.Groups["utc"].Value.Equals("Z") ? DateTimeKind.Utc : DateTimeKind.Local);
                     query = query.Include(c => c.CalendarObjects.Where(e => e.LastOccurence >= startDt));
                 }
             }
@@ -298,7 +298,7 @@ public class DavController : ControllerBase
                     int.TryParse(endMatch.Groups["min"].Value, out var min) &&
                     int.TryParse(endMatch.Groups["sec"].Value, out var sec))
                 {
-                    var endDt = new DateTime(year, month, day, hour, min, sec, endMatch.Groups[endMatch.Groups.Count - 1].Value.Equals("Z") ? DateTimeKind.Utc : DateTimeKind.Unspecified);
+                    var endDt = new DateTime(year, month, day, hour, min, sec, endMatch.Groups["utc"].Value.Equals("Z") ? DateTimeKind.Utc : DateTimeKind.Local);
                     query = query.Include(c => c.CalendarObjects.Where(e => e.FirstOccurence >= endDt));
                 }
             }
