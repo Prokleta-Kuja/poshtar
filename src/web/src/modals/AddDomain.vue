@@ -40,16 +40,34 @@ const submit = () => {
   <GeneralModal title="Add domain" :shown="shown" :onClose="toggle">
     <template #body>
       <form @submit.prevent="submit">
-        <Text class="mb-3" label="Domain" autoFocus v-model="domain.model.name" required
-          :error="domain.error?.errors?.name" />
-        <SelectBox class="mb-3" label="Relay" v-model="domain.model.relayId" :error="domain.error?.errors?.relayId"
-          :options="props.relays" undefined-label="No relay. Local routing only." />
+        <Text
+          class="mb-3"
+          label="Domain"
+          autoFocus
+          v-model="domain.model.name"
+          required
+          :error="domain.error?.errors?.name"
+        />
+        <SelectBox
+          class="mb-3"
+          label="Relay"
+          v-model="domain.model.relayId"
+          :error="domain.error?.errors?.relayId"
+          :options="props.relays"
+          undefined-label="No relay. Local routing only."
+        />
       </form>
     </template>
     <template #footer>
       <p v-if="domain.error" class="text-danger">{{ domain.error.message }}</p>
       <button class="btn btn-outline-danger" @click="toggle">Cancel</button>
-      <SpinButton class="btn-primary" :loading="domain.submitting" text="Add" loadingText="Adding" @click="submit" />
+      <SpinButton
+        class="btn-primary"
+        :loading="domain.submitting"
+        text="Add"
+        loadingText="Adding"
+        @click="submit"
+      />
     </template>
   </GeneralModal>
 </template>

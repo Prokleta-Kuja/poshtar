@@ -7,7 +7,6 @@ export interface IModal {
   centered?: boolean
   shown?: boolean
   autoFocus?: boolean
-  closeOnBackdrop?: boolean
   onClose: () => void
 }
 const el = ref<HTMLHeadingElement | null>(null)
@@ -24,9 +23,6 @@ const classDialog = computed(() => ({
   'modal-dialog-scrollable': props.scrollable,
   'modal-dialog-centered': props.centered
 }))
-const closeBackdrop = () => {
-  if (props.closeOnBackdrop) props.onClose()
-}
 onMounted(() => {
   if (props.autoFocus) el.value?.focus()
 })
@@ -48,5 +44,5 @@ onMounted(() => {
       </div>
     </div>
   </div>
-  <div class="modal-backdrop" :class="classModal" @click="closeBackdrop"></div>
+  <div class="modal-backdrop" :class="classModal"></div>
 </template>

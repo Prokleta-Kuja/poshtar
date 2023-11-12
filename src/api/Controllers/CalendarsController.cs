@@ -157,6 +157,38 @@ public class CalendarsController : ControllerBase
         return NoContent();
     }
 
+    [HttpGet("{calendarId}/addable-users", Name = "GetCalendarAddableUsers")]
+    [ProducesResponseType(typeof(ListResponse<CalendarUserSM>), StatusCodes.Status200OK)]
+    public async Task<IActionResult> GetAllAddableUsersAsync(int calendarId, [FromQuery] FilterQuery req)
+    {
+        var query = _db.Users.AsNoTracking().Where(u => !u.CalendarUsers.Any(cu => cu.CalendarId == calendarId));
+
+        if (!string.IsNullOrWhiteSpace(req.SearchTerm))
+            query = query.Where(u => u.Name.Contains(req.SearchTerm.ToLower()));
+
+        var count = await query.CountAsync();
+
+        if (!string.IsNullOrWhiteSpace(req.SortBy) && Enum.TryParse<CalendarUsersSortBy>(req.SortBy, true, out var sortBy))
+            query = sortBy switch
+            {
+                CalendarUsersSortBy.Name => query.Order(u => u.Name, req.Ascending),
+                CalendarUsersSortBy.IsMaster => query.Order(u => u.IsMaster, req.Ascending),
+                _ => query
+            };
+
+        var items = await query
+        .Paginate(req)
+        .Select(u => new CalendarUserSM
+        {
+            UserId = u.UserId,
+            UserName = u.Name,
+            IsMaster = u.IsMaster,
+        })
+        .ToListAsync();
+
+        return Ok(new ListResponse<CalendarUserSM>(req, count, items));
+    }
+
     [HttpPost("{calendarId}/users/{userId}", Name = "AddCalendarUser")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -216,4 +248,9 @@ public class CalendarsController : ControllerBase
 public enum CalendarsSortBy
 {
     Name = 0,
+}
+public enum CalendarUsersSortBy
+{
+    Name = 0,
+    IsMaster = 1,
 }

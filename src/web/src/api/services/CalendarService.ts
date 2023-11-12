@@ -5,6 +5,7 @@
 import type { CalendarCM } from '../models/CalendarCM';
 import type { CalendarLMListResponse } from '../models/CalendarLMListResponse';
 import type { CalendarUM } from '../models/CalendarUM';
+import type { CalendarUserSMListResponse } from '../models/CalendarUserSMListResponse';
 import type { CalendarVM } from '../models/CalendarVM';
 
 import type { CancelablePromise } from '../core/CancelablePromise';
@@ -127,6 +128,41 @@ export class CalendarService {
             },
             errors: {
                 404: `Not Found`,
+            },
+        });
+    }
+
+    /**
+     * @returns CalendarUserSMListResponse Success
+     * @throws ApiError
+     */
+    public static getCalendarAddableUsers({
+        calendarId,
+        size,
+        page,
+        ascending,
+        sortBy,
+        searchTerm,
+    }: {
+        calendarId: number,
+        size?: number,
+        page?: number,
+        ascending?: boolean,
+        sortBy?: string,
+        searchTerm?: string,
+    }): CancelablePromise<CalendarUserSMListResponse> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/api/calendars/{calendarId}/addable-users',
+            path: {
+                'calendarId': calendarId,
+            },
+            query: {
+                'size': size,
+                'page': page,
+                'ascending': ascending,
+                'sortBy': sortBy,
+                'searchTerm': searchTerm,
             },
         });
     }

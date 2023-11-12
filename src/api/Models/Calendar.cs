@@ -13,6 +13,7 @@ public class CalendarVM
         {
             UserId = cu.UserId,
             UserName = cu.User?.Name ?? string.Empty,
+            IsMaster = cu.User?.IsMaster ?? false,
             CanWrite = cu.CanWrite,
         }).ToArray();
     }
@@ -24,6 +25,7 @@ public class CalendarUserVM
 {
     [Required] public int UserId { get; set; }
     [Required] public required string UserName { get; set; }
+    [Required] public bool IsMaster { get; set; }
     [Required] public bool CanWrite { get; set; }
 }
 public class CalendarLM
@@ -58,4 +60,10 @@ public class CalendarUM
 
         return errorModel.Errors.Count > 0;
     }
+}
+public class CalendarUserSM
+{
+    [Required] public int UserId { get; set; }
+    [Required] public required string UserName { get; set; }
+    [Required] public bool IsMaster { get; set; }
 }

@@ -3,10 +3,9 @@
 /* tslint:disable */
 /* eslint-disable */
 
-export type CalendarUserVM = {
+export type CalendarUserSM = {
     userId: number;
     userName: string;
     isMaster: boolean;
-    canWrite: boolean;
 };
 

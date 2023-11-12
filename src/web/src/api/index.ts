@@ -19,6 +19,8 @@ export type { CalendarCM } from './models/CalendarCM';
 export type { CalendarLM } from './models/CalendarLM';
 export type { CalendarLMListResponse } from './models/CalendarLMListResponse';
 export type { CalendarUM } from './models/CalendarUM';
+export type { CalendarUserSM } from './models/CalendarUserSM';
+export type { CalendarUserSMListResponse } from './models/CalendarUserSMListResponse';
 export type { CalendarUserVM } from './models/CalendarUserVM';
 export type { CalendarVM } from './models/CalendarVM';
 export type { DomainCM } from './models/DomainCM';
