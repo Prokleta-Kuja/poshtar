@@ -25,12 +25,14 @@ export interface ITableParams {
   sortBy?: string
 }
 
+const pageKey = nameof<ITableParams>('page')
 const sizeKey = nameof<ITableParams>('size')
 const totalKey = nameof<ITableParams>('total')
 
 const minPageSize = 10,
   defaultPageSize = 25,
-  maxPageSize = 100
+  maxPageSize = 100,
+  defaultPage = 1
 export const defaultPageSizes = [minPageSize, defaultPageSize, 50, maxPageSize]
 
 export const getQueryKey = (key: string, prefix?: string) => (prefix ? `${prefix}.${key}` : key)
@@ -76,11 +78,18 @@ export const initParams = (query?: LocationQuery, prefix?: string): ITableParams
   return params
 }
 
-export const getQuery = (params: ITableParams, prefix?: string): LocationQuery => {
+export const getQuery = (
+  /*current:{ [key: string]: string | null },*/
+  params: ITableParams,
+  prefix?: string
+): LocationQuery => {
   const query: { [key: string]: string | null } = {}
   const indexableParams = params as { [key: string]: any }
+  // TODO: Remove all current params keys from current qurey string getQueryKey(key, prefix)
   Object.keys(params).forEach((key) => {
     if (key === totalKey) return
+    if (key === pageKey && indexableParams[key] === defaultPage) return
+    if (key === sizeKey && indexableParams[key] === defaultPageSize) return
 
     const queryKey = getQueryKey(key, prefix)
     const type = typeof indexableParams[key]
@@ -89,6 +98,7 @@ export const getQuery = (params: ITableParams, prefix?: string): LocationQuery =
         query[queryKey] = null
         return
       } else return
+    else if (indexableParams[key] === '') return
 
     query[queryKey] = indexableParams[key]
   })

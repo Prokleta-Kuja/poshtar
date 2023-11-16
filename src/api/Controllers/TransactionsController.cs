@@ -29,8 +29,17 @@ public class TransactionsController : ControllerBase
             .Include(t => t.FromUser)
             .AsNoTracking();
 
-        if (!string.IsNullOrWhiteSpace(req.SearchTerm))
-            query = query.Where(t => EF.Functions.Like(t.Client!, $"%{req.SearchTerm}%") || EF.Functions.Like(t.From!, $"%{req.SearchTerm}%"));
+        if (!string.IsNullOrWhiteSpace(req.CountryName))
+            query = query.Where(t => EF.Functions.Like(t.CountryName!, $"%{req.CountryName}%"));
+
+        if (!string.IsNullOrWhiteSpace(req.Asn))
+            query = query.Where(t => EF.Functions.Like(t.Asn!, $"%{req.Asn}%"));
+
+        if (!string.IsNullOrWhiteSpace(req.Client))
+            query = query.Where(t => EF.Functions.Like(t.Client!, $"%{req.Client}%"));
+
+        if (!string.IsNullOrWhiteSpace(req.From))
+            query = query.Where(t => EF.Functions.Like(t.From!, $"%{req.From}%"));
 
         if (req.ConnectionId.HasValue)
             query = query.Where(t => t.ConnectionId == req.ConnectionId);
@@ -168,6 +177,10 @@ public class TransactionsController : ControllerBase
 public class TransactionQuery : FilterQuery
 {
     public Guid? ConnectionId { get; set; }
+    public string? CountryName { get; set; }
+    public string? Asn { get; set; }
+    public string? Client { get; set; }
+    public string? From { get; set; }
     public bool? IncludeMonitor { get; set; }
     public bool? IncludePrivate { get; set; }
 }

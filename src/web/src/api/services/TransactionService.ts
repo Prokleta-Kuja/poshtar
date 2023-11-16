@@ -18,6 +18,10 @@ export class TransactionService {
      */
     public static getTransactions({
         connectionId,
+        countryName,
+        asn,
+        client,
+        from,
         includeMonitor,
         includePrivate,
         size,
@@ -27,6 +31,10 @@ export class TransactionService {
         searchTerm,
     }: {
         connectionId?: string,
+        countryName?: string,
+        asn?: string,
+        client?: string,
+        from?: string,
         includeMonitor?: boolean,
         includePrivate?: boolean,
         size?: number,
@@ -40,6 +48,10 @@ export class TransactionService {
             url: '/api/transactions',
             query: {
                 'connectionId': connectionId,
+                'countryName': countryName,
+                'asn': asn,
+                'client': client,
+                'from': from,
                 'includeMonitor': includeMonitor,
                 'includePrivate': includePrivate,
                 'size': size,
