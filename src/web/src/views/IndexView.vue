@@ -105,14 +105,12 @@ refresh()
 
     <div class="d-flex flex-wrap">
       <Sizes class="me-3 mb-2" style="max-width: 8rem" :params="data.params" :on-change="refresh" />
-      <Search autoFocus class="me-3 mb-2" style="max-width: 14rem" label="Country name" v-model="data.params.countryName"
+      <Search class="me-3 mb-2" style="max-width: 14rem" label="Country name" v-model="data.params.countryName"
         :on-change="refresh" />
-      <Search autoFocus class="me-3 mb-2" style="max-width: 14rem" label="ASN" v-model="data.params.asn"
+      <Search class="me-3 mb-2" style="max-width: 14rem" label="ASN" v-model="data.params.asn" :on-change="refresh" />
+      <Search class="me-3 mb-2" style="max-width: 14rem" label="Client" v-model="data.params.client"
         :on-change="refresh" />
-      <Search autoFocus class="me-3 mb-2" style="max-width: 14rem" label="Client" v-model="data.params.client"
-        :on-change="refresh" />
-      <Search autoFocus class="me-3 mb-2" style="max-width: 14rem" label="From" v-model="data.params.from"
-        :on-change="refresh" />
+      <Search class="me-3 mb-2" style="max-width: 14rem" label="From" v-model="data.params.from" :on-change="refresh" />
       <!-- <Search class="me-3 mb-2" style="max-width:16rem" label="Connection Id" v-model="data.params.connectionId" :on-change="refresh" /> -->
       <div class="me-3 mb-2">
         <label class="form-label">Include</label>

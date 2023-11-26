@@ -60,7 +60,7 @@ public class TransactionsController : ControllerBase
                 TransactionsSortBy.Asn => query.Order(t => t.Asn, req.Ascending),
                 TransactionsSortBy.Client => query.Order(t => t.Client, req.Ascending),
                 TransactionsSortBy.From => query.Order(t => t.From, req.Ascending),
-                _ => query
+                _ => query.OrderByDescending(t => t.TransactionId)
             };
 
         var items = await query
