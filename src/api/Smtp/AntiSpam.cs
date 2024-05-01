@@ -60,6 +60,7 @@ public static class AntiSpam
         var key = GetBannedIpKey(ctx.Transaction.IpAddress);
         var cache = ctx.ServiceScope.ServiceProvider.GetRequiredService<IMemoryCache>();
         cache.Set(key, message, TimeSpan.FromMinutes(C.Smtp.AntiSpamSettings.BanMinutes));
+        ctx.Log($"Banned IP for {C.Smtp.AntiSpamSettings.BanMinutes} minutes");
     }
     public static bool IsBannedIp(this SessionContext ctx)
     {
