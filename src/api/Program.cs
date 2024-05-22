@@ -197,7 +197,7 @@ public class Program
         var cache = scope.ServiceProvider.GetRequiredService<IMemoryCache>();
         var blockedIps = await db.BlockedIps.ToListAsync();
         var banDuration = TimeSpan.FromHours(C.Smtp.AntiSpamSettings.BanHours);
-        var now = DateTime.Now;
+        var now = DateTime.UtcNow;
         foreach (var blockedIp in blockedIps)
         {
             var elapsed = now - blockedIp.LastHit;
