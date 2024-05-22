@@ -15,7 +15,7 @@ namespace poshtar.Entities.Migrations.Sqlite
         protected override void BuildModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
-            modelBuilder.HasAnnotation("ProductVersion", "7.0.13");
+            modelBuilder.HasAnnotation("ProductVersion", "8.0.5");
 
             modelBuilder.Entity("AddressUser", b =>
                 {
@@ -98,6 +98,31 @@ namespace poshtar.Entities.Migrations.Sqlite
                         .HasDatabaseName("ix_addresses_domain_id");
 
                     b.ToTable("addresses", (string)null);
+                });
+
+            modelBuilder.Entity("poshtar.Entities.BlockedIp", b =>
+                {
+                    b.Property<string>("Address")
+                        .HasColumnType("TEXT")
+                        .HasColumnName("address");
+
+                    b.Property<long>("BlockedOn")
+                        .HasColumnType("INTEGER")
+                        .HasColumnName("blocked_on");
+
+                    b.Property<long>("LastHit")
+                        .HasColumnType("INTEGER")
+                        .HasColumnName("last_hit");
+
+                    b.Property<string>("Reason")
+                        .IsRequired()
+                        .HasColumnType("TEXT")
+                        .HasColumnName("reason");
+
+                    b.HasKey("Address")
+                        .HasName("pk_blocked_ips");
+
+                    b.ToTable("blocked_ips", (string)null);
                 });
 
             modelBuilder.Entity("poshtar.Entities.Calendar", b =>

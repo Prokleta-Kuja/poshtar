@@ -1,4 +1,4 @@
-/* generated using openapi-typescript-codegen -- do no edit */
+/* generated using openapi-typescript-codegen -- do not edit */
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
@@ -6,15 +6,12 @@ import type { DomainCM } from '../models/DomainCM';
 import type { DomainLMListResponse } from '../models/DomainLMListResponse';
 import type { DomainUM } from '../models/DomainUM';
 import type { DomainVM } from '../models/DomainVM';
-
 import type { CancelablePromise } from '../core/CancelablePromise';
 import { OpenAPI } from '../core/OpenAPI';
 import { request as __request } from '../core/request';
-
 export class DomainService {
-
     /**
-     * @returns DomainLMListResponse Success
+     * @returns DomainLMListResponse OK
      * @throws ApiError
      */
     public static getDomains({
@@ -54,9 +51,8 @@ export class DomainService {
             },
         });
     }
-
     /**
-     * @returns DomainVM Success
+     * @returns DomainVM OK
      * @throws ApiError
      */
     public static createDomain({
@@ -74,9 +70,8 @@ export class DomainService {
             },
         });
     }
-
     /**
-     * @returns DomainVM Success
+     * @returns DomainVM OK
      * @throws ApiError
      */
     public static getDomain({
@@ -95,9 +90,8 @@ export class DomainService {
             },
         });
     }
-
     /**
-     * @returns DomainVM Success
+     * @returns DomainVM OK
      * @throws ApiError
      */
     public static updateDomain({
@@ -121,7 +115,6 @@ export class DomainService {
             },
         });
     }
-
     /**
      * @returns void
      * @throws ApiError
@@ -142,5 +135,4 @@ export class DomainService {
             },
         });
     }
-
 }

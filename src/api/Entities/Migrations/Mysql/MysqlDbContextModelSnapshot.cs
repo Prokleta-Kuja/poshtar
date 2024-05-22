@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using poshtar.Entities;
 
@@ -16,8 +17,10 @@ namespace poshtar.Entities.Migrations.Mysql
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "7.0.13")
+                .HasAnnotation("ProductVersion", "8.0.5")
                 .HasAnnotation("Relational:MaxIdentifierLength", 64);
+
+            MySqlModelBuilderExtensions.AutoIncrementColumns(modelBuilder);
 
             modelBuilder.Entity("AddressUser", b =>
                 {
@@ -45,6 +48,8 @@ namespace poshtar.Entities.Migrations.Mysql
                         .HasColumnType("int")
                         .HasColumnName("id");
 
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
+
                     b.Property<string>("FriendlyName")
                         .HasColumnType("longtext")
                         .HasColumnName("friendly_name");
@@ -65,6 +70,8 @@ namespace poshtar.Entities.Migrations.Mysql
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int")
                         .HasColumnName("address_id");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("AddressId"));
 
                     b.Property<string>("Description")
                         .HasColumnType("longtext")
@@ -102,12 +109,39 @@ namespace poshtar.Entities.Migrations.Mysql
                     b.ToTable("addresses", (string)null);
                 });
 
+            modelBuilder.Entity("poshtar.Entities.BlockedIp", b =>
+                {
+                    b.Property<string>("Address")
+                        .HasColumnType("varchar(255)")
+                        .HasColumnName("address");
+
+                    b.Property<DateTime>("BlockedOn")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("blocked_on");
+
+                    b.Property<DateTime>("LastHit")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("last_hit");
+
+                    b.Property<string>("Reason")
+                        .IsRequired()
+                        .HasColumnType("longtext")
+                        .HasColumnName("reason");
+
+                    b.HasKey("Address")
+                        .HasName("pk_blocked_ips");
+
+                    b.ToTable("blocked_ips", (string)null);
+                });
+
             modelBuilder.Entity("poshtar.Entities.Calendar", b =>
                 {
                     b.Property<int>("CalendarId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int")
                         .HasColumnName("calendar_id");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("CalendarId"));
 
                     b.Property<string>("DisplayName")
                         .IsRequired()
@@ -126,6 +160,8 @@ namespace poshtar.Entities.Migrations.Mysql
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int")
                         .HasColumnName("calendar_object_id");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("CalendarObjectId"));
 
                     b.Property<int>("CalendarId")
                         .HasColumnType("int")
@@ -195,6 +231,8 @@ namespace poshtar.Entities.Migrations.Mysql
                         .HasColumnType("int")
                         .HasColumnName("domain_id");
 
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("DomainId"));
+
                     b.Property<DateTime?>("Disabled")
                         .HasColumnType("datetime(6)")
                         .HasColumnName("disabled");
@@ -226,6 +264,8 @@ namespace poshtar.Entities.Migrations.Mysql
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int")
                         .HasColumnName("log_entry_id");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("LogEntryId"));
 
                     b.Property<string>("Message")
                         .IsRequired()
@@ -259,6 +299,8 @@ namespace poshtar.Entities.Migrations.Mysql
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int")
                         .HasColumnName("recipient_id");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("RecipientId"));
 
                     b.Property<string>("Data")
                         .IsRequired()
@@ -295,6 +337,8 @@ namespace poshtar.Entities.Migrations.Mysql
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int")
                         .HasColumnName("relay_id");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("RelayId"));
 
                     b.Property<DateTime?>("Disabled")
                         .HasColumnType("datetime(6)")
@@ -339,6 +383,8 @@ namespace poshtar.Entities.Migrations.Mysql
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int")
                         .HasColumnName("transaction_id");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("TransactionId"));
 
                     b.Property<string>("Asn")
                         .HasColumnType("longtext")
@@ -403,6 +449,8 @@ namespace poshtar.Entities.Migrations.Mysql
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int")
                         .HasColumnName("user_id");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("UserId"));
 
                     b.Property<string>("Description")
                         .HasColumnType("longtext")

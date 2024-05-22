@@ -24,11 +24,18 @@ public static class RecurringJobs
            "0 4 * * *", // Every day @ 4
            defaultOpt);
 
+        activeJobIds.Add(nameof(CleanupBlockedIps));
+        RecurringJob.AddOrUpdate<CleanupBlockedIps>(
+           nameof(CleanupBlockedIps),
+           j => j.Run(null, CancellationToken.None),
+           "0 5 * * *", // Every day @ 5
+           defaultOpt);
+
         activeJobIds.Add(nameof(CleanupCalendarObjects));
         RecurringJob.AddOrUpdate<CleanupCalendarObjects>(
            nameof(CleanupCalendarObjects),
            j => j.Run(null, CancellationToken.None),
-           "0 3 * * *", // Every day @ 4
+           "0 3 * * *", // Every day @ 3
            defaultOpt);
 
         activeJobIds.Add(nameof(CertReload));

@@ -1,78 +1,81 @@
 // For format details, see https://aka.ms/devcontainer.json. For config options, see the
 // README at: https://github.com/devcontainers/templates/tree/main/src/dotnet
 {
-	"name": "poshtar",
-	// Or use a Dockerfile or Docker Compose file. More info: https://containers.dev/guide/dockerfile
-	"image": "mcr.microsoft.com/devcontainers/dotnet:0-7.0",
-	// Features to add to the dev container. More info: https://containers.dev/features.
-	"features": {
-		"ghcr.io/devcontainers/features/node": "20"
-	},
-	// Use 'forwardPorts' to make a list of ports inside the container available locally.
-	"forwardPorts": [
-		3000
-	],
-	"appPort": [
-		"0.0.0.0:5025:5025",
-		"0.0.0.0:5080:5080",
-		"0.0.0.0:5443:5443",
-		"0.0.0.0:5465:5465",
-		"0.0.0.0:5587:5587",
-		"0.0.0.0:5143:5143",
-		"0.0.0.0:5993:5993"
-	],
-	"portsAttributes": {
-		"5025": {
-			"label": "SMTP",
-			"onAutoForward": "notify",
-			"requireLocalPort": true,
-			"elevateIfNeeded": true
-		},
-		"5080": {
-			"protocol": "http"
-		},
-		"5443": {
-			"protocol": "https"
-		},
-		"5465": {
-			"label": "Submission implicit",
-			"onAutoForward": "notify",
-			"requireLocalPort": true,
-			"elevateIfNeeded": true
-		},
-		"5587": {
-			"label": "Submission explicit",
-			"onAutoForward": "notify",
-			"requireLocalPort": true,
-			"elevateIfNeeded": true
-		},
-		"5143": {
-			"label": "IMAP",
-			"onAutoForward": "notify",
-			"requireLocalPort": true,
-			"elevateIfNeeded": true
-		},
-		"5993": {
-			"label": "IMAPs",
-			"onAutoForward": "notify",
-			"requireLocalPort": true,
-			"elevateIfNeeded": true
-		}
-	},
-	// Use 'postCreateCommand' to run commands after the container is created.
-	"postCreateCommand": "dotnet restore src/api;dotnet tool restore;dotnet dev-certs https -q;npm i --prefix src/web/;echo \"alias ll='ls -hal'\" >> ~/.bashrc;sudo ./dev.sh",
-	"customizations": {
-		"vscode": {
-			"extensions": [
-				"esbenp.prettier-vscode",
-				"Vue.volar",
-				"Vue.vscode-typescript-vue-plugin"
-			]
-		}
-	},
-	"init": true
-	// Configure tool-specific properties.
-	// "customizations": {},
-	// Uncomment to connect as root instead. More info: https://aka.ms/dev-containers-non-root.
-	// "remoteUser": "root"
+  "name": "poshtar",
+  // Or use a Dockerfile or Docker Compose file. More info: https://containers.dev/guide/dockerfile
+  "image": "mcr.microsoft.com/devcontainers/dotnet:1-8.0-bookworm",
+
+  // Features to add to the dev container. More info: https://containers.dev/features.
+  "features": {
+    "ghcr.io/devcontainers/features/node:1": {}
+  },
+
+  // Use 'forwardPorts' to make a list of ports inside the container available locally.
+  "forwardPorts": [3000],
+  "appPort": [
+    "0.0.0.0:5025:5025",
+    "0.0.0.0:5080:5080",
+    "0.0.0.0:5443:5443",
+    "0.0.0.0:5465:5465",
+    "0.0.0.0:5587:5587",
+    "0.0.0.0:5143:5143",
+    "0.0.0.0:5993:5993"
+  ],
+  "portsAttributes": {
+    "5025": {
+      "label": "SMTP",
+      "onAutoForward": "notify",
+      "requireLocalPort": true,
+      "elevateIfNeeded": true
+    },
+    "5080": {
+      "protocol": "http"
+    },
+    "5443": {
+      "protocol": "https"
+    },
+    "5465": {
+      "label": "Submission implicit",
+      "onAutoForward": "notify",
+      "requireLocalPort": true,
+      "elevateIfNeeded": true
+    },
+    "5587": {
+      "label": "Submission explicit",
+      "onAutoForward": "notify",
+      "requireLocalPort": true,
+      "elevateIfNeeded": true
+    },
+    "5143": {
+      "label": "IMAP",
+      "onAutoForward": "notify",
+      "requireLocalPort": true,
+      "elevateIfNeeded": true
+    },
+    "5993": {
+      "label": "IMAPs",
+      "onAutoForward": "notify",
+      "requireLocalPort": true,
+      "elevateIfNeeded": true
+    }
+  },
+
+  // Use 'postCreateCommand' to run commands after the container is created.
+  "postCreateCommand": "dotnet restore src/api;dotnet tool restore;dotnet dev-certs https -q;npm i --prefix src/web/;echo \"alias ll='ls -hal'\" >> ~/.bashrc;sudo ./dev.sh",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "esbenp.prettier-vscode",
+        "Vue.volar",
+        "Vue.vscode-typescript-vue-plugin"
+      ]
+    }
+  },
+  "init": true
+
+  // Configure tool-specific properties.
+  // "customizations": {},
+
+  // Uncomment to connect as root instead. More info: https://aka.ms/dev-containers-non-root.
+  // "remoteUser": "root"
 }

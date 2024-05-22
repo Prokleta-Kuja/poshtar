@@ -7,9 +7,11 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Memory;
 using poshtar.Entities;
 using poshtar.Extensions;
 using poshtar.Services;
+using poshtar.Smtp;
 using Serilog;
 using Serilog.Events;
 
@@ -190,6 +192,20 @@ public class Program
         {
             var dpProvider = scope.ServiceProvider.GetRequiredService<IDataProtectionProvider>();
             await db.InitializeDefaults(dpProvider);
+        }
+
+        var cache = scope.ServiceProvider.GetRequiredService<IMemoryCache>();
+        var blockedIps = await db.BlockedIps.ToListAsync();
+        var banDuration = TimeSpan.FromHours(C.Smtp.AntiSpamSettings.BanHours);
+        var now = DateTime.Now;
+        foreach (var blockedIp in blockedIps)
+        {
+            var elapsed = now - blockedIp.LastHit;
+            if (elapsed < banDuration)
+            {
+                var key = AntiSpam.GetBannedIpKey(blockedIp.Address);
+                cache.Set(key, blockedIp.Reason, banDuration - elapsed);
+            }
         }
     }
 }

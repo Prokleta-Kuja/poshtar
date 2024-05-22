@@ -2,34 +2,37 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using poshtar.Entities;
 
 #nullable disable
 
-namespace poshtar.Entities.Migrations.Postgres
+namespace poshtar.Entities.Migrations.Mysql
 {
-    [DbContext(typeof(PostgresDbContext))]
-    partial class PostgresDbContextModelSnapshot : ModelSnapshot
+    [DbContext(typeof(MysqlDbContext))]
+    [Migration("20240522130033_BlockedIps")]
+    partial class BlockedIps
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
                 .HasAnnotation("ProductVersion", "8.0.5")
-                .HasAnnotation("Relational:MaxIdentifierLength", 63);
+                .HasAnnotation("Relational:MaxIdentifierLength", 64);
 
-            NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
+            MySqlModelBuilderExtensions.AutoIncrementColumns(modelBuilder);
 
             modelBuilder.Entity("AddressUser", b =>
                 {
                     b.Property<int>("AddressesAddressId")
-                        .HasColumnType("integer")
+                        .HasColumnType("int")
                         .HasColumnName("addresses_address_id");
 
                     b.Property<int>("UsersUserId")
-                        .HasColumnType("integer")
+                        .HasColumnType("int")
                         .HasColumnName("users_user_id");
 
                     b.HasKey("AddressesAddressId", "UsersUserId")
@@ -45,17 +48,17 @@ namespace poshtar.Entities.Migrations.Postgres
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
+                        .HasColumnType("int")
                         .HasColumnName("id");
 
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("FriendlyName")
-                        .HasColumnType("text")
+                        .HasColumnType("longtext")
                         .HasColumnName("friendly_name");
 
                     b.Property<string>("Xml")
-                        .HasColumnType("text")
+                        .HasColumnType("longtext")
                         .HasColumnName("xml");
 
                     b.HasKey("Id")
@@ -68,36 +71,36 @@ namespace poshtar.Entities.Migrations.Postgres
                 {
                     b.Property<int>("AddressId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
+                        .HasColumnType("int")
                         .HasColumnName("address_id");
 
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("AddressId"));
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("AddressId"));
 
                     b.Property<string>("Description")
-                        .HasColumnType("text")
+                        .HasColumnType("longtext")
                         .HasColumnName("description");
 
                     b.Property<DateTime?>("Disabled")
-                        .HasColumnType("timestamp with time zone")
+                        .HasColumnType("datetime(6)")
                         .HasColumnName("disabled");
 
                     b.Property<int>("DomainId")
-                        .HasColumnType("integer")
+                        .HasColumnType("int")
                         .HasColumnName("domain_id");
 
                     b.Property<string>("Expression")
                         .ValueGeneratedOnAddOrUpdate()
-                        .HasColumnType("text")
+                        .HasColumnType("longtext")
                         .HasColumnName("expression")
                         .HasComputedColumnSql("CASE type WHEN 0 THEN pattern WHEN 1 THEN pattern || '%' WHEN 2 THEN '%' || pattern ELSE NULL END", true);
 
                     b.Property<string>("Pattern")
                         .IsRequired()
-                        .HasColumnType("text")
+                        .HasColumnType("longtext")
                         .HasColumnName("pattern");
 
                     b.Property<int>("Type")
-                        .HasColumnType("integer")
+                        .HasColumnType("int")
                         .HasColumnName("type");
 
                     b.HasKey("AddressId")
@@ -112,20 +115,20 @@ namespace poshtar.Entities.Migrations.Postgres
             modelBuilder.Entity("poshtar.Entities.BlockedIp", b =>
                 {
                     b.Property<string>("Address")
-                        .HasColumnType("text")
+                        .HasColumnType("varchar(255)")
                         .HasColumnName("address");
 
                     b.Property<DateTime>("BlockedOn")
-                        .HasColumnType("timestamp with time zone")
+                        .HasColumnType("datetime(6)")
                         .HasColumnName("blocked_on");
 
                     b.Property<DateTime>("LastHit")
-                        .HasColumnType("timestamp with time zone")
+                        .HasColumnType("datetime(6)")
                         .HasColumnName("last_hit");
 
                     b.Property<string>("Reason")
                         .IsRequired()
-                        .HasColumnType("text")
+                        .HasColumnType("longtext")
                         .HasColumnName("reason");
 
                     b.HasKey("Address")
@@ -138,14 +141,14 @@ namespace poshtar.Entities.Migrations.Postgres
                 {
                     b.Property<int>("CalendarId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
+                        .HasColumnType("int")
                         .HasColumnName("calendar_id");
 
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("CalendarId"));
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("CalendarId"));
 
                     b.Property<string>("DisplayName")
                         .IsRequired()
-                        .HasColumnType("text")
+                        .HasColumnType("longtext")
                         .HasColumnName("display_name");
 
                     b.HasKey("CalendarId")
@@ -158,38 +161,38 @@ namespace poshtar.Entities.Migrations.Postgres
                 {
                     b.Property<int>("CalendarObjectId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
+                        .HasColumnType("int")
                         .HasColumnName("calendar_object_id");
 
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("CalendarObjectId"));
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("CalendarObjectId"));
 
                     b.Property<int>("CalendarId")
-                        .HasColumnType("integer")
+                        .HasColumnType("int")
                         .HasColumnName("calendar_id");
 
                     b.Property<DateTime?>("Deleted")
-                        .HasColumnType("timestamp with time zone")
+                        .HasColumnType("datetime(6)")
                         .HasColumnName("deleted");
 
                     b.Property<string>("FileName")
                         .IsRequired()
-                        .HasColumnType("text")
+                        .HasColumnType("longtext")
                         .HasColumnName("file_name");
 
                     b.Property<DateTime?>("FirstOccurence")
-                        .HasColumnType("timestamp with time zone")
+                        .HasColumnType("datetime(6)")
                         .HasColumnName("first_occurence");
 
                     b.Property<DateTime?>("LastOccurence")
-                        .HasColumnType("timestamp with time zone")
+                        .HasColumnType("datetime(6)")
                         .HasColumnName("last_occurence");
 
                     b.Property<DateTime>("Modified")
-                        .HasColumnType("timestamp with time zone")
+                        .HasColumnType("datetime(6)")
                         .HasColumnName("modified");
 
                     b.Property<int>("Type")
-                        .HasColumnType("integer")
+                        .HasColumnType("int")
                         .HasColumnName("type");
 
                     b.HasKey("CalendarObjectId")
@@ -204,15 +207,15 @@ namespace poshtar.Entities.Migrations.Postgres
             modelBuilder.Entity("poshtar.Entities.CalendarUser", b =>
                 {
                     b.Property<int>("CalendarId")
-                        .HasColumnType("integer")
+                        .HasColumnType("int")
                         .HasColumnName("calendar_id");
 
                     b.Property<int>("UserId")
-                        .HasColumnType("integer")
+                        .HasColumnType("int")
                         .HasColumnName("user_id");
 
                     b.Property<bool>("CanWrite")
-                        .HasColumnType("boolean")
+                        .HasColumnType("tinyint(1)")
                         .HasColumnName("can_write");
 
                     b.HasKey("CalendarId", "UserId")
@@ -228,22 +231,22 @@ namespace poshtar.Entities.Migrations.Postgres
                 {
                     b.Property<int>("DomainId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
+                        .HasColumnType("int")
                         .HasColumnName("domain_id");
 
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("DomainId"));
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("DomainId"));
 
                     b.Property<DateTime?>("Disabled")
-                        .HasColumnType("timestamp with time zone")
+                        .HasColumnType("datetime(6)")
                         .HasColumnName("disabled");
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("text")
+                        .HasColumnType("varchar(255)")
                         .HasColumnName("name");
 
                     b.Property<int?>("RelayId")
-                        .HasColumnType("integer")
+                        .HasColumnType("int")
                         .HasColumnName("relay_id");
 
                     b.HasKey("DomainId")
@@ -262,26 +265,26 @@ namespace poshtar.Entities.Migrations.Postgres
                 {
                     b.Property<int>("LogEntryId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
+                        .HasColumnType("int")
                         .HasColumnName("log_entry_id");
 
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("LogEntryId"));
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("LogEntryId"));
 
                     b.Property<string>("Message")
                         .IsRequired()
-                        .HasColumnType("text")
+                        .HasColumnType("longtext")
                         .HasColumnName("message");
 
                     b.Property<string>("Properties")
-                        .HasColumnType("text")
+                        .HasColumnType("longtext")
                         .HasColumnName("properties");
 
                     b.Property<DateTime>("Timestamp")
-                        .HasColumnType("timestamp with time zone")
+                        .HasColumnType("datetime(6)")
                         .HasColumnName("timestamp");
 
                     b.Property<int>("TransactionId")
-                        .HasColumnType("integer")
+                        .HasColumnType("int")
                         .HasColumnName("transaction_id");
 
                     b.HasKey("LogEntryId")
@@ -297,26 +300,26 @@ namespace poshtar.Entities.Migrations.Postgres
                 {
                     b.Property<int>("RecipientId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
+                        .HasColumnType("int")
                         .HasColumnName("recipient_id");
 
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("RecipientId"));
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("RecipientId"));
 
                     b.Property<string>("Data")
                         .IsRequired()
-                        .HasColumnType("text")
+                        .HasColumnType("longtext")
                         .HasColumnName("data");
 
                     b.Property<bool>("Delivered")
-                        .HasColumnType("boolean")
+                        .HasColumnType("tinyint(1)")
                         .HasColumnName("delivered");
 
                     b.Property<int>("TransactionId")
-                        .HasColumnType("integer")
+                        .HasColumnType("int")
                         .HasColumnName("transaction_id");
 
                     b.Property<int?>("UserId")
-                        .HasColumnType("integer")
+                        .HasColumnType("int")
                         .HasColumnName("user_id");
 
                     b.HasKey("RecipientId")
@@ -335,37 +338,37 @@ namespace poshtar.Entities.Migrations.Postgres
                 {
                     b.Property<int>("RelayId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
+                        .HasColumnType("int")
                         .HasColumnName("relay_id");
 
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("RelayId"));
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("RelayId"));
 
                     b.Property<DateTime?>("Disabled")
-                        .HasColumnType("timestamp with time zone")
+                        .HasColumnType("datetime(6)")
                         .HasColumnName("disabled");
 
                     b.Property<string>("Host")
                         .IsRequired()
-                        .HasColumnType("text")
+                        .HasColumnType("longtext")
                         .HasColumnName("host");
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("text")
+                        .HasColumnType("varchar(255)")
                         .HasColumnName("name");
 
                     b.Property<string>("Password")
                         .IsRequired()
-                        .HasColumnType("text")
+                        .HasColumnType("longtext")
                         .HasColumnName("password");
 
                     b.Property<int>("Port")
-                        .HasColumnType("integer")
+                        .HasColumnType("int")
                         .HasColumnName("port");
 
                     b.Property<string>("Username")
                         .IsRequired()
-                        .HasColumnType("text")
+                        .HasColumnType("longtext")
                         .HasColumnName("username");
 
                     b.HasKey("RelayId")
@@ -381,57 +384,57 @@ namespace poshtar.Entities.Migrations.Postgres
                 {
                     b.Property<int>("TransactionId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
+                        .HasColumnType("int")
                         .HasColumnName("transaction_id");
 
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("TransactionId"));
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("TransactionId"));
 
                     b.Property<string>("Asn")
-                        .HasColumnType("text")
+                        .HasColumnType("longtext")
                         .HasColumnName("asn");
 
                     b.Property<string>("Client")
-                        .HasColumnType("text")
+                        .HasColumnType("longtext")
                         .HasColumnName("client");
 
                     b.Property<Guid>("ConnectionId")
-                        .HasColumnType("uuid")
+                        .HasColumnType("char(36)")
                         .HasColumnName("connection_id");
 
                     b.Property<string>("CountryCode")
-                        .HasColumnType("text")
+                        .HasColumnType("longtext")
                         .HasColumnName("country_code");
 
                     b.Property<string>("CountryName")
-                        .HasColumnType("text")
+                        .HasColumnType("longtext")
                         .HasColumnName("country_name");
 
                     b.Property<DateTime>("End")
-                        .HasColumnType("timestamp with time zone")
+                        .HasColumnType("datetime(6)")
                         .HasColumnName("end");
 
                     b.Property<string>("From")
-                        .HasColumnType("text")
+                        .HasColumnType("longtext")
                         .HasColumnName("from");
 
                     b.Property<int?>("FromUserId")
-                        .HasColumnType("integer")
+                        .HasColumnType("int")
                         .HasColumnName("from_user_id");
 
                     b.Property<string>("IpAddress")
-                        .HasColumnType("text")
+                        .HasColumnType("longtext")
                         .HasColumnName("ip_address");
 
                     b.Property<bool>("Secure")
-                        .HasColumnType("boolean")
+                        .HasColumnType("tinyint(1)")
                         .HasColumnName("secure");
 
                     b.Property<DateTime>("Start")
-                        .HasColumnType("timestamp with time zone")
+                        .HasColumnType("datetime(6)")
                         .HasColumnName("start");
 
                     b.Property<bool>("Submission")
-                        .HasColumnType("boolean")
+                        .HasColumnType("tinyint(1)")
                         .HasColumnName("submission");
 
                     b.HasKey("TransactionId")
@@ -447,49 +450,49 @@ namespace poshtar.Entities.Migrations.Postgres
                 {
                     b.Property<int>("UserId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
+                        .HasColumnType("int")
                         .HasColumnName("user_id");
 
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("UserId"));
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("UserId"));
 
                     b.Property<string>("Description")
-                        .HasColumnType("text")
+                        .HasColumnType("longtext")
                         .HasColumnName("description");
 
                     b.Property<DateTime?>("Disabled")
-                        .HasColumnType("timestamp with time zone")
+                        .HasColumnType("datetime(6)")
                         .HasColumnName("disabled");
 
                     b.Property<string>("Hash")
                         .IsRequired()
-                        .HasColumnType("text")
+                        .HasColumnType("longtext")
                         .HasColumnName("hash");
 
                     b.Property<bool>("IsMaster")
-                        .HasColumnType("boolean")
+                        .HasColumnType("tinyint(1)")
                         .HasColumnName("is_master");
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("text")
+                        .HasColumnType("longtext")
                         .HasColumnName("name");
 
                     b.Property<byte[]>("OtpKey")
-                        .HasColumnType("bytea")
+                        .HasColumnType("longblob")
                         .HasColumnName("otp_key");
 
                     b.Property<string>("Password")
                         .IsRequired()
-                        .HasColumnType("text")
+                        .HasColumnType("longtext")
                         .HasColumnName("password");
 
                     b.Property<int?>("Quota")
-                        .HasColumnType("integer")
+                        .HasColumnType("int")
                         .HasColumnName("quota");
 
                     b.Property<string>("Salt")
                         .IsRequired()
-                        .HasColumnType("text")
+                        .HasColumnType("longtext")
                         .HasColumnName("salt");
 
                     b.HasKey("UserId")

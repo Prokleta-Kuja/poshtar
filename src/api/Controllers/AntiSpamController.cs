@@ -29,8 +29,8 @@ public class AntiSpamController : ControllerBase
     [ProducesResponseType(typeof(ValidationError), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> PutAsync(AntiSpamSettings model)
     {
-        if (model.BanMinutes < 0)
-            model.BanMinutes = 0;
+        if (model.BanHours < 0)
+            model.BanHours = 0;
 
         if (model.TarpitSeconds < 0)
             model.TarpitSeconds = 0;

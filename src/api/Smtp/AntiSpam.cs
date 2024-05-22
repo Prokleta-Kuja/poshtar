@@ -9,7 +9,7 @@ namespace poshtar.Smtp;
 
 public class AntiSpamSettings
 {
-    public int BanMinutes { get; set; } = 60;
+    public int BanHours { get; set; } = 48;
     public int TarpitSeconds { get; set; } = 60;
     public bool EnableFCrDNSWorkarounds { get; set; }
 
@@ -51,16 +51,23 @@ public class AntiSpamSettings
 }
 public static class AntiSpam
 {
-    static string GetBannedIpKey(string ip) => $"ipban.{ip}";
+    public static string GetBannedIpKey(string ip) => $"ipban.{ip}";
     static void BanIp(this SessionContext ctx, string message)
     {
-        if (string.IsNullOrWhiteSpace(ctx.Transaction.IpAddress) || C.Smtp.AntiSpamSettings.BanMinutes <= 0)
+        if (string.IsNullOrWhiteSpace(ctx.Transaction.IpAddress) || C.Smtp.AntiSpamSettings.BanHours <= 0)
             return;
 
         var key = GetBannedIpKey(ctx.Transaction.IpAddress);
         var cache = ctx.ServiceScope.ServiceProvider.GetRequiredService<IMemoryCache>();
-        cache.Set(key, message, TimeSpan.FromMinutes(C.Smtp.AntiSpamSettings.BanMinutes));
-        ctx.Log($"Banned IP for {C.Smtp.AntiSpamSettings.BanMinutes} minutes");
+        cache.Set(key, message, TimeSpan.FromHours(C.Smtp.AntiSpamSettings.BanHours));
+        ctx.Db.BlockedIps.Add(new Entities.BlockedIp
+        {
+            Address = ctx.Transaction.IpAddress,
+            Reason = message,
+            BlockedOn = DateTime.UtcNow,
+            LastHit = DateTime.UtcNow,
+        });
+        ctx.Log($"Banned IP for {C.Smtp.AntiSpamSettings.BanHours} hours");
     }
     public static bool IsBannedIp(this SessionContext ctx)
     {

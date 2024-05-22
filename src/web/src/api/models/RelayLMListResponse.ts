@@ -1,10 +1,8 @@
-/* generated using openapi-typescript-codegen -- do no edit */
+/* generated using openapi-typescript-codegen -- do not edit */
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-
 import type { RelayLM } from './RelayLM';
-
 export type RelayLMListResponse = {
     items: Array<RelayLM>;
     size: number;

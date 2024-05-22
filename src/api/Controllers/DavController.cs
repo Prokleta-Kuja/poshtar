@@ -86,7 +86,7 @@ public class DavController : ControllerBase
             )
         );
 
-        Response.Headers.Add("DAV", string.Join(", ", "1", "2", "3", "calendar-access"));
+        Response.Headers.Append("DAV", string.Join(", ", "1", "2", "3", "calendar-access"));
         Response.ContentType = "text/xml";
         Response.StatusCode = StatusCodes.Status207MultiStatus;
         using var stream = Response.BodyWriter.AsStream();
@@ -145,7 +145,7 @@ public class DavController : ControllerBase
             )
         );
 
-        Response.Headers.Add("DAV", string.Join(", ", "1", "2", "3", "calendar-access"));
+        Response.Headers.Append("DAV", string.Join(", ", "1", "2", "3", "calendar-access"));
         Response.ContentType = "text/xml";
         Response.StatusCode = StatusCodes.Status207MultiStatus;
         using var stream = Response.BodyWriter.AsStream();
@@ -225,7 +225,7 @@ public class DavController : ControllerBase
             )
         );
 
-        Response.Headers.Add("DAV", string.Join(", ", "1", "2", "3", "calendar-access"));
+        Response.Headers.Append("DAV", string.Join(", ", "1", "2", "3", "calendar-access"));
         Response.ContentType = "text/xml";
         Response.StatusCode = StatusCodes.Status207MultiStatus;
         using var stream = Response.BodyWriter.AsStream();
@@ -382,7 +382,7 @@ X.nsDav.Element("response",
         }
 
         _logger.LogDebug("OPTIONS 200");
-        Response.Headers.Add("DAV", string.Join(", ", "1", "2", "3", "calendar-access"));
+        Response.Headers.Append("DAV", string.Join(", ", "1", "2", "3", "calendar-access"));
         Response.Headers.Allow = "OPTIONS, HEAD, DELETE, PROPFIND, PUT, REPORT";
         return Ok();
     }
@@ -512,7 +512,7 @@ X.nsDav.Element("response",
             )
         );
 
-        Response.Headers.Add("DAV", string.Join(", ", "1", "2", "3", "calendar-access"));
+        Response.Headers.Append("DAV", string.Join(", ", "1", "2", "3", "calendar-access"));
         Response.ContentType = "text/xml";
         Response.StatusCode = StatusCodes.Status207MultiStatus;
         using var stream = Response.BodyWriter.AsStream();
@@ -555,7 +555,7 @@ X.nsDav.Element("response",
         if (!System.IO.File.Exists(path))
             return NotFound();
 
-        Response.Headers.Add("DAV", string.Join(", ", "1", "2", "3", "calendar-access"));
+        Response.Headers.Append("DAV", string.Join(", ", "1", "2", "3", "calendar-access"));
         Response.ContentType = "text/calendar";
         Response.StatusCode = StatusCodes.Status200OK;
         using var fs = System.IO.File.OpenRead(path);

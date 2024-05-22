@@ -59,14 +59,14 @@ load()
             />
             <IntegerBox
               class="mb-3"
-              label="Ban time in minutes"
-              v-model="settings.model.banMinutes"
+              label="Ban time in hours"
+              v-model="settings.model.banHours"
               required
-              :error="settings.error?.errors?.banMinutes"
+              :error="settings.error?.errors?.banHours"
             />
           </fieldset>
           <fieldset>
-            <legend c>Command failure</legend>
+            <legend>Command failure</legend>
             <IntegerBox
               class="mb-3"
               label="Consecutive fail count"

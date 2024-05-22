@@ -3,7 +3,6 @@
 - a way to see dovecot log
 - loading indicator na stranicama
 - Toasts
-- Block lists (ASN, Country code, Client, From)
 
 # Important dovecot conf
 

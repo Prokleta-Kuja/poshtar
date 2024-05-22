@@ -1,4 +1,4 @@
-/* generated using openapi-typescript-codegen -- do no edit */
+/* generated using openapi-typescript-codegen -- do not edit */
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
@@ -6,15 +6,12 @@ import type { AuthStatusModel } from '../models/AuthStatusModel';
 import type { LoginModel } from '../models/LoginModel';
 import type { TotpCM } from '../models/TotpCM';
 import type { TotpVM } from '../models/TotpVM';
-
 import type { CancelablePromise } from '../core/CancelablePromise';
 import { OpenAPI } from '../core/OpenAPI';
 import { request as __request } from '../core/request';
-
 export class AuthService {
-
     /**
-     * @returns AuthStatusModel Success
+     * @returns AuthStatusModel OK
      * @throws ApiError
      */
     public static status(): CancelablePromise<AuthStatusModel> {
@@ -23,9 +20,8 @@ export class AuthService {
             url: '/api/auth',
         });
     }
-
     /**
-     * @returns AuthStatusModel Success
+     * @returns AuthStatusModel OK
      * @throws ApiError
      */
     public static autoLogin(): CancelablePromise<AuthStatusModel> {
@@ -37,9 +33,8 @@ export class AuthService {
             },
         });
     }
-
     /**
-     * @returns AuthStatusModel Success
+     * @returns AuthStatusModel OK
      * @throws ApiError
      */
     public static login({
@@ -57,7 +52,6 @@ export class AuthService {
             },
         });
     }
-
     /**
      * @returns void
      * @throws ApiError
@@ -71,9 +65,8 @@ export class AuthService {
             },
         });
     }
-
     /**
-     * @returns TotpVM Success
+     * @returns TotpVM OK
      * @throws ApiError
      */
     public static getTotp(): CancelablePromise<TotpVM> {
@@ -82,9 +75,8 @@ export class AuthService {
             url: '/api/auth/totp',
         });
     }
-
     /**
-     * @returns any Success
+     * @returns any OK
      * @throws ApiError
      */
     public static saveTotp({
@@ -99,5 +91,4 @@ export class AuthService {
             mediaType: 'application/json',
         });
     }
-
 }

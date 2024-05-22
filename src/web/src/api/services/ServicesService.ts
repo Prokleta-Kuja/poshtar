@@ -1,18 +1,15 @@
-/* generated using openapi-typescript-codegen -- do no edit */
+/* generated using openapi-typescript-codegen -- do not edit */
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
 import type { ServiceRequestModel } from '../models/ServiceRequestModel';
 import type { ServiceResultModel } from '../models/ServiceResultModel';
-
 import type { CancelablePromise } from '../core/CancelablePromise';
 import { OpenAPI } from '../core/OpenAPI';
 import { request as __request } from '../core/request';
-
 export class ServicesService {
-
     /**
-     * @returns ServiceResultModel Success
+     * @returns ServiceResultModel OK
      * @throws ApiError
      */
     public static request({
@@ -30,5 +27,4 @@ export class ServicesService {
             },
         });
     }
-
 }

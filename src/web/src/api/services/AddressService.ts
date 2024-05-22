@@ -1,4 +1,4 @@
-/* generated using openapi-typescript-codegen -- do no edit */
+/* generated using openapi-typescript-codegen -- do not edit */
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
@@ -6,15 +6,12 @@ import type { AddressCM } from '../models/AddressCM';
 import type { AddressLMListResponse } from '../models/AddressLMListResponse';
 import type { AddressUM } from '../models/AddressUM';
 import type { AddressVM } from '../models/AddressVM';
-
 import type { CancelablePromise } from '../core/CancelablePromise';
 import { OpenAPI } from '../core/OpenAPI';
 import { request as __request } from '../core/request';
-
 export class AddressService {
-
     /**
-     * @returns AddressLMListResponse Success
+     * @returns AddressLMListResponse OK
      * @throws ApiError
      */
     public static getAddresses({
@@ -51,9 +48,8 @@ export class AddressService {
             },
         });
     }
-
     /**
-     * @returns AddressVM Success
+     * @returns AddressVM OK
      * @throws ApiError
      */
     public static createAddress({
@@ -71,9 +67,8 @@ export class AddressService {
             },
         });
     }
-
     /**
-     * @returns AddressVM Success
+     * @returns AddressVM OK
      * @throws ApiError
      */
     public static getAddress({
@@ -92,9 +87,8 @@ export class AddressService {
             },
         });
     }
-
     /**
-     * @returns AddressVM Success
+     * @returns AddressVM OK
      * @throws ApiError
      */
     public static updateAddress({
@@ -118,7 +112,6 @@ export class AddressService {
             },
         });
     }
-
     /**
      * @returns void
      * @throws ApiError
@@ -139,7 +132,6 @@ export class AddressService {
             },
         });
     }
-
     /**
      * @returns void
      * @throws ApiError
@@ -164,7 +156,6 @@ export class AddressService {
             },
         });
     }
-
     /**
      * @returns void
      * @throws ApiError
@@ -189,5 +180,4 @@ export class AddressService {
             },
         });
     }
-
 }

@@ -1,19 +1,16 @@
-/* generated using openapi-typescript-codegen -- do no edit */
+/* generated using openapi-typescript-codegen -- do not edit */
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
 import type { LogEntryLMListResponse } from '../models/LogEntryLMListResponse';
 import type { RecipientLMListResponse } from '../models/RecipientLMListResponse';
 import type { TransactionLMListResponse } from '../models/TransactionLMListResponse';
-
 import type { CancelablePromise } from '../core/CancelablePromise';
 import { OpenAPI } from '../core/OpenAPI';
 import { request as __request } from '../core/request';
-
 export class TransactionService {
-
     /**
-     * @returns TransactionLMListResponse Success
+     * @returns TransactionLMListResponse OK
      * @throws ApiError
      */
     public static getTransactions({
@@ -62,9 +59,8 @@ export class TransactionService {
             },
         });
     }
-
     /**
-     * @returns LogEntryLMListResponse Success
+     * @returns LogEntryLMListResponse OK
      * @throws ApiError
      */
     public static getLogs({
@@ -97,9 +93,8 @@ export class TransactionService {
             },
         });
     }
-
     /**
-     * @returns RecipientLMListResponse Success
+     * @returns RecipientLMListResponse OK
      * @throws ApiError
      */
     public static getRecipients({
@@ -132,7 +127,6 @@ export class TransactionService {
             },
         });
     }
-
     /**
      * @returns void
      * @throws ApiError
@@ -153,5 +147,4 @@ export class TransactionService {
             },
         });
     }
-
 }

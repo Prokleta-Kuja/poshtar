@@ -31,6 +31,7 @@ public class MysqlDbContext : AppDbContext
 public partial class AppDbContext : DbContext, IDataProtectionKeyContext
 {
     public DbSet<DataProtectionKey> DataProtectionKeys { get; set; } = null!;
+    public DbSet<BlockedIp> BlockedIps => Set<BlockedIp>();
     public DbSet<Address> Addresses => Set<Address>();
     public DbSet<Domain> Domains => Set<Domain>();
     public DbSet<Relay> Relays => Set<Relay>();
@@ -54,6 +55,11 @@ public partial class AppDbContext : DbContext, IDataProtectionKeyContext
     protected override void OnModelCreating(ModelBuilder builder)
     {
         base.OnModelCreating(builder);
+
+        builder.Entity<BlockedIp>(e =>
+        {
+            e.HasKey(e => e.Address);
+        });
 
         builder.Entity<Address>(e =>
         {

@@ -1,4 +1,4 @@
-/* generated using openapi-typescript-codegen -- do no edit */
+/* generated using openapi-typescript-codegen -- do not edit */
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
@@ -6,15 +6,12 @@ import type { UserCM } from '../models/UserCM';
 import type { UserLMListResponse } from '../models/UserLMListResponse';
 import type { UserUM } from '../models/UserUM';
 import type { UserVM } from '../models/UserVM';
-
 import type { CancelablePromise } from '../core/CancelablePromise';
 import { OpenAPI } from '../core/OpenAPI';
 import { request as __request } from '../core/request';
-
 export class UserService {
-
     /**
-     * @returns UserLMListResponse Success
+     * @returns UserLMListResponse OK
      * @throws ApiError
      */
     public static getUsers({
@@ -48,9 +45,8 @@ export class UserService {
             },
         });
     }
-
     /**
-     * @returns UserVM Success
+     * @returns UserVM OK
      * @throws ApiError
      */
     public static createUser({
@@ -68,9 +64,8 @@ export class UserService {
             },
         });
     }
-
     /**
-     * @returns UserVM Success
+     * @returns UserVM OK
      * @throws ApiError
      */
     public static getUser({
@@ -89,9 +84,8 @@ export class UserService {
             },
         });
     }
-
     /**
-     * @returns UserVM Success
+     * @returns UserVM OK
      * @throws ApiError
      */
     public static updateUser({
@@ -115,7 +109,6 @@ export class UserService {
             },
         });
     }
-
     /**
      * @returns void
      * @throws ApiError
@@ -136,5 +129,4 @@ export class UserService {
             },
         });
     }
-
 }

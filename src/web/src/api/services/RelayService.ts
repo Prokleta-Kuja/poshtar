@@ -1,4 +1,4 @@
-/* generated using openapi-typescript-codegen -- do no edit */
+/* generated using openapi-typescript-codegen -- do not edit */
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
@@ -6,15 +6,12 @@ import type { RelayCM } from '../models/RelayCM';
 import type { RelayLMListResponse } from '../models/RelayLMListResponse';
 import type { RelayUM } from '../models/RelayUM';
 import type { RelayVM } from '../models/RelayVM';
-
 import type { CancelablePromise } from '../core/CancelablePromise';
 import { OpenAPI } from '../core/OpenAPI';
 import { request as __request } from '../core/request';
-
 export class RelayService {
-
     /**
-     * @returns RelayLMListResponse Success
+     * @returns RelayLMListResponse OK
      * @throws ApiError
      */
     public static getRelays({
@@ -42,9 +39,8 @@ export class RelayService {
             },
         });
     }
-
     /**
-     * @returns RelayVM Success
+     * @returns RelayVM OK
      * @throws ApiError
      */
     public static createRelay({
@@ -62,9 +58,8 @@ export class RelayService {
             },
         });
     }
-
     /**
-     * @returns RelayVM Success
+     * @returns RelayVM OK
      * @throws ApiError
      */
     public static getRelay({
@@ -83,9 +78,8 @@ export class RelayService {
             },
         });
     }
-
     /**
-     * @returns RelayVM Success
+     * @returns RelayVM OK
      * @throws ApiError
      */
     public static updateRelay({
@@ -109,7 +103,6 @@ export class RelayService {
             },
         });
     }
-
     /**
      * @returns void
      * @throws ApiError
@@ -130,5 +123,4 @@ export class RelayService {
             },
         });
     }
-
 }

@@ -1,4 +1,4 @@
-/* generated using openapi-typescript-codegen -- do no edit */
+/* generated using openapi-typescript-codegen -- do not edit */
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
@@ -7,15 +7,12 @@ import type { CalendarLMListResponse } from '../models/CalendarLMListResponse';
 import type { CalendarUM } from '../models/CalendarUM';
 import type { CalendarUserSMListResponse } from '../models/CalendarUserSMListResponse';
 import type { CalendarVM } from '../models/CalendarVM';
-
 import type { CancelablePromise } from '../core/CancelablePromise';
 import { OpenAPI } from '../core/OpenAPI';
 import { request as __request } from '../core/request';
-
 export class CalendarService {
-
     /**
-     * @returns CalendarLMListResponse Success
+     * @returns CalendarLMListResponse OK
      * @throws ApiError
      */
     public static getCalendars({
@@ -43,9 +40,8 @@ export class CalendarService {
             },
         });
     }
-
     /**
-     * @returns CalendarVM Success
+     * @returns CalendarVM OK
      * @throws ApiError
      */
     public static createCalendar({
@@ -63,9 +59,8 @@ export class CalendarService {
             },
         });
     }
-
     /**
-     * @returns CalendarVM Success
+     * @returns CalendarVM OK
      * @throws ApiError
      */
     public static getCalendar({
@@ -84,9 +79,8 @@ export class CalendarService {
             },
         });
     }
-
     /**
-     * @returns CalendarVM Success
+     * @returns CalendarVM OK
      * @throws ApiError
      */
     public static updateCalendar({
@@ -110,7 +104,6 @@ export class CalendarService {
             },
         });
     }
-
     /**
      * @returns void
      * @throws ApiError
@@ -131,9 +124,8 @@ export class CalendarService {
             },
         });
     }
-
     /**
-     * @returns CalendarUserSMListResponse Success
+     * @returns CalendarUserSMListResponse OK
      * @throws ApiError
      */
     public static getCalendarAddableUsers({
@@ -166,7 +158,6 @@ export class CalendarService {
             },
         });
     }
-
     /**
      * @returns void
      * @throws ApiError
@@ -196,7 +187,6 @@ export class CalendarService {
             },
         });
     }
-
     /**
      * @returns void
      * @throws ApiError
@@ -221,5 +211,4 @@ export class CalendarService {
             },
         });
     }
-
 }
